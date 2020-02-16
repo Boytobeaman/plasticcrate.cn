@@ -260,5 +260,3 @@ if ( ! function_exists( 'woocommerce_template_loop_product_thumbnail_custom' ) )
     </div>
   </div>
 </div>
-
-<?php
