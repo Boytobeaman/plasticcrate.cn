@@ -243,9 +243,8 @@ if ( ! function_exists( 'woocommerce_template_loop_product_thumbnail_custom' ) )
 	}
 }
 
-?>
 
-<div id="contactUs" class="modal fade" role="dialog">
+echo '<div id="contactUs" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -254,9 +253,9 @@ if ( ! function_exists( 'woocommerce_template_loop_product_thumbnail_custom' ) )
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4 class="modal-title">Request a Free Quote</h4>
       </div>
-      <div class="modal-body">
+      <div class="modal-body">'
 		<?php echo do_shortcode( '[contact-form-7 id="244" title="Contact form 1"]' ); ?>
-      </div>
+		echo'</div>
     </div>
   </div>
-</div>
+</div>'
