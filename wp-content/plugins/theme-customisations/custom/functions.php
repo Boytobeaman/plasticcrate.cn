@@ -247,19 +247,19 @@ if ( ! function_exists( 'woocommerce_template_loop_product_thumbnail_custom' ) )
 
 function add_contact_modal() {
 	echo '<div id="contactUs" class="modal fade" role="dialog">
-	<div class="modal-dialog">
+					<div class="modal-dialog">
 
-		<!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Request a Free Quote</h4>
-			</div>
-			<div class="modal-body">' .
-		<?php echo do_shortcode( '[contact-form-7 id="244" title="Contact form 1"]' ); ?>
-			. echo'</div>
-		</div>
-	</div>
-</div>'
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Request a Free Quote</h4>
+							</div>
+							<div class="modal-body">'
+							. do_shortcode( '[contact-form-7 id="244" title="Contact form 1"]' ) .'
+							</div>
+						</div>
+					</div>
+				</div>'
 }
 add_action( 'wp_footer', 'add_contact_modal' );
