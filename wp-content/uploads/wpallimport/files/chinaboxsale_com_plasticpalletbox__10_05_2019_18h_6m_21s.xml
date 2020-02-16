@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 4.4.15.10
+- https://www.phpmyadmin.net
+-
+- Host: localhost
+- Generation Time: Oct 05, 2019 at 06:13 PM
+- Server version: 10.2.7-MariaDB-log
+- PHP Version: 7.1.8
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="nodedb" collation="utf8_general_ci" charset="utf8">
+            <pma:table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+                CREATE TABLE `movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `post_title` varchar(255) DEFAULT NULL,
+                  `model` varchar(255) DEFAULT NULL,
+                  `external_long` varchar(255) DEFAULT NULL,
+                  `external_width` varchar(255) DEFAULT NULL,
+                  `external_height` varchar(255) DEFAULT NULL,
+                  `internal_long` varchar(255) DEFAULT NULL,
+                  `internal_width` varchar(255) DEFAULT NULL,
+                  `internal_height` varchar(255) DEFAULT NULL,
+                  `foldedHeight` varchar(255) DEFAULT NULL,
+                  `volumn` varchar(255) DEFAULT NULL,
+                  `weight` varchar(255) DEFAULT NULL,
+                  `img_path` longtext DEFAULT NULL,
+                  `backlinks` longtext DEFAULT NULL,
+                  `product_category` varchar(255) DEFAULT NULL,
+                  `tags` varchar(255) DEFAULT NULL,
+                  `post_title_slug` varchar(255) DEFAULT NULL,
+                  `static_load` varchar(255) DEFAULT NULL,
+                  `dynamic_load` varchar(255) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Database: 'nodedb'
+    -->
+    <database name="nodedb">
+        <!-- Table movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s -->
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">1</column>
+            <column name="post_title">bulk plastic containers</column>
+            <column name="model">solid wall 1210 -760</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">760</column>
+            <column name="internal_long">1110</column>
+            <column name="internal_width">910</column>
+            <column name="internal_height">600</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">606</column>
+            <column name="weight">36</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/b73a2ead18d74ce0adcd2679b322bc6d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/ea7ed7e4eca34599a4cb2ecfb08799ba.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/384290f1adcb454d92d363b9119acc4d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/028d267fce8342debdf6e8282fed8904.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/37443128084c4c7499811521e9fe3534.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">pallet container,plastic pallet box</column>
+            <column name="post_title_slug">bulk-plastic-containers</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">2</column>
+            <column name="post_title">bulk plastic storage containers</column>
+            <column name="model">mesh wall 1210-760</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">760</column>
+            <column name="internal_long">1100</column>
+            <column name="internal_width">910</column>
+            <column name="internal_height">600</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">606</column>
+            <column name="weight">34</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/72f2d30afeb84e9cb6b81a184836795e.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/6553b563718647e3bdaebc61f3bfb63b.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3549bcf851ed448e9b48260bc8cc7d5c.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/848ee3b188a846bc848ad7804d196492.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">pallet container,plastic pallet box</column>
+            <column name="post_title_slug">bulk-plastic-storage-containers</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">3</column>
+            <column name="post_title">plastic bulk containers</column>
+            <column name="model">foldable 1210-590</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">590</column>
+            <column name="internal_long">1110</column>
+            <column name="internal_width">910</column>
+            <column name="internal_height">405</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">409</column>
+            <column name="weight">50.9</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/bd4ac392f0d34c9b889341f7de8d5859.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/c42d66b5dc49483295f21a1d9eb8f70b.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/abf032146f4f4a0f852f016643bb54ca.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/93667a4641064678bc9c5ea9117a90b9.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable pallet container,plastic pallet box </column>
+            <column name="post_title_slug">plastic-bulk-containers</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">4</column>
+            <column name="post_title">reusable bulk container</column>
+            <column name="model">foldable 1210-810 mesh</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">810</column>
+            <column name="internal_long">1120</column>
+            <column name="internal_width">920</column>
+            <column name="internal_height">665</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">685</column>
+            <column name="weight">42</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/ed78099ed0884019bca9756847c20c48.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/bacfe53c91a04b87b9dd3b9be9cbbaa7.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/fe9ef00b7bfe4aa7b47918467db389ad.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/65cbc89cf7054c7eb9cd1b2004e99f81.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/93be3c629f2648ee945e901f62d3e1bc.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable pallet container,plastic pallet box </column>
+            <column name="post_title_slug">reusable-bulk-container</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">5</column>
+            <column name="post_title">plastic bulk containers with lids</column>
+            <column name="model">foldable 1210-1000 </column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">1000</column>
+            <column name="internal_long">1117</column>
+            <column name="internal_width">918</column>
+            <column name="internal_height">865</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">886</column>
+            <column name="weight">58</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/249ef51d0d1d43979dee79f7fedd8e49.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/12e9556870ae4514af17d36fec093249.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/1b5f592616f04c5f99531fe18e86cc26.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/506efd9eb44942508c47e0fa44b5a94f.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable pallet container,plastic pallet box </column>
+            <column name="post_title_slug">plastic-bulk-containers-with-lids</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">6</column>
+            <column name="post_title">bulk plastic containers with lids</column>
+            <column name="model">foldable 1210-760</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">760</column>
+            <column name="internal_long">1126</column>
+            <column name="internal_width">926</column>
+            <column name="internal_height">593</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">618</column>
+            <column name="weight">39</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/33950654cfb74cc6992c2a5d3ae59102.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3e9e8d921e174e98a1f689bf32e9e0b4.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/04e2f020b822458bbce341e6ef68272d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/159be7af79294ca8bfce363ff4b883a1.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/176bda54f55a4bbfa74291a4834bc65b.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable pallet container,plastic pallet box</column>
+            <column name="post_title_slug">bulk-plastic-containers-with-lids</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">7</column>
+            <column name="post_title">bulk plastic storage containers with lids</column>
+            <column name="model">foldable 1140-985</column>
+            <column name="external_long">1140</column>
+            <column name="external_width">980</column>
+            <column name="external_height">1050</column>
+            <column name="internal_long">1063</column>
+            <column name="internal_width">903</column>
+            <column name="internal_height">915</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">878</column>
+            <column name="weight">53</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/2cb801cee87a490bb93a0bf258caf4bd.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/c1be5a4f8af34f838bcdf402044d0912.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable pallet container,plastic pallet box</column>
+            <column name="post_title_slug">bulk-plastic-storage-containers-with-lids</column>
+            <column name="static_load">4</column>
+            <column name="dynamic_load">1</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">8</column>
+            <column name="post_title">pallets and containers</column>
+            <column name="model">1150-985</column>
+            <column name="external_long">1150</column>
+            <column name="external_width">985</column>
+            <column name="external_height">1100</column>
+            <column name="internal_long">1106</column>
+            <column name="internal_width">940</column>
+            <column name="internal_height">930</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">966</column>
+            <column name="weight">30</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/f2836b3bc1b2480d8ed399abcfe207ef.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/f6a8a583bc884fa2acc7543057d51c07.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/1485feee01354bf9b2da9445c0e53452.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/8febd2e790a1406480403968c6c67bef.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/623a17071bad4a7591079a1527a905ce.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable coaming box,corrugated pallet box,collapsible storage coaming box with lid</column>
+            <column name="post_title_slug">pallets-and-containers</column>
+            <column name="static_load">1.5</column>
+            <column name="dynamic_load">0.35</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">9</column>
+            <column name="post_title">plastic bulk storage containers</column>
+            <column name="model">1200-800</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">800</column>
+            <column name="external_height">710</column>
+            <column name="internal_long">1140</column>
+            <column name="internal_width">740</column>
+            <column name="internal_height">585</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">493</column>
+            <column name="weight">30</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9c9a4ca2dc71460e9423ca11dbdb77c6.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/8eb88ea82cc54fdfbfc26658ac7b3656.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/e8272290254d4baeaddb9a03f0c31f0e.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/24b8d23bced34321bc9c19b7b0568c80.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/2f73b5e45624431bbc735b438dbd4d9f.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable coaming box,corrugated pallet box,collapsible plastic pallet box</column>
+            <column name="post_title_slug">plastic-bulk-storage-containers</column>
+            <column name="static_load">1.5</column>
+            <column name="dynamic_load">0.35</column>
+        </table>
+        <table name="movingboxsale_com_plasticpalletbox__10_05_2019_18h_6m_21s">
+            <column name="id">10</column>
+            <column name="post_title">bulk crates</column>
+            <column name="model">1200-1000</column>
+            <column name="external_long">1200</column>
+            <column name="external_width">1000</column>
+            <column name="external_height">1000</column>
+            <column name="internal_long">1140</column>
+            <column name="internal_width">940</column>
+            <column name="internal_height">875</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">937</column>
+            <column name="weight">30</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/4090049e35194b4f83c52dac4eadc54e.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/213bb48230a44d1aae4bfb71fd5c5d99.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9a09c7475ab84d90aed362b19cd7a327.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/d6b55f4a381341978e4147af55c8d7a2.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/c21109fab79b40edb23ff5e1519398b2.jpg</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">plastic pallet box</column>
+            <column name="tags">foldable coaming box,corrugated pallet box,collapsible plastic pallet box</column>
+            <column name="post_title_slug">bulk-crates</column>
+            <column name="static_load">1.5</column>
+            <column name="dynamic_load">0.35</column>
+        </table>
+    </database>
+</pma_xml_export>

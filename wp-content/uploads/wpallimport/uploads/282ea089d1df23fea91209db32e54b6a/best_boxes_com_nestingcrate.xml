@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 4.4.15.10
+- https://www.phpmyadmin.net
+-
+- Host: localhost
+- Generation Time: Dec 21, 2018 at 04:38 PM
+- Server version: 10.2.7-MariaDB-log
+- PHP Version: 7.1.8
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="nodedb" collation="utf8_general_ci" charset="utf8">
+            <pma:table name="best_boxes_com_nestingcrate">
+                CREATE TABLE `best_boxes_com_nestingcrate` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `post_title` varchar(255) DEFAULT NULL,
+                  `model` varchar(255) DEFAULT NULL,
+                  `external_long` varchar(255) DEFAULT NULL,
+                  `external_width` varchar(255) DEFAULT NULL,
+                  `external_height` varchar(255) DEFAULT NULL,
+                  `internal_long` varchar(255) DEFAULT NULL,
+                  `internal_width` varchar(255) DEFAULT NULL,
+                  `internal_height` varchar(255) DEFAULT NULL,
+                  `foldedHeight` varchar(255) DEFAULT NULL,
+                  `volumn` varchar(255) DEFAULT NULL,
+                  `weight` varchar(255) DEFAULT NULL,
+                  `img_path` longtext DEFAULT NULL,
+                  `backlinks` longtext DEFAULT NULL,
+                  `product_category` varchar(255) DEFAULT NULL,
+                  `tags` varchar(255) DEFAULT NULL,
+                  `post_title_slug` varchar(255) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Database: 'nodedb'
+    -->
+    <database name="nodedb">
+        <!-- Table best_boxes_com_nestingcrate -->
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">1</column>
+            <column name="post_title">black plastic storage baskets</column>
+            <column name="model">395</column>
+            <column name="external_long">430</column>
+            <column name="external_width">300</column>
+            <column name="external_height">285</column>
+            <column name="internal_long">395</column>
+            <column name="internal_width">280</column>
+            <column name="internal_height">270</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">29.8</column>
+            <column name="weight">1.6</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/837bb4aa0e0542dda791de62d4cd90a9.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/6582e0ae8ecf4881b3ac3d6e59b6a087.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/b895c3ca9f4442eb9b55694a1968ccca.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3b0ed21aab2241f68ebbe370fe39714d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/2de418385b364542b8f5d24064fc8e36.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable bin,nestable lidded container </column>
+            <column name="post_title_slug">black-plastic-storage-baskets</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">2</column>
+            <column name="post_title">totes for storage</column>
+            <column name="model">480</column>
+            <column name="external_long">550</column>
+            <column name="external_width">345</column>
+            <column name="external_height">210</column>
+            <column name="internal_long">500</column>
+            <column name="internal_width">320</column>
+            <column name="internal_height">190</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">29</column>
+            <column name="weight">2.11</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/33ff03aab27040b8b3aaf4fd93130ec8.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/e28ad425821b4a7b9f5c921e572a7e72.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/ec4a8af51d4c48bfba538f97aa4221f9.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/a28048d8a9a24e05beb2175ee83ab776.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/a5d8eeddf8174d88bd8514cc25ca9bcd.JPG,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable bin,nestable lidded container </column>
+            <column name="post_title_slug">totes-for-storage</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">3</column>
+            <column name="post_title">hinged storage containers</column>
+            <column name="model">500</column>
+            <column name="external_long">540</column>
+            <column name="external_width">360</column>
+            <column name="external_height">295</column>
+            <column name="internal_long">500</column>
+            <column name="internal_width">310</column>
+            <column name="internal_height">270</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">41.8</column>
+            <column name="weight">2.5</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/02ef977324874195a839ccd6b6aeba7a.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/f5af4680ffbe4a7a833053e1ce16840f.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/ed8da1fc618b4fbba459348d28580030.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/13427496cb514c8d9304437cebb13dc2.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/facf801a2ebd46cd8c28209ea2db335d.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable bin,nestable lidded container </column>
+            <column name="post_title_slug">hinged-storage-containers</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">4</column>
+            <column name="post_title">plastic storage boxes on sale</column>
+            <column name="model">560</column>
+            <column name="external_long">600</column>
+            <column name="external_width">400</column>
+            <column name="external_height">315</column>
+            <column name="internal_long">560</column>
+            <column name="internal_width">365</column>
+            <column name="internal_height">300</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">61.3</column>
+            <column name="weight">3</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3bde0ae3a25d4765bce902a792c7ace2.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9db654eaedfa45b9ae95933aa76ca24b.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/dec4953a6dfa471089e005a98cebc9ab.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/0e45e51f173f49eeafe8a18cfa6735d2.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/efd4f1468fa84e6e96eb5305ba9dcec6.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">plastic-storage-boxes-on-sale</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">5</column>
+            <column name="post_title">white plastic storage box</column>
+            <column name="model">6425</column>
+            <column name="external_long">600</column>
+            <column name="external_width">400</column>
+            <column name="external_height">250</column>
+            <column name="internal_long">539</column>
+            <column name="internal_width">364</column>
+            <column name="internal_height">230</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">45.1</column>
+            <column name="weight">2.7</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/53734ec17282467eabc5dee5061cecf3.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/241eb544999b47e3adaf587fb7350337.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9375a94271444aadb7368d8db202a118.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/e6a21e23ccdd4104b553bb2fa110746d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/c319e6916c654b7492e16ca34c01fc9a.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">white-plastic-storage-box</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">6</column>
+            <column name="post_title">nestable totes</column>
+            <column name="model">6428</column>
+            <column name="external_long">600</column>
+            <column name="external_width">400</column>
+            <column name="external_height">280</column>
+            <column name="internal_long">539</column>
+            <column name="internal_width">364</column>
+            <column name="internal_height">255</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">50</column>
+            <column name="weight">2.96</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/7c5b67ea2f4a4522a893e1a8883f238c.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9c5ea813d51b4628bfd3eb557cacf353.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/346571cfe2a5479b822d23caad4a372a.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/ea75864aec62467aa6a834eca7eb21f6.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/cf47625b64ca4f6ba0c447d150b80eec.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">nestable-totes</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">7</column>
+            <column name="post_title">plastic totes with hinged lids</column>
+            <column name="model">6843</column>
+            <column name="external_long">680</column>
+            <column name="external_width">430</column>
+            <column name="external_height">320</column>
+            <column name="internal_long">543</column>
+            <column name="internal_width">395</column>
+            <column name="internal_height">300</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">75</column>
+            <column name="weight">3.58</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3ed18b0972d54cd78b5e09f2f24c0b0e.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/76f4c54248b44ff98d5d0781aa3755a2.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/920185fe35dd432a9c05238c20163996.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/d66669e6da6949618053a0bf9f0a902d.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/0410090e76b94792ab2230cb3f01848c.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">plastic-totes-with-hinged-lids</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">8</column>
+            <column name="post_title">80 ltr plastic storage boxes with lids</column>
+            <column name="model">700</column>
+            <column name="external_long">700</column>
+            <column name="external_width">465</column>
+            <column name="external_height">345</column>
+            <column name="internal_long">635</column>
+            <column name="internal_width">414</column>
+            <column name="internal_height">340</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">80</column>
+            <column name="weight">4.36</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/4d4c82d7100a49bb9f77e1e3aeb2bea2.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/3b245e4b3fce4ad7b447cd7d534dc553.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/a2c598acc26f4f64acf08c830eb674f3.JPG,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/c799b760ebc84385bcf0d5d367f1c810.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/458b825d61b244a791cc0c5644c495d4.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">80-ltr-plastic-storage-boxes-with-lids</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">9</column>
+            <column name="post_title">kitchen storage boxes with lids</column>
+            <column name="model">7457</column>
+            <column name="external_long">740</column>
+            <column name="external_width">570</column>
+            <column name="external_height">625</column>
+            <column name="internal_long">638</column>
+            <column name="internal_width">540</column>
+            <column name="internal_height">580</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">148</column>
+            <column name="weight">8</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/2583a805316a4512962b61f4d9b8b9d9.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/9f9dee45f93544c99f2af3a7ce95eaa1.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/6666abdc8701480d8287c800215fd4ff.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/774cda5ac03f45829432afea238f17f3.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/4c6e8188cda845019f2b1e160f9a762f.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">kitchen-storage-boxes-with-lids</column>
+        </table>
+        <table name="best_boxes_com_nestingcrate">
+            <column name="id">10</column>
+            <column name="post_title">huge plastic box</column>
+            <column name="model">6040-355</column>
+            <column name="external_long">600</column>
+            <column name="external_width">400</column>
+            <column name="external_height">355</column>
+            <column name="internal_long">555</column>
+            <column name="internal_width">365</column>
+            <column name="internal_height">345</column>
+            <column name="foldedHeight">NULL</column>
+            <column name="volumn">62</column>
+            <column name="weight">3.4</column>
+            <column name="img_path">http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/fbed1cac1f8346b294f67d33e98e4a6e.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/b5385d131b4947dc92ff909a07d30cc5.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/bc1e3bca67af47c2af5743ebf8bb12c3.jpg,http://ali-us-west-1-products.oss-us-west-1.aliyuncs.com/products/e674dce4f56f479a9e50a0036275ac01.jpg,</column>
+            <column name="backlinks">NULL</column>
+            <column name="product_category">nesting crate</column>
+            <column name="tags">attached lid container,nestable lidded container </column>
+            <column name="post_title_slug">huge-plastic-box</column>
+        </table>
+    </database>
+</pma_xml_export>
