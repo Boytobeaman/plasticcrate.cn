@@ -248,6 +248,9 @@ if ( ! function_exists( 'woocommerce_template_loop_product_thumbnail_custom' ) )
 add_action( 'wp_footer', 'add_contact_modal',99 );
 
 function add_contact_modal() {
+	?>
 	echo '<h4 id="contactUs">test contact</h4>'
-}
+<?php
+};
+	
 
