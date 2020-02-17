@@ -250,4 +250,4 @@ function add_contact_modal() {
 	echo '<h4 id="contactUs">test contact</h4>'
 }
 
-add_action( 'wp_footer', 'add_contact_modal' );
+add_action( 'wp_footer', 'add_contact_modal',99 );
