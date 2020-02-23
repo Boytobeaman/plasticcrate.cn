@@ -122,4 +122,9 @@ RewriteRule . /index.php [L]
     Header always set Access-Control-Allow-Origin "*"
 </FilesMatch>
 
-Redirect 301 /products/stackableBox/(.*)$ /product-category/plastic-stacking-crates/
+RedirectMatch 301 ^/products/stackableBox/ /product-category/plastic-stacking-crates/
+RedirectMatch 301 ^/products/attached-lid-containers/ /product-category/round-trip-totes/
+RedirectMatch 301 ^/products/foldableBox/ /product-category/folding-crate/
+RedirectMatch 301 ^/products/drawerBin/ /product-category/drawer-bins/
+RedirectMatch 301 ^/products/palletBox/ /product-category/pallet-box/
+
