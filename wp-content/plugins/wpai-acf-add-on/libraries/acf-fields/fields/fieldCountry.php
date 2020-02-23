@@ -41,4 +41,21 @@ class FieldCountry extends Field {
         }
         ACFService::update_post_meta($this, $this->getPostID(), $this->getFieldName(), $this->getFieldValue());
     }
+
+    public function getFieldValue() {
+
+        $value = parent::getFieldValue();
+
+        $parsedData = $this->getParsedData();
+
+        $field_post = get_post($parsedData['id']);
+        if ($field_post){
+            $field_post_options = unserialize($field_post->post_content);
+            if (!empty($field_post_options['multiple'])) {
+                $value = explode(",", $value);
+            }
+        }
+
+        return $value;
+    }
 }
