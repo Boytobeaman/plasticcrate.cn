@@ -1,3 +1,9 @@
+# BEGIN Imagify: webp file type
+<IfModule mod_mime.c>
+	AddType image/webp .webp
+</IfModule>
+# END Imagify: webp file type
+
 # BEGIN WpFastestCache
 <IfModule mod_rewrite.c>
 RewriteEngine On
@@ -89,20 +95,6 @@ FileETag None
 </FilesMatch>
 # END LBCWpFastestCache
 
-
-
-# BEGIN Imagify: webp file type
-<IfModule mod_mime.c>
-	AddType image/webp .webp
-</IfModule>
-# END Imagify: webp file type
-
-
-
-
-
-
-
 # BEGIN WordPress
 # The directives (lines) between `BEGIN WordPress` and `END WordPress` are
 # dynamically generated, and should only be modified via WordPress filters.
@@ -127,4 +119,3 @@ RedirectMatch 301 ^/products/attached-lid-containers/ /product-category/round-tr
 RedirectMatch 301 ^/products/foldableBox/ /product-category/folding-crate/
 RedirectMatch 301 ^/products/drawerBin/ /product-category/drawer-bins/
 RedirectMatch 301 ^/products/palletBox/ /product-category/pallet-box/
-

@@ -1,0 +1,13 @@
+2020-02-26T00:05:13+00:00 CRITICAL Uncaught Error: Class 'Elementor\System_Info\Main' not found in /data/wwwroot/www.plasticcrate.cn/wp-content/plugins/elementor/includes/plugin.php:567
+Stack trace:
+#0 /data/wwwroot/www.plasticcrate.cn/wp-content/plugins/elementor/includes/plugin.php(480): Elementor\Plugin->init_components()
+#1 /data/wwwroot/www.plasticcrate.cn/wp-includes/class-wp-hook.php(288): Elementor\Plugin->init('')
+#2 /data/wwwroot/www.plasticcrate.cn/wp-includes/class-wp-hook.php(312): WP_Hook->apply_filters(NULL, Array)
+#3 /data/wwwroot/www.plasticcrate.cn/wp-includes/plugin.php(478): WP_Hook->do_action(Array)
+#4 /data/wwwroot/www.plasticcrate.cn/wp-settings.php(523): do_action('init')
+#5 /data/wwwroot/www.plasticcrate.cn/wp-config.php(90): require_once('/data/wwwroot/w...')
+#6 /data/wwwroot/www.plasticcrate.cn/wp-load.php(37): require_once('/data/wwwroot/w...')
+#7 /data/wwwroot/www.plasticcrate.cn/wp-admin/admin-ajax.php(22): require_once('/data/wwwroot/w...')
+#8 {main}
+  thrown in /data/wwwroot/www.plasticcrate.cn/wp-content/plugins/elementor/includes/plugin.php on line 567
+
