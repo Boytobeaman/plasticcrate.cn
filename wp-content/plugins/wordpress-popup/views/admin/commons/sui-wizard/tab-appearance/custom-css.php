@@ -9,7 +9,8 @@
 
 		<label
 			for="hustle-customize-css"
-			class="sui-toggle"
+			class="sui-toggle hustle-toggle-with-container"
+			data-toggle-on="customize-css"
 		>
 			<input
 				type="checkbox"
@@ -22,7 +23,7 @@
 
 		<label for="hustle-customize-css"><?php esc_html_e( 'Enable custom CSS', 'wordpress-popup' ); ?></label>
 
-		<div id="hustle-customize-css-toggle-wrapper" class="sui-background-frame {{ _.class( _.isFalse( customize_css ), 'sui-hidden' ) }}">
+		<div class="sui-background-frame" data-toggle-content="customize-css">
 
 			<label class="sui-label"><?php esc_html_e( 'Modal selectors', 'wordpress-popup' ); ?></label>
 

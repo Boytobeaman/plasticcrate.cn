@@ -394,12 +394,10 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 
 	/**
 	 * Process the current request.
-	 * @todo handle this without ajax.
+	 *
 	 * @since 4.0
 	 */
 	private function process_request() {
-
-		// TODO: check if the user has enough permissions to perform this action.
 
 		// Start modifying data.
 		if ( ! isset( $_REQUEST['hustle_nonce'] ) ) {
@@ -408,6 +406,10 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 
 		$nonce = $_REQUEST['hustle_nonce']; // WPCS: CSRF OK
 		if ( ! wp_verify_nonce( $nonce, 'hustle_entries_request' ) ) {
+			return;
+		}
+
+		if ( ! Opt_In_Utils::is_user_allowed( 'hustle_access_emails' ) ) {
 			return;
 		}
 
@@ -980,6 +982,11 @@ class Hustle_Entries_Admin extends Hustle_Admin_Page_Abstract {
 		if ( ! wp_verify_nonce( $nonce, 'hustle_module_export_listing' ) ) {
 			return;
 		}
+
+		if ( ! Opt_In_Utils::is_user_allowed( 'hustle_access_emails' ) ) {
+			return;
+		}
+
 		$id = filter_input( INPUT_POST, 'id', FILTER_VALIDATE_INT );
 		if ( ! $id ) {
 			return;

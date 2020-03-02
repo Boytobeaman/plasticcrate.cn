@@ -90,12 +90,16 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 					$api_fields = wp_list_pluck( $result->attributes, 'name' );
 				}
 
-				$_fields 	= wp_list_pluck( $custom_fields, 'name' );
-				$new_fields = array_udiff( $_fields, $api_fields, 'strcasecmp' );
-
+				$module 	 = Hustle_Module_Model::instance()->get( $module_id );
+				$_fields 	 = wp_list_pluck( $custom_fields, 'name' );
+				$new_fields  = array_udiff( $_fields, $api_fields, 'strcasecmp' );
+				$form_fields = $module->get_form_fields();
+				$form_fields = array_change_key_case( $form_fields, CASE_UPPER );
+				
 				foreach ( $new_fields as $custom_field ) {
 					//create custom fields
-					$api->create_attributes( $custom_field, 'normal', array( 'type' => 'text' ) );
+					$type = isset( $form_fields[ $custom_field ] ) ? $this->get_field_type( $form_fields[ $custom_field ]['type'] ) : 'text';
+					$api->create_attributes( $custom_field, 'normal', array( 'type' => $type ) );
 				}
 			}
 
@@ -299,6 +303,38 @@ class Hustle_SendinBlue_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return $this->_subscriber[ md5( $data ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 'date';
+				break;
+			case 'number':
+			case 'phone':
+				$type = 'float';
+				break;
+			default:
+				$type = 'text';
+				break;
+		}
+
+		return $type;
 	}
 
 }

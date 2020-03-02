@@ -71,11 +71,11 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$gdpr = false;
 			if ( isset( $submitted_data['first_name'] ) ) {
 				$merge_vals['MERGE1'] = $submitted_data['first_name'];
-				$merge_vals['FNAME'] = $submitted_data['first_name'];
+				$merge_vals['FNAME']  = $submitted_data['first_name'];
 			}
 			if ( isset( $submitted_data['last_name'] ) ) {
 				$merge_vals['MERGE2'] = $submitted_data['last_name'];
-				$merge_vals['LNAME'] = $submitted_data['last_name'];
+				$merge_vals['LNAME']  = $submitted_data['last_name'];
 			}
 			if ( isset( $submitted_data['gdpr'] ) ){
 				$gdpr = ( 'on' === $submitted_data['gdpr'] ? true : false );
@@ -112,7 +112,7 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 			// Add a warning in the entry letting the admin know how we're handling their keys.
 			if ( ! empty( $shortened_keys ) ) {
-				$success_message_extra = sprintf( 
+				$success_message_extra = sprintf(
 					__( " These fields' names are being truncated to have a max length of 10. In parenthesis is the name currently used by Mailchimp: %s", 'wordpress-popup' ),
 					implode( ', ', $shortened_keys )
 				);
@@ -145,14 +145,6 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				$subscribe_data['interests'] = $interests;
 			}
 
-			//tags
-			$static_segments 	 = isset( $addon_setting_values['tags'] ) ? $addon_setting_values['tags'] : '' ;
-			$static_segments_val = ! empty( $static_segments ) ? array_values( $static_segments ) : '';
-
-			if( ! empty( $static_segments_val ) ){
-				$subscribe_data['tags'] = $static_segments_val;
-			}
-
 			$error_detail = __( 'Something went wrong.', 'wordpress-popup' );
 			try {
 				// Add custom fields
@@ -163,7 +155,17 @@ class Hustle_Mailchimp_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				}
 
 				$existing_member = $addon->get_member( $email, $list_id, $submitted_data, $api_key );
-				if ( ! is_wp_error( $existing_member ) && $existing_member ) {
+				$member_exists = ! is_wp_error( $existing_member ) && $existing_member;
+
+				//tags
+				$static_segments 	 = isset( $addon_setting_values['tags'] ) ? $addon_setting_values['tags'] : '' ;
+				$static_segments_val = ! empty( $static_segments ) ? ( $member_exists ? array_keys( $static_segments ) : array_values( $static_segments ) ) : '';
+
+				if( ! empty( $static_segments_val ) ){
+					$subscribe_data['tags'] = $static_segments_val;
+				}
+
+				if ( $member_exists ) {
 					$member_interests = isset($existing_member->interests) ? (array) $existing_member->interests : array();
 					$can_subscribe = true;
 					if ( isset( $subscribe_data['interests'] ) ) {

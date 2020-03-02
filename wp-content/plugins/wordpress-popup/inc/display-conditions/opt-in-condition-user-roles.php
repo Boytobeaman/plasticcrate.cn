@@ -1,11 +1,16 @@
 <?php
 
 class Opt_In_Condition_User_Roles extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ){
-		if ( ! empty( $this->args->filter_type ) && is_user_logged_in() ) {
+	public function is_allowed(){
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		if ( !empty( $this->args->filter_type ) ) {
 			$user 		 = wp_get_current_user();
 			$roles 		 = ( array ) $user->roles;
-			$valid_roles = array_intersect( $roles, $this->args->roles );
+			$saved_roles = ( array ) $this->args->roles;
+			$valid_roles = array_intersect( $roles, $saved_roles );
 
 			if( 'except' === $this->args->filter_type ) {
 				return empty( $valid_roles );
@@ -15,14 +20,7 @@ class Opt_In_Condition_User_Roles extends Opt_In_Condition_Abstract {
 
 		}
 
-		return true;
+		return false;
 	}
 
-	public function label() {
-		if ( ! empty( $this->args->filter_type ) ) {
-			return isset( $this->args->roles ) ? __( 'For specific roles', 'wordpress-popup') : "";
-		}
-
-		return '';
-	}
 }

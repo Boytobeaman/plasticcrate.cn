@@ -19,7 +19,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 			<div class="sui-tabs-menu">
 
-				<label class="sui-tab-item {{ 'show_success' === after_successful_submission ? 'active' : '' }}">
+				<label class="sui-tab-item">
 					<input type="radio"
 						name="after_successful_submission"
 						data-attribute="after_successful_submission"
@@ -28,7 +28,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 						{{ _.checked( ( 'show_success' === after_successful_submission ), true) }}/>
 					<?php esc_html_e( 'Success message', 'wordpress-popup' ); ?>
 				</label>
-				<label class="sui-tab-item {{ 'redirect' === after_successful_submission ? 'active' : '' }}">
+				<label class="sui-tab-item">
 					<input type="radio"
 						name="after_successful_submission"
 						data-attribute="after_successful_submission"
@@ -42,7 +42,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 			<div class="sui-tabs-content">
 
-				<div class="sui-tab-content sui-tab-boxed {{ 'show_success' === after_successful_submission ? 'active' : '' }}" data-tab-content="show_success">
+				<div class="sui-tab-content sui-tab-boxed" data-tab-content="show_success">
 
 					<div class="sui-form-field">
 
@@ -99,7 +99,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 				</div>
 
-				<div class="sui-tab-content sui-tab-boxed {{ 'redirect' === after_successful_submission ? 'active' : '' }}" data-tab-content="redirect">
+				<div class="sui-tab-content sui-tab-boxed" data-tab-content="redirect">
 
 					<div class="sui-form-field">
 

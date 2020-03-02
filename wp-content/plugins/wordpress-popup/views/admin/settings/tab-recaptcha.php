@@ -46,9 +46,9 @@
 		<div class="sui-actions-right">
 
 			<button
-				form="hustle-settings-recaptcha-form"
 				class="sui-button sui-button-blue hustle-settings-save"
-				data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle-settings' ) ); ?>"
+				data-form-id="hustle-settings-recaptcha-form"
+				data-target="recaptcha"
 			>
 				<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
 				<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>

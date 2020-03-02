@@ -23,6 +23,15 @@ class Opt_In_Utils {
 	 */
 	private static $post_types;
 
+	/**
+	 * Array of administrator roles
+	 *
+	 * @var array
+	 */
+	private static $admin_roles;
+
+	public static $comment;
+
 	public function __construct( Opt_In_Geo $geo ) {
 		$this->_geo = $geo;
 	}
@@ -33,23 +42,20 @@ class Opt_In_Utils {
 	 * @return bool|int
 	 */
 	public function has_user_commented() {
-		global $wpdb;
-		static $comment = null;
-
-		if ( null === $comment ) {
+		if ( null === self::$comment ) {
 			// Guests (and maybe logged in users) are tracked via a cookie.
-			$comment = isset( $_COOKIE[ 'comment_author_' . COOKIEHASH ] ) ? 1 : 0;
+			self::$comment = isset( $_COOKIE[ 'comment_author_' . COOKIEHASH ] ) ? 1 : 0;
 
-			if ( ! $comment && is_user_logged_in() ) {
+			if ( ! self::$comment && is_user_logged_in() ) {
 				// For logged-in users we can also check the database.
 				$count = get_comments( [
 					'count' => true,
 					'user_id' => get_current_user_id(),
 				] );
-				$comment = $count > 0;
+				self::$comment = $count > 0;
 			}
 		}
-		return $comment;
+		return self::$comment;
 	}
 
 	/**
@@ -84,7 +90,7 @@ class Opt_In_Utils {
 	public function test_referrer( $list ) {
 		$response = false;
 		if ( is_string( $list ) ) {
-			$list = array( $list );
+			$list = preg_split( '/\r\n|\r|\n/', $list );
 		}
 		if ( ! is_array( $list ) ) {
 			return true;
@@ -92,9 +98,7 @@ class Opt_In_Utils {
 
 		$referrer = $this->get_referrer();
 
-		if ( empty( $referrer ) ) {
-			$response = false;
-		} else {
+		if ( ! empty( $referrer ) ) {
 			foreach ( $list as $item ) {
 				$item = trim( $item );
 				$res = stripos( $referrer, $item );
@@ -201,8 +205,6 @@ class Opt_In_Utils {
 		return 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	}
 
-
-
 	/**
 	 * Checks if the current user IP belongs to one of the countries defined in
 	 * country_codes list.
@@ -234,6 +236,51 @@ class Opt_In_Utils {
 		if ( ! $allowed ) {
 			wp_send_json_error( __( 'Invalid request, you are not allowed to make this request', 'wordpress-popup' ) );
 		}
+	}
+
+	/**
+	 * Check is it admin role or not
+	 *
+	 * @param string|array $role
+	 * @return bool
+	 */
+	public static function is_admin_role( $role ) {
+		$admin_roles = array_keys( self::get_admin_roles() );
+
+		if ( ! is_array( $role ) ) {
+			return in_array( $role, $admin_roles, true );
+		}
+
+		return (bool) array_intersect( $role, $admin_roles );
+	}
+
+	/**
+	 * Get admin role array
+	 *
+	 * @since 4.1.0
+	 * @return array
+	 */
+	public static function get_admin_roles() {
+
+		if ( is_null( self::$admin_roles ) ) {
+			$admins    = [];
+			$all_roles = wp_roles();
+
+			if ( $all_roles->is_role( 'administrator' ) ) {
+				$admins['administrator'] = ucfirst( translate_user_role( 'administrator', 'wordpress-popup' ) );
+
+			} else {
+				foreach ( $all_roles->roles as $name => $data ) {
+					if ( ! empty( $data['capabilities']['manage_options'] ) && true === $data['capabilities']['manage_options'] ) {
+						$admins[ $name ] = $data['name'];
+					}
+				}
+			}
+
+			self::$admin_roles = apply_filters( 'hustle_get_admin_roles', $admins );
+		}
+
+		return self::$admin_roles;
 	}
 
 	/**
@@ -287,30 +334,43 @@ class Opt_In_Utils {
 	 */
 	public static function is_user_allowed( $capability, $module_id = null ) {
 
-		if ( is_null( $module_id ) ) {
-			/**
-			 * check permissions
-			 */
-			$allowed = current_user_can( $capability );
-		} elseif ( empty( (int) $module_id ) ) {
-			$allowed = false;
-		} elseif ( current_user_can( 'manage_options' ) ) {
-			$allowed = true;
-		} else {
-			$user = wp_get_current_user();
-			$roles = ( array ) $user->roles;
+		// Super admins can do everything.
+		if ( current_user_can( 'setup_network' ) ) {
+			return true;
+		}
 
+		$user               = wp_get_current_user();
+		$current_user_caps  = (array) $user->allcaps;
+		$current_user_roles = (array) $user->roles;
+
+		if ( self::is_admin_role( $current_user_roles ) ) {
+			// If editing a module and the user is godish, allow.
+			return true;
+
+		} elseif ( 'hustle_edit_module' === $capability && ! empty( $current_user_caps['hustle_create'] ) ) {
+			// If the user can create, it also can edit. Allow.
+			return true;
+
+		} elseif ( is_null( $module_id ) ) {
+			// If we're not editing a module, check for the requested capability.
+			return ! empty( $current_user_caps[ $capability ] );
+
+		} else {
+
+			// If editing a module and the user isn't godish...
 			$module = Hustle_Module_Model::instance()->get( $module_id );
+
+			// If the module isn't valid, abort.
 			if ( is_wp_error( $module ) ) {
 				return false;
 			}
-			$allowed_roles = $module->get_meta( $module::KEY_MODULE_META_PERMISSIONS );
-			$allowed_roles = ! empty( $allowed_roles ) ? json_decode( $allowed_roles ) : array();
 
-			$allowed = (bool) array_intersect( $allowed_roles, $roles );
+			// Check for the specific allowed roles.
+			$allowed_roles = $module->get_edit_roles();
+			return (bool) array_intersect( $allowed_roles, $current_user_roles );
 		}
 
-		return $allowed;
+		return false;
 	}
 
 	/**
@@ -338,39 +398,6 @@ class Opt_In_Utils {
 	 **/
 	public static function clean_current_screen( $screen ) {
 		return str_replace( 'hustle-pro', 'hustle', $screen );
-	}
-
-	/**
-	 * Add/remove hustle_edit_module capability.
-	 *
-	 * @since 4.0
-	 * @param array $roles Roles
-	 */
-	public static function update_hustle_edit_module_capability( $roles = null ) {
-		global $wpdb;
-		$cap = 'hustle_edit_module';
-		$table = Hustle_Db::modules_meta_table();
-
-		if ( is_null( $roles ) ) {
-			$roles = array_keys( self::get_user_roles() );
-		}
-		foreach ( $roles as $role_key ) {
-			if ( 'administrator' === $role_key ) {
-				continue;
-			}
-			$result = $wpdb->get_var( $wpdb->prepare( "SELECT module_id FROM `{$table}` WHERE `meta_key`='edit_roles' AND meta_value LIKE %s LIMIT 1", '%"' . $role_key . '"%' ) ); // WPCS: unprepared SQL OK. False positive.
-
-			// get the role object
-			$role = get_role( $role_key );
-			if ( $result || $role->has_cap( 'hustle_create' ) ) {
-				// add capability
-				$role->add_cap( $cap );
-			} else {
-				// remove capability
-				$role->remove_cap( $cap );
-			}
-		}
-
 	}
 
 	/**
@@ -657,12 +684,6 @@ class Opt_In_Utils {
 				$cpt_array['label'] = $cpt->label;
 				$cpt_array['data'] = self::get_select2_data( $cpt->name );
 
-				// all posts under this custom post type
-				$all_cpt_posts = new stdClass();
-				$all_cpt_posts->id = 'all';
-				$all_cpt_posts->text = __( 'ALL ', 'wordpress-popup' ) . $cpt->label;
-				array_unshift( $cpt_array['data'], $all_cpt_posts );
-
 				$post_types[ $cpt->name ] = $cpt_array;
 			}
 			self::$post_types = $post_types;
@@ -677,15 +698,20 @@ class Opt_In_Utils {
 	 * @param $post_type post type
 	 * @return array
 	 */
-	public static function get_select2_data( $post_type ) {
+	public static function get_select2_data( $post_type, $include_ids = null ) {
 		$data = [];
-		$posts = get_posts( [
+		$args = [
 			'numberposts' => -1,
 			'post_type' => $post_type,
 			'post_status' => 'publish',
 			'order' => 'ASC',
-		] );
+		];
 
+		if ( ! empty( $include_ids ) ) {
+			$args['post__in'] = $include_ids;
+		}
+
+		$posts = get_posts( $args );
 		foreach ( $posts as $post ) {
 			$data[] = (object)[
 				'id' => $post->ID,
@@ -852,6 +878,23 @@ class Opt_In_Utils {
 			return intval( $value, 10 ) * 60 * 60 * 1000;
 		}
 	}
+
+	/**
+	 * Get analytics ranges for dashboard widget
+	 *
+	 * @return array
+	 */
+	public static function get_analytic_ranges() {
+		$ranges = [
+			1 => __( 'Last 24 hrs', 'wordpress-popup' ),
+			7 => __( 'Last 7 days', 'wordpress-popup' ),
+			30 => __( 'Last 30 days', 'wordpress-popup' ),
+		//	90 => __( 'Last 90 days', 'wordpress-popup' ),
+		];
+
+		return $ranges;
+	}
+
 
 	/**
 	 * Get social patform names
@@ -1239,6 +1282,15 @@ class Opt_In_Utils {
 			$page_templates[$template_filename] = $template_name;
 		}
 		return $page_templates;
+	}
+
+	/**
+	 * Check if WooCommerce is active or not
+	 *
+	 * @return bool
+	 */
+	public static function is_woocommerce_active() {
+		return is_plugin_active( 'woocommerce/woocommerce.php' );
 	}
 
 	/**

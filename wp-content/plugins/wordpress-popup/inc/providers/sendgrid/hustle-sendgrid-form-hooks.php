@@ -73,11 +73,20 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 			if ( ! empty( $extra_data ) ) {
 				if ( 'new_campaigns' === $new_campaigns ) {
-					// Save Custom Fields on saving modules for Sendgrid New Campaigns
+					// Save Custom Fields on saving modules for Sendgrid New Campaigns.
 					$submitted_data['custom_fields'] = $extra_data;
+
 				} else {
 					$custom_fields = array();
+					$module        = Hustle_Module_Model::instance()->get( $module_id );
+					$form_fields   = $module->get_form_fields();
 					foreach ( $extra_data as $key => $value ) {
+						$type = isset( $form_fields[ $key ] ) ? $this->get_field_type( $form_fields[ $key ]['type'] ) : 'text';
+
+						if ( 'date' === $type && 'm/d/y' !== $form_fields[ $key ]['date_format'] && ! empty( $submitted_data[$key] ) ){
+							$submitted_data[ $key ] = date( 'm/d/Y', strtotime( $submitted_data[$key] ) );
+						}
+
 						$custom_fields[] = array(
 							'name' => $key,
 							'value' => $value,
@@ -274,6 +283,38 @@ class Hustle_Sendgrid_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return $this->_subscriber[ md5( $data['email'] ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 'date';
+				break;
+			case 'number':
+			case 'phone':
+				$type = 'number';
+				break;
+			default:
+				$type = 'text';
+				break;
+		}
+
+		return $type;
 	}
 
 }

@@ -7,7 +7,6 @@
  * @property string $module_name
  * @property string $module_type
  * @property int $active
- * @property int $test_mode
  *
  */
 abstract class Hustle_Model extends Hustle_Data {
@@ -68,49 +67,15 @@ abstract class Hustle_Model extends Hustle_Data {
 		return $this;
     }
 
-	/**
-     * user can edit
-     *
-     * Check user permissions for selected object.
-     *
-     * @since 4.0.0
-     *
-     * @param integer $user_id User id, can be null, then it is current user.
-     * @return boolen Can or can't edit - this is a question!
-     */
-//	it's similar with Opt_In_Utils::is_user_allowed_ajax
-//    private function user_can_edit( $user_id = null ) {
-//        if ( empty( $user_id ) ) {
-//            $user_id = get_current_user_id();
-//        }
-//        if ( empty( $user_id ) ) {
-//            return false;
-//        }
-//        if ( user_can( $user_id, 'administrator' ) ) {
-//            return true;
-//        }
-//
-//		$user = get_userdata( $user_id );
-//		$roles = ( array ) $user->roles;
-//		$edit_roles = $this->get_meta( self::KEY_MODULE_META_PERMISSIONS );
-//		if ( $edit_roles ) {
-//			$edit_roles = json_decode( $edit_roles );
-//		}
-//
-//        return $edit_roles && $roles && array_intersect( $edit_roles, $roles );
-//    }
-
-
-	private function _populate(){
-		if( $this->_data ){
+	private function _populate() {
+		if ( $this->_data ) {
 			$this->id = $this->_data->module_id;
-			foreach( $this->_data as $key => $data){
-                $method =  "get_" . $key;
-				$_d =  method_exists( $this, $method ) ? $this->{$method}() : $data;
+			foreach ( $this->_data as $key => $data ) {
+				$method       = 'get_' . $key;
+				$_d           = method_exists( $this, $method ) ? $this->{$method}() : $data;
 				$this->{$key} = $_d;
 			}
 		}
-		//$this->get_test_types();
 		$this->get_tracking_types();
 	}
 
@@ -615,8 +580,6 @@ abstract class Hustle_Model extends Hustle_Data {
 			)
 		);
 
-		//$roles = $this->get_meta( self::KEY_MODULE_META_PERMISSIONS );
-
 		//delete metas
 		$result = $result && $this->_wpdb->delete( Hustle_Db::modules_meta_table(), array(
 			"module_id" => $this->id
@@ -639,33 +602,8 @@ abstract class Hustle_Model extends Hustle_Data {
 		//delete entries
 		Hustle_Entry_Model::delete_entries( $this->id );
 
-		//if ( $roles ) {
-		//	$roles = json_decode($roles);
-		//	Opt_In_Utils::update_hustle_edit_module_capability( $roles );
-		//}
-
 		return $result;
 	}
-
-	/**
-	 * Checks if this optin is allowed to show up in frontend for current user
-	 *
-	 * @return bool
-	 */
-	public function is_allowed_for_current_user(){
-		return  1 === (int)$this->test_mode || current_user_can( 'manage_options' );
-	}
-
-	/**
-	 * Retrieves active types from db
-	 *
-	 * @return null|array
-	 */
-	public function get_test_types(){
-		$this->_test_types = json_decode( $this->get_meta( self::TEST_TYPES ), true );
-		return $this->_test_types;
-	}
-
 	/**
 	 * Retrieves active tracking types from db
 	 *
@@ -677,16 +615,16 @@ abstract class Hustle_Model extends Hustle_Data {
 	}
 
 	/**
-	 * Checks if $type is active
+	 * Get the "edit roles" stored for this module.
 	 *
-	 * @param $type
-	 * @return bool
+	 * @since 4.1.0
+	 * @return array
 	 */
-	public function is_test_type_active( $type ){
-		if ( 'slidein' === $this->module_type || 'popup' === $this->module_type ) {
-			return (bool) $this->test_mode;
-		}
-		return isset( $this->_test_types[ $type ] );
+	public function get_edit_roles() {
+		$meta_edit_roles = $this->get_meta( self::KEY_MODULE_META_PERMISSIONS );
+		$meta_edit_roles = ! empty( $meta_edit_roles ) ? json_decode( $meta_edit_roles, true ) : array();
+
+		return apply_filters( 'hustle_module_get_edit_roles_meta', $meta_edit_roles, $this );
 	}
 
 	/**
@@ -718,10 +656,10 @@ abstract class Hustle_Model extends Hustle_Data {
 	 * @param array $roles Roles
 	 * @return false|integer
 	 */
-	public function update_edit_role( $roles ) {
+	public function update_edit_roles( $roles ) {
 
 		$available_roles = Opt_In_Utils::get_user_roles();
-		$roles = array_intersect( $roles, array_keys( $available_roles ) );
+		$roles           = array_intersect( $roles, array_keys( $available_roles ) );
 
 		return $this->update_meta( self::KEY_MODULE_META_PERMISSIONS, $roles );
 	}
@@ -860,129 +798,6 @@ abstract class Hustle_Model extends Hustle_Data {
 	protected function get_settings_meta( $key, $default = "{}", $as_array = false, $get_cached = true ){
 		$settings_json = $this->get_meta( $key, null, $get_cached );
 		return json_decode( $settings_json ? $settings_json : $default, $as_array );
-	}
-
-	/**
-	 * Checks if module should be displayed on frontend
-	 *
-	 * @return bool
-	 */
-	public function should_display(){
-
-		/**
-		 * Return true if any test type if active
-		 */
-		$test_types = $this->get_test_types();
-		if( !empty( $test_types ) && current_user_can('administrator')  )
-			return true;
-
-		if( !$this->active )
-			return false;
-
-		if( current_user_can('administrator') && !$this->is_active_for_admin )
-			return false;
-
-		return true;
-	}
-
-	/**
-	 * Get the meta ID of all views and conversions containig the given IP
-	 *
-	 * @todo get meta_key names from constants instead.
-	 *
-	 * @since 3.0.6
-	 * @return (array|null) Database query results
-	 */
-	public function get_all_views_and_conversions_meta_id() {
-		$prepared_array = array(
-			'popup_view',
-			'popup_conversion',
-			'slidein_view',
-			'slidein_conversion',
-			'after_content_view',
-			'shortcode_view',
-			'floating_social_view',
-			'floating_social_conversion',
-			'widget_view',
-			'after_content_conversion',
-			'shortcode_conversion',
-			'widget_conversion'
-		);
-		$meta_keys_placeholders = implode( ', ', array_fill( 0, count( $prepared_array ), '%s' ) );
-
-		$sql = $this->_wpdb->prepare(
-			"SELECT `meta_id` FROM `". Hustle_Db::modules_meta_table() ."`
-			WHERE `meta_key` IN (" . $meta_keys_placeholders . ")",
-			$prepared_array
-		);
-
-		return $this->_wpdb->get_col( $sql );
-
-	}
-
-	/**
-	 * Get meta_id and meta_value by meta_id and by meta_value containing the passed values
-	 *
-	 * @since 3.0.6
-	 *
-	 * @param array $meta_id_array meta_id list which meta_value will be inspected.
-	 * @param array $needle_meta_values string with a value to be found in the meta_value of the provided meta_id by Like %$value%
-	 * @return array
-	 */
-	public function get_metas_for_matching_meta_values_in_a_range( $meta_id_array, $needle_meta_values ) {
-
-		if ( empty( $meta_id_array ) || empty( $needle_meta_values ) ) {
-			return array();
-		}
-
-		$meta_ids_placeholders = implode( ', ', array_fill( 0, count( $meta_id_array ), '%d' ) );
-		$needle_values_placeholder = "`meta_value` LIKE %s ";
-
-		foreach( $needle_meta_values as $key => $value ) {
-			$prepared_value = $this->_wpdb->esc_like( $value );
-			$prepared_value = "%" . $prepared_value . "%";
-			$needle_meta_values[ $key ] = $prepared_value;
-		}
-
-		if ( count( $needle_meta_values ) > 1 ) {
-			$needle_values_placeholder .= 'OR `meta_value` LIKE %s ' . implode( ' ', array_fill( 0, ( count( $needle_meta_values ) - 2 ), 'OR `meta_value` LIKE %s' ) );
-		}
-
-		$prepared_array = array_merge( $meta_id_array, $needle_meta_values );
-
-		$sql = $this->_wpdb->prepare(
-			"SELECT `meta_id`,`meta_value` FROM `". Hustle_Db::modules_meta_table() ."` WHERE `meta_id` IN (" . $meta_ids_placeholders . ") AND " . $needle_values_placeholder,
-			$prepared_array
-		);
-
-		return $this->_wpdb->get_results( $sql, ARRAY_A );
-
-	}
-
-	/**
-	 * Updates existing meta by id, disregarding the module_id
-	 *
-	 * @since 3.0.6
-	 *
-	 * @param int $meta_id
-	 * @param mixed $meta_value
-	 * @return false|int
-	 */
-	public function update_any_meta( $meta_id, $meta_value ){
-
-		return $this->_wpdb->update( Hustle_Db::modules_meta_table(), array(
-				"meta_value" => is_array($meta_value) || is_object($meta_value) ? wp_json_encode($meta_value) : $meta_value
-			), array(
-				'meta_id' => $meta_id
-			),
-			array(
-				"%s",
-			),
-			array(
-				"%d",
-			)
-		);
-
 	}
 
 	/**
@@ -1174,6 +989,24 @@ abstract class Hustle_Model extends Hustle_Data {
 	}
 
 	/**
+	 * Return whether the provided role can edit at least one module.
+	 *
+	 * @since 4.1.0
+	 * @param string $role_slug The slug of the role to be checked.
+	 * @return boolean
+	 */
+	public static function can_role_edit_one_module( $role_slug ) {
+
+		global $wpdb;
+		$cap   = 'hustle_edit_module';
+		$table = Hustle_Db::modules_meta_table();
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare( "SELECT module_id FROM `{$table}` WHERE `meta_key`='edit_roles' AND meta_value LIKE %s LIMIT 1", '%"' . $role_slug . '"%' );
+		return $wpdb->get_var( $query );
+	}
+
+	/**
      * Special save used in migration.
 	 * It keeps the passed module id when saving a new module.
 	 * It's useful when adding old modules in new tables in MU.
@@ -1210,13 +1043,4 @@ abstract class Hustle_Model extends Hustle_Data {
         return $this->id;
     }
 
-    /**
-	 * Checks if module is active for admin user
-	 *
-	 * @return int
-	 */
-	public function get_is_active_for_admin(){
-		$is_allowed = (int) $this->get_meta( self::ACTIVE_FOR_ADMIN, 1 );
-		return apply_filters( 'hustle_modules_allowed_for_admin', $is_allowed );
-	}
 }

@@ -87,15 +87,24 @@ class Hustle_ActiveCampaign_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstra
 
 			if ( $extra_custom_fields ) {
 
-				$field_labels    = wp_list_pluck( $module->get_form_fields(), 'label', 'name' );
-				$prepared_fields = array();
+				$form_fields 		= $module->get_form_fields();
+				$field_labels 		= wp_list_pluck( $form_fields, 'label', 'name' );
+				$prepared_fields 	= array();
+				$module 	 		= Hustle_Module_Model::instance()->get( $module_id );
+
 				foreach ( $extra_custom_fields as $new_field ) {
+
 					if ( ! in_array( strtoupper( $new_field ), $reserved_fields, true ) ) {
 						$prepared_fields[ $new_field ] = ! empty( $field_labels[ $new_field ] ) ? $field_labels[ $new_field ] : $new_field;
+
+						//$type = isset( $form_fields[ $new_field ] ) ? $this->get_field_type( $form_fields[ $new_field ]['type'] ) : 1;
+						//$prepared_fields[ $new_field ] = array(
+						//	'label' => ! empty( $field_labels[ $new_field ] ) ? $field_labels[ $new_field ] : $new_field,
+						//	'type'  => $type,
+						//);
 					}
 				}
 				$api->add_custom_fields( $prepared_fields, $id, $module );
-
 			}
 
 			//store the new custom fields key
@@ -235,7 +244,7 @@ class Hustle_ActiveCampaign_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstra
 				)
 			);
 
-			if( true === $is_sub )
+			if ( true === $is_sub )
 				$is_success = self::ALREADY_SUBSCRIBED_ERROR;
 		}
 
@@ -291,6 +300,34 @@ class Hustle_ActiveCampaign_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstra
 		}
 
 		return $this->_subscriber[ md5( $data['email'] ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 9;
+				break;
+			default:
+				$type = 1;
+				break;
+		}
+
+		return $type;
 	}
 
 	/*

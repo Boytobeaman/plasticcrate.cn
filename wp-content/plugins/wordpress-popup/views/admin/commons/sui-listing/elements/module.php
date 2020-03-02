@@ -2,6 +2,7 @@
 
 	<?php
 	$module_id = $module->module_id;
+	$can_edit = Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module_id );
 	$last_entry_time = Opt_In_Utils::get_latest_conversion_time_by_module_id( $module_id );
 	if ( isset( $_GET['view-stats'] ) && intval( $module_id ) === intval( $_GET['view-stats'] ) ) { // WPCS CSRF: ok.
 		$display_chart_class = ' hustle-display-chart hustle-scroll-to';
@@ -49,20 +50,22 @@
 
 		<div class="sui-accordion-col-auto">
 
-			<a
-				href="<?php echo esc_url( $module->decorated->get_edit_url() ); ?>"
-				class="sui-button sui-button-ghost sui-accordion-item-action sui-desktop-visible"
-			>
-				<i class="sui-icon-pencil" aria-hidden="true"></i> <?php esc_attr_e( 'Edit', 'wordpress-popup' ); ?>
-			</a>
+			<?php if ( $can_edit ) { ?>
+				<a
+					href="<?php echo esc_url( $module->decorated->get_edit_url() ); ?>"
+					class="sui-button sui-button-ghost sui-accordion-item-action sui-desktop-visible"
+				>
+					<i class="sui-icon-pencil" aria-hidden="true"></i> <?php esc_attr_e( 'Edit', 'wordpress-popup' ); ?>
+				</a>
 
-			<a
-				href="<?php echo esc_url( $module->decorated->get_edit_url() ); ?>"
-				class="sui-button-icon sui-accordion-item-action sui-mobile-visible"
-			>
-				<i class="sui-icon-pencil" aria-hidden="true"></i>
-				<span class="sui-screen-reader-text"><?php esc_attr_e( 'Edit', 'wordpress-popup' ); ?></span>
-			</a>
+				<a
+					href="<?php echo esc_url( $module->decorated->get_edit_url() ); ?>"
+					class="sui-button-icon sui-accordion-item-action sui-mobile-visible"
+				>
+					<i class="sui-icon-pencil" aria-hidden="true"></i>
+					<span class="sui-screen-reader-text"><?php esc_attr_e( 'Edit', 'wordpress-popup' ); ?></span>
+				</a>
+			<?php } ?>
 
 			<div class="sui-dropdown sui-accordion-item-action">
 

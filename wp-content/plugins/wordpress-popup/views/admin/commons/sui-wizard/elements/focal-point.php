@@ -15,12 +15,12 @@
 					<div class="sui-tabs-menu">
 
 						<label
-
 							for="hustle-in-container-image-positionX--left"
 							class="sui-tab-item {{ _.class( ( 'left' === feature_image_horizontal ), 'active' ) }}"
 						>
 							<input
 								type="radio"
+								name="feature_image_horizontal"
 								data-attribute="feature_image_horizontal"
 								value="left"
 								id="hustle-in-container-image-positionX--left"
@@ -36,6 +36,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_horizontal"
 								data-attribute="feature_image_horizontal"
 								value="center"
 								id="hustle-in-container-image-positionX--center"
@@ -51,6 +52,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_horizontal"
 								data-attribute="feature_image_horizontal"
 								value="right"
 								id="hustle-in-container-image-positionX--right"
@@ -66,6 +68,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_horizontal"
 								data-attribute="feature_image_horizontal"
 								value="custom"
 								id="hustle-in-container-image-positionX--custom"
@@ -118,6 +121,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_vertical"
 								data-attribute="feature_image_vertical"
 								value="top"
 								id="hustle-in-container-image-positionY--top"
@@ -133,6 +137,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_vertical"
 								data-attribute="feature_image_vertical"
 								value="center"
 								id="hustle-in-container-image-positionY--middle"
@@ -148,6 +153,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_vertical"
 								data-attribute="feature_image_vertical"
 								value="bottom"
 								id="hustle-in-container-image-positionY--bottom"
@@ -163,6 +169,7 @@
 						>
 							<input
 								type="radio"
+								name="feature_image_vertical"
 								data-attribute="feature_image_vertical"
 								value="custom"
 								id="hustle-in-container-image-positionY--custom"

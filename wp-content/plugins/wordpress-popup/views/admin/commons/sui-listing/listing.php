@@ -6,10 +6,10 @@ if ( isset( $page_title ) ) {
 }
 $sql_month_start_date = date( 'Y-m-d H:i:s', strtotime( '-30 days midnight' ) );
 $tracking_model = Hustle_Tracking_Model::get_instance();
-$can_create = Hustle_Module_Admin::can_create_new_module( $module_type );
+$free_limit_reached = ! Hustle_Module_Admin::can_create_new_module( $module_type );
 ?>
 
-<main class="<?php echo implode( ' ', apply_filters( 'hustle_sui_wrap_class', null ) ); ?>">
+<main class="<?php echo esc_attr( implode( ' ', apply_filters( 'hustle_sui_wrap_class', null ) ) ); ?>">
 
 	<div class="sui-header">
 
@@ -22,14 +22,14 @@ $can_create = Hustle_Module_Admin::can_create_new_module( $module_type );
 				<button
 					id="hustle-create-new-module"
 					class="sui-button sui-button-blue hustle-create-module"
-					<?php if ( ! $can_create ) echo 'data-enabled="false"'; ?>
+					<?php if ( $free_limit_reached ) echo 'data-enabled="false"'; ?>
 				>
 					<i class="sui-icon-plus" aria-hidden="true"></i> <?php esc_html_e( 'Create', 'wordpress-popup' ); ?>
 				</button>
 
 				<button
 					class="sui-button hustle-import-module-button"
-					<?php if ( ! $can_create ) echo 'data-enabled="false"'; ?>
+					<?php if ( $free_limit_reached ) echo 'data-enabled="false"'; ?>
 				>
 					<i class="sui-icon-upload-cloud" aria-hidden="true"></i> <?php esc_html_e( 'Import', 'wordpress-popup' ); ?>
 				</button>
@@ -129,7 +129,7 @@ $can_create = Hustle_Module_Admin::can_create_new_module( $module_type );
 						'capitalize_singular'	=> $capitalize_singular,
 						'capability'           => $capability,
 						'tracking_types'       => $module->get_tracking_types(),
-						'can_create'		   => $can_create,
+						'can_create'		   => ! $free_limit_reached,
 					)
 				); ?>
 
@@ -148,7 +148,7 @@ $can_create = Hustle_Module_Admin::can_create_new_module( $module_type );
 				'page'             => $page,
 				'paged'            => $paged,
 				'entries_per_page' => $entries_per_page,
-				'is_bottom'			=> true,
+				'is_bottom'        => true,
 			)
 		); ?>
 

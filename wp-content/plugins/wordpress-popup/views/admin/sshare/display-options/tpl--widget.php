@@ -26,7 +26,7 @@
 			<label for="hustle-settings--widget-enable"><?php esc_html_e( 'Enable widget module', 'wordpress-popup' ); ?></label>
 
 			<div class="sui-toggle-content" data-toggle-content="widget-enabled">
-				<span class="sui-description"><?php printf( esc_html__( 'Enabling this will add a new widget named "Hustle" under the Available Widgets list. You can go to %1$sAppreance > %2$s%3$s and configure this widget to show your social bar in the sidebars.', 'wordpress-popup' ), '<strong>', '<a href="' . esc_url( admin_url( 'widgets.php' ) ) . '">Widgets</a>', '</strong>' ); ?></span>
+				<span class="sui-description"><?php printf( esc_html__( 'Enabling this will add a new widget named "Hustle" under the Available Widgets list. You can go to %1$sAppearance > %2$s%3$s and configure this widget to show your social bar in the sidebars.', 'wordpress-popup' ), '<strong>', '<a href="' . esc_url( admin_url( 'widgets.php' ) ) . '">Widgets</a>', '</strong>' ); ?></span>
 			</div>
 
 		</div>

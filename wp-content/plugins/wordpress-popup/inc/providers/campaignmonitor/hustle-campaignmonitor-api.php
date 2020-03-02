@@ -420,7 +420,6 @@ class Hustle_Campaignmonitor_API {
 	public function add_list_custom_field( $list_id, $args = array() ) {
 		$default_args = array(
 			'VisibleInPreferenceCenter' => true,
-			'DataType' 					=> 'Text'
 		);
 
 		$args = array_merge( $default_args, $args );

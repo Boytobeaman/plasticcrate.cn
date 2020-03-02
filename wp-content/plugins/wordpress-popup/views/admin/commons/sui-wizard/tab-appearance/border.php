@@ -7,7 +7,7 @@
 
 	<div class="sui-box-settings-col-2">
 
-		<label for="hustle-module-border" class="sui-toggle">
+		<label for="hustle-module-border" class="sui-toggle hustle-toggle-with-container" data-toggle-on="border">
 			<input type="checkbox"
 				name="border"
 				data-attribute="border"
@@ -18,7 +18,7 @@
 
 		<label for="hustle-module-border"><?php esc_html_e( 'Show border', 'wordpress-popup' ); ?></label>
 
-		<div id="hustle-border-toggle-wrapper" class="sui-border-frame sui-toggle-content{{ ( _.isTrue( border ) ) ? '' : ' sui-hidden' }}">
+		<div class="sui-border-frame sui-toggle-content" data-toggle-content="border">
 
 			<div class="sui-row">
 

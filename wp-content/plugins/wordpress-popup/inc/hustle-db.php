@@ -56,6 +56,13 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 		public static $db;
 
 		/**
+		 * It's true only for the FIRST load for fresh plugin installations
+		 *
+		 * @var bool
+		 */
+		public static $is_fresh_install = false;
+
+		/**
 		 * Check whether the db is up to date.
 		 *
 		 * @since 4.0
@@ -67,6 +74,10 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 			// check if current version is equal to database version
 			if ( version_compare( $stored_db_version, self::DB_VERSION, '=' ) ) {
 				return true;
+			}
+
+			if ( false === $stored_db_version ) {
+				self::$is_fresh_install = true;
 			}
 
 			return false;
@@ -165,7 +176,7 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 				'meta_value longtext ' . $collate,
 				'PRIMARY KEY  (meta_id)',
 				'KEY module_id (module_id)',
-				'KEY meta_key (meta_key(191))',
+				'KEY meta_key (meta_key)',
 			);
 		}
 
@@ -178,7 +189,6 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 		 * @return array
 		 */
 		private function _get_tables() {
-			global $wpdb;
 			return array(
 				self::TABLE_HUSTLE_MODULES  => self::get_table_modules(),
 				self::TABLE_HUSTLE_MODULES_META => self::get_table_modules_meta(),
@@ -188,7 +198,7 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 					'module_id bigint(20) UNSIGNED NOT NULL',
 					"date_created datetime NOT NULL default '0000-00-00 00:00:00'",
 					'PRIMARY KEY (entry_id)',
-					'KEY entry_type (entry_type(191))',
+					'KEY entry_type (entry_type)',
 					'KEY entry_module_id (module_id)',
 				),
 				self::TABLE_HUSTLE_ENTRIES_META => array(
@@ -199,7 +209,7 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 					"date_created datetime NOT NULL DEFAULT '0000-00-00 00:00:00'",
 					"date_updated datetime NOT NULL DEFAULT '0000-00-00 00:00:00'",
 					'PRIMARY KEY  (meta_id)',
-					'KEY meta_key (meta_key(191))',
+					'KEY meta_key (meta_key)',
 					'KEY meta_entry_id (entry_id ASC )',
 					'KEY meta_key_object (entry_id ASC, meta_key ASC)',
 				),
@@ -215,9 +225,10 @@ if ( ! class_exists( 'Hustle_Db' ) ) :
 					"date_updated datetime NOT NULL DEFAULT '0000-00-00 00:00:00'",
 					'PRIMARY KEY  (tracking_id)',
 					'KEY tracking_module_id (module_id ASC )',
-					'KEY action (action(100))',
+					'KEY action (action)',
 					'KEY tracking_module_object (action ASC, module_id ASC, module_type ASC)',
 					'KEY tracking_module_object_ip (module_id ASC, tracking_id ASC, ip ASC)',
+					'KEY tracking_date_created (date_created DESC)',
 				),
 			);
 		}

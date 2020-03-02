@@ -98,7 +98,7 @@ $has_modules = ( count( $popups ) + count( $slideins ) + count( $embeds ) ) > 0;
 
 	</div>
 
-	<?php 
+	<?php
 	// Global Footer
 	$this->render( 'admin/footer/footer', array( 'is_large' => true ) ); ?>
 
@@ -111,6 +111,17 @@ $has_modules = ( count( $popups ) + count( $slideins ) + count( $embeds ) ) > 0;
 		$current_user = wp_get_current_user();
 		$username = ! empty( $current_user->user_firstname ) ? $current_user->user_firstname : $current_user->user_login;
 		self::static_render( 'admin/dashboard/dialogs/fresh-install', array( 'username' => $username ) );
+	}
+
+	// DIALOG: Visibility behavior updated
+	$review_conditions = filter_input( INPUT_GET, 'review-conditions' );
+	if ( $review_conditions && Hustle_Migration::is_migrated( 'hustle_40_migrated' ) && ! Hustle_Settings_Admin::was_notification_dismissed( '41_visibility_behavior_update' ) ) {
+		$version = Opt_In_Utils::_is_free() ? '7.1' : '4.1';
+		$support_url = Opt_In_Utils::_is_free() ? 'https://wordpress.org/support/plugin/wordpress-popup/' : 'https://premium.wpmudev.org/hub/support/#wpmud-chat-pre-survey-modal';
+		self::static_render( 'admin/dashboard/dialogs/review-conditions', [
+			'version' => $version,
+			'support_url' => $support_url,
+		] );
 	}
 
 	// DIALOG: On Boarding (Migrate)

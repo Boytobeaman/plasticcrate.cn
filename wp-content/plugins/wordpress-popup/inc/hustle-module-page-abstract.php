@@ -24,7 +24,7 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 
 		$this->page_edit = Hustle_Module_Admin::get_wizard_page_by_module_type( $this->module_type );
 
-		$this->page_edit_capability = 'hustle_create';
+		$this->page_edit_capability = 'hustle_edit_module';
 
 		$this->page_edit_title = sprintf( esc_html__( 'New %s', 'wordpress-popup' ), Opt_In_Utils::get_module_type_display_name( $this->module_type ) );
 
@@ -32,8 +32,14 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 
 		add_action( 'admin_head', array( $this, 'hide_unwanted_submenus' ) );
 
-		// admin-menu-editor compat
+		// admin-menu-editor compatibility.
 		add_action( 'admin_menu_editor-menu_replaced', array( $this, 'hide_unwanted_submenus' ) );
+
+		// Actions to perform when the current page is the listing or the wizard page.
+		if ( ! empty( $this->current_page ) && ( $this->current_page === $this->page || $this->current_page === $this->page_edit ) ) {
+			$this->on_listing_and_wizard_actions();
+		}
+
 	}
 
 	abstract protected function set_page_properties();
@@ -43,32 +49,48 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 	 *
 	 * @since 4.0.4
 	 */
-	protected function on_current_page_actions() {
+	protected function on_listing_and_wizard_actions() {
 
-		// Set the current module on Wizards, abort if invalid.
-		$this->set_current_module();
-		add_action( 'admin_init', array( $this, 'on_admin_init' ) );
+		if ( $this->page_edit === $this->current_page ) {
+			$this->on_wizard_only_actions();
+		}
 
 		// For preview.
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_recaptcha_script' ] );
-		add_action( 'admin_footer', array( $this, 'maybe_print_forminator_scripts' ) );
+		add_action( 'admin_enqueue_scripts', [ 'Hustle_Module_Front', 'add_hui_scripts' ] );
+		add_action( 'admin_footer', [ $this, 'maybe_print_forminator_scripts' ] );
+	}
+
+	/**
+	 * Method called when the action 'load-' . $this->page_slug runs.
+	 * That is, Listing page only.
+	 *
+	 * @since 4.2.0
+	 */
+	public function run_action_on_page_load() {
+		Hustle_Modules_Common_Admin::export();
 	}
 
 	/**
 	 * Set the current module only if the current page is wizard and the module is valid.
+	 *
 	 * @since 4.0.3
 	 */
-	private function set_current_module() {
+	private function on_wizard_only_actions() {
 
-		if ( $this->page_edit === $this->current_page ) {
+		// Set the current module on Wizards, abort if invalid.
+		$module_id = filter_input( INPUT_GET, 'id', FILTER_VALIDATE_INT );
+		$module    = Hustle_Module_Collection::instance()->return_model_from_id( $module_id );
 
-			$module_id = filter_input( INPUT_GET, 'id', FILTER_VALIDATE_INT );
-			$module = Hustle_Module_Collection::instance()->return_model_from_id( $module_id );
-
-			if ( ! is_wp_error( $module ) ) {
-				$this->module = $module;
-			}
+		if ( is_wp_error( $module ) ) {
+			// Redirect asap.
+			add_action( 'admin_init', [ $this, 'redirect_module_not_found' ] );
+			return;
 		}
+
+		$this->module = $module;
+
+		// Register variables for the js side only if this is the requested page.
+		add_filter( 'hustle_optin_vars', array( $this, 'register_current_json' ) );
 	}
 
 	public function register_admin_menu() {
@@ -93,7 +115,8 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 			'hustle_access_emails' => current_user_can( 'hustle_access_emails' ),
 		);
 
-		$paged = ! empty( $_GET['paged'] ) ? (int) $_GET['paged'] : 1; //don't use filter_input() here, because of see Hustle_Module_Admin::maybe_remove_paged function
+		//don't use filter_input() here, because of see Hustle_Module_Admin::maybe_remove_paged function
+		$paged = ! empty( $_GET['paged'] ) ? (int) $_GET['paged'] : 1; // phpcs:ignore
 
 		$modules = Hustle_Module_Collection::instance()->get_all( null, array(
 				'module_type' => $this->module_type,
@@ -157,114 +180,19 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 	}
 
 	/**
-	 * Check whether the requested module exists.
-	 * Redirect to the listing page if not.
+	 * Redirect to the listing page when in wizard and the module wasn't found.
 	 *
 	 * @since 4.0.0
 	 */
-	public function on_admin_init() {
+	public function redirect_module_not_found() {
 
-		if ( $this->page_edit === $this->current_page && ! $this->module ) {
-			$url = add_query_arg( array(
-				'page' => $this->page,
-				'message' => 'module-does-not-exists',
-			), 'admin.php' );
+		// We're on wizard, but the current module isn't valid. Aborting.
+		$url = add_query_arg([
+			'page'    => $this->page,
+			'message' => 'module-does-not-exists',
+		], 'admin.php' );
 
-			wp_safe_redirect( $url );
-			exit;
-		}
-
-		$this->export();
-	}
-
-	/**
-	 * Export single module
-	 *
-	 * @since 4.0.0
-	 */
-	private function export() {
-
-		$nonce = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
-		if ( ! wp_verify_nonce( $nonce, 'hustle_module_export' ) ) {
-			return;
-		}
-		$id = filter_input( INPUT_POST, 'id', FILTER_VALIDATE_INT );
-		if ( ! $id ) {
-			return;
-		}
-		/**
-		 * plugin data
-		 */
-		$plugin = get_plugin_data( WP_PLUGIN_DIR.'/'.Opt_In::$plugin_base_file );
-		/**
-		 * get module
-		 */
-		$module = Hustle_Module_Model::instance()->get( $id );
-		if ( is_wp_error( $module ) ) {
-			return;
-		}
-		/**
-		 * Export data
-		 */
-		$settings = array(
-			'plugin' => array(
-				'name' => $plugin['Name'],
-				'version' => Opt_In::VERSION,
-				'network' => $plugin['Network'],
-			),
-			'timestamp' => time(),
-			'attributes' => $module->get_attributes(),
-			'data' => $module->get_data(),
-			'meta' => array(),
-		);
-
-		if ( 'optin' === $module->module_mode ) {
-			$integrations = array();
-			$providers = Hustle_Providers::get_instance()->get_providers();
-			foreach ( $providers as $slug => $provider ) {
-				$provider_data = $module->get_provider_settings( $slug, false );
-				if ( $provider_data && $provider->is_connected()
-						&& $provider->is_form_connected( $id ) ) {
-					$integrations[ $slug ] = $provider_data;
-				}
-			}
-
-			$settings['meta']['integrations'] = $integrations;
-		}
-
-		$meta_names = $module->get_module_meta_names();
-		foreach ( $meta_names as $meta_key ) {
-			$settings['meta'][ $meta_key ] = json_decode( $module->get_meta( $meta_key ) );
-		}
-		/**
-		 * Filename
-		 */
-		$filename = sprintf(
-			'hustle-%s-%s-%s-%s.json',
-			$module->module_type,
-			date( 'Ymd-his' ),
-			get_bloginfo( 'name' ),
-			$module->module_name
-		);
-		$filename = strtolower( $filename );
-		$filename = sanitize_file_name( $filename );
-		/**
-		 * Print HTTP headers
-		 */
-		header( 'Content-Description: File Transfer' );
-		header( 'Content-Disposition: attachment; filename=' . $filename );
-		header( 'Content-Type: application/bin; charset=' . get_option( 'blog_charset' ), true );
-		/**
-		 * Check PHP version, for PHP < 3 do not add options
-		 */
-		$version = phpversion();
-		$compare = version_compare( $version, '5.3', '<' );
-		if ( $compare ) {
-			echo wp_json_encode( $settings );
-			exit;
-		}
-		$option = defined( 'JSON_PRETTY_PRINT' )? JSON_PRETTY_PRINT : null;
-		echo wp_json_encode( $settings, $option );
+		wp_safe_redirect( $url );
 		exit;
 	}
 
@@ -303,7 +231,7 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 			);
 
 			// Listing page only.
-		} elseif ( $this->page === $this->current_page ) { 
+		} elseif ( $this->page === $this->current_page ) {
 
 			$current_array['current'] = array(
 				'wizard_page' => $this->page_edit,
@@ -338,8 +266,12 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 		$page_ids = array();
 		$tag_ids = array();
 		$cat_ids = array();
+		$wc_cat_ids = array();
+		$wc_tag_ids = array();
 		$tags = array();
 		$cats = array();
+		$wc_cats = array();
+		$wc_tags = array();
 
 		$module = Hustle_Module_Model::instance()->get( filter_input( INPUT_GET, 'id', FILTER_VALIDATE_INT ) );
 		if ( ! is_wp_error( $module ) ) {
@@ -349,6 +281,10 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 			$page_ids = $this->get_conditions_ids( $settings, 'pages' );
 			$tag_ids = $this->get_conditions_ids( $settings, 'tags' );
 			$cat_ids = $this->get_conditions_ids( $settings, 'categories' );
+			if ( Opt_In_Utils::is_woocommerce_active() ) {
+				$wc_cat_ids = $this->get_conditions_ids( $settings, 'wc_categories' );
+				$wc_tag_ids = $this->get_conditions_ids( $settings, 'wc_tags' );
+			}
 		}
 
 
@@ -367,25 +303,25 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 			)));
 		}
 
-		$posts = $this->get_select2_data( 'post', $post_ids );
+		if ( $wc_cat_ids ) {
+			$wc_cats = array_map( array( $this, 'terms_to_select2_data' ), get_categories( array(
+				'include' => $wc_cat_ids,
+				'hide_empty' => false,
+				'taxonomy' => 'product_cat',
+			)));
+		}
 
-		/**
-		 * Add all posts
-		 */
-		$all_posts = new stdClass();
-		$all_posts->id = 'all';
-		$all_posts->text = __( 'All Posts' );
-		array_unshift( $posts, $all_posts );
+		if ( $wc_tag_ids ) {
+			$wc_tags = array_map( array( $this, 'terms_to_select2_data' ), get_categories( array(
+				'include' => $wc_tag_ids,
+				'hide_empty' => false,
+				'taxonomy' => 'product_tag',
+			)));
+		}
 
-		$pages = $this->get_select2_data( 'page', $page_ids );
+		$posts = Opt_In_Utils::get_select2_data( 'post', $post_ids );
 
-		/**
-		 * Add all pages
-		 */
-		$all_pages = new stdClass();
-		$all_pages->id = 'all';
-		$all_pages->text = __( 'All Pages' );
-		array_unshift( $pages, $all_pages );
+		$pages = Opt_In_Utils::get_select2_data( 'page', $page_ids );
 
 		/**
 		 * Add all custom post types
@@ -406,19 +342,14 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 
 			$cpt_array['name'] = $cpt->name;
 			$cpt_array['label'] = $cpt->label;
-			$cpt_array['data'] = $this->get_select2_data( $cpt->name, $cpt_ids );
-
-			// all posts under this custom post type
-			$all_cpt_posts = new stdClass();
-			$all_cpt_posts->id = 'all';
-			$all_cpt_posts->text = ! empty( $cpt->labels ) && ! empty( $cpt->labels->all_items )
-				? $cpt->labels->all_items : __( 'All Items', 'wordpress-popup' );
-			array_unshift( $cpt_array['data'], $all_cpt_posts );
+			$cpt_array['data'] = Opt_In_Utils::get_select2_data( $cpt->name, $cpt_ids );
 
 			$post_types[ $cpt->name ] = $cpt_array;
 		}
 
 		$vars['cats'] = $cats;
+		$vars['wc_cats'] = $wc_cats;
+		$vars['wc_tags'] = $wc_tags;
 		$vars['tags'] = $tags;
 		$vars['posts'] = $posts;
 		$vars['post_types'] = Opt_In_Utils::get_post_types();
@@ -441,29 +372,38 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 
 		// Visibility conditions titles, labels and bodies.
 		$vars['messages']['conditions'] = array(
-			'visitor_logged_in'           => __( "Visitor's logged in status", 'wordpress-popup' ),
+			'visitor_logged_in'           => __( "Logged in status", 'wordpress-popup' ),
 			'shown_less_than'             => __( 'Number of times visitor has seen', 'wordpress-popup' ),
 			'only_on_mobile'              => __( "Visitor's Device", 'wordpress-popup' ),
 			'from_specific_ref'           => __( 'Referrer', 'wordpress-popup' ),
 			'from_search_engine'          => __( 'Source of Arrival', 'wordpress-popup' ),
 			'on_specific_url'             => __( 'Specific URL', 'wordpress-popup' ),
+			'on_specific_browser'         => __( 'Visitor\'s Browser', 'wordpress-popup' ),
 			'visitor_has_never_commented' => __( 'Visitor Commented Before', 'wordpress-popup' ),
 			'not_in_a_country'            => __( "Visitor's Country", 'wordpress-popup' ),
-			'on_specific_roles'           => __( "Specific Roles", 'wordpress-popup' ),
-			'on_specific_templates'       => __( "Specific Templates", 'wordpress-popup' ),
-			'user_registration'				=> __( 'After registration', 'wordpress-popup' ),
-			'page_404'						=> __( '404 page', 'wordpress-popup' ),
-			'posts' => __( 'Posts', 'wordpress-popup' ),
-			'pages' => __( 'Pages', 'wordpress-popup' ),
-			'categories' => __( 'Categories', 'wordpress-popup' ),
-			'tags' => __( 'Tags', 'wordpress-popup' ),
+			'on_specific_roles'           => __( "User Roles", 'wordpress-popup' ),
+			'wp_conditions'               => __( "Static Pages", 'wordpress-popup' ),
+			'archive_pages'               => __( "Archive Pages", 'wordpress-popup' ),
+			'on_specific_templates'       => __( "Page Templates", 'wordpress-popup' ),
+			'user_registration'           => __( 'After Registration', 'wordpress-popup' ),
+			'page_404'                    => __( '404 page', 'wordpress-popup' ),
+			'posts'                       => __( 'Posts', 'wordpress-popup' ),
+			'pages'                       => __( 'Pages', 'wordpress-popup' ),
+			'categories'                  => __( 'Categories', 'wordpress-popup' ),
+			'tags'                        => __( 'Tags', 'wordpress-popup' ),
+			'wc_pages'                    => __( 'WooCommerce Pages', 'wordpress-popup' ),
+			'wc_categories'               => __( 'WooCommerce Categories', 'wordpress-popup' ),
+			'wc_tags'                     => __( 'WooCommerce Tags', 'wordpress-popup' ),
+			'wc_archive_pages'            => __( "WooCommerce Archives", 'wordpress-popup' ),
+			'wc_static_pages'             => __( "WooCommerce Static Pages", 'wordpress-popup' ),
 		);
 
 		$vars['messages']['condition_labels'] = array(
 			'mobile_only' => __( 'Mobile only', 'wordpress-popup' ),
 			'desktop_only' => __( 'Desktop only', 'wordpress-popup' ),
-			'any_conditions' => __( 'Any with {number} conditions', 'wordpress-popup' ),
+			'any_conditions' => __( '{number} condition(s)', 'wordpress-popup' ),
 			'number_views' => '< {number}',
+			'number_views_more' => '> {number}',
 			'any' => __( 'Any', 'wordpress-popup' ),
 			'all' => __( 'All', 'wordpress-popup' ),
 			'no' => __( 'No', 'wordpress-popup' ),
@@ -473,11 +413,10 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 			'logged_in' => __( 'Logged in', 'wordpress-popup' ),
 			'logged_out' => __( 'Logged out', 'wordpress-popup' ),
 			'only_these' => __( 'Only {number}', 'wordpress-popup' ),
-			'except_these' => __( 'Any except {number}', 'wordpress-popup' ),
-			'user_registration' => __( 'Show after registration', 'wordpress-popup' ),
-			'from_reg_date' => __( 'From day {number} ', 'wordpress-popup' ),
-			'to_reg_date' => __( ' - To day {number} ', 'wordpress-popup' ),
-			'after_registration' => __( 'Immediately', 'wordpress-popup' ),
+			'except_these' => __( 'All except {number}', 'wordpress-popup' ),
+			'reg_date' => __( 'Day {number} ', 'wordpress-popup' ),
+			'immediately' => __( 'Immediately', 'wordpress-popup' ),
+			'forever' => __( 'Forever', 'wordpress-popup' ),
 		);
 
 		return $vars;
@@ -581,42 +520,16 @@ abstract class Hustle_Module_Page_Abstract extends Hustle_Admin_Page_Abstract {
 	}
 
 	/**
-	 * Get usable objects for select2
-	 *
-	 * @since 4.0.3 moved from Hustle_Modules_Admin to here.
-	 * @param string $post_type post type
-	 * @param array $include_ids IDs
-	 * @return array
-	 */
-	private function get_select2_data( $post_type, $include_ids = null ) {
-		if ( empty( $include_ids ) ) {
-			$data = array();
-		} else {
-			$data = [];
-			$posts = get_posts( [
-				'numberposts' => -1,
-				'post_type' => $post_type,
-				'include' => $include_ids,
-				'post_status' => 'publish',
-				'order' => 'ASC',
-			] );
-
-			foreach ( $posts as $post ) {
-				$data[] = (object)[
-					'id' => $post->ID,
-					'text' => $post->post_title,
-				];
-			}
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Render the module's wizard page.
 	 * @since 4.0.1
 	 */
 	public function render_edit_page() {
+
+		$template_args = $this->get_page_edit_template_args();
+		$allowed = Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $template_args['module_id'] );
+		if ( ! $allowed  ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.' ), 403 );
+		}
 
 		if ( Hustle_Module_Model::SOCIAL_SHARING_MODULE !== $this->module_type ) {
 			wp_enqueue_editor();

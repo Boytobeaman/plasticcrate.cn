@@ -7,7 +7,7 @@
 
 	<div class="sui-box-settings-col-2">
 
-		<label for="hustle-drop-shadow" class="sui-toggle">
+		<label for="hustle-drop-shadow" class="sui-toggle hustle-toggle-with-container" data-toggle-on="drop-shadow">
 			<input type="checkbox"
 				name="drop_shadow"
 				data-attribute="drop_shadow"
@@ -18,7 +18,7 @@
 
 		<label for="hustle-drop-shadow"><?php esc_html_e( 'Show drop shadow', 'wordpress-popup' ); ?></label>
 
-		<div id="hustle-drop-shadow-toggle-wrapper" class="sui-border-frame sui-toggle-content{{ ( _.isTrue( drop_shadow ) ) ? '' : ' sui-hidden' }}">
+		<div class="sui-border-frame sui-toggle-content" data-toggle-content="drop-shadow">
 
 			<div class="sui-row">
 

@@ -1768,8 +1768,97 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 		$html = '';
 		$module = $this->module;
 		$fields = $this->module->emails->form_elements;
-		$render_id = self::$render_ids[ $this->module->module_id ];
 
+		// Check if this module has a recaptcha field, and that its creds were added.
+		if ( $this->is_recaptcha_active( $fields ) ) {
+
+			$recaptcha = $fields['recaptcha'];
+
+			$recaptcha_version = empty( $recaptcha['version'] ) ? 'v2_checkbox' : $recaptcha['version'];
+			$site_key_key = $recaptcha_version . '_site_key';
+			$secret_key_key = $recaptcha_version . '_secret_key';
+
+			if ( 'v2_checkbox' === $recaptcha_version ) {
+				$size = $recaptcha['recaptcha_type'];
+				$badge = '';
+				$show_badge = true;
+
+			} else {
+				$size = 'invisible';
+				$show_badge = '1' === $recaptcha[ $recaptcha_version . '_show_badge' ];
+				$badge = 'inline';
+			}
+
+			$recaptcha_classes = isset( $recaptcha['css_classes'] ) ? $recaptcha['css_classes'] : '';
+
+			if ( ! $show_badge ) {
+				$recaptcha_classes .= ' hustle-recaptcha-nobadge';
+			}
+
+			$extra_data = sprintf(
+				'data-size="%s" data-theme="%s" data-badge="%3$s"',
+				esc_attr( $size ),
+				esc_attr( $recaptcha['recaptcha_theme'] ),
+				$badge
+			);
+
+			$recaptcha_settings = Hustle_Settings_Admin::get_recaptcha_settings();
+			$render_id = self::$render_ids[ $this->module->module_id ];
+			$html .= sprintf(
+				'<div id="hustle-modal-recaptcha-%1$d-%2$d" class="hustle-recaptcha %3$s" data-required-error="%4$s" data-sitekey="%5$s" data-version=%6$s %7$s></div>',
+				$this->module->id,
+				$render_id,
+				esc_attr( $recaptcha_classes ),
+				esc_attr( $fields['recaptcha']['validation_message'] ),
+				esc_attr( $recaptcha_settings[ $site_key_key ] ),
+				$recaptcha_version,
+				$extra_data
+			);
+
+			// Display custom text instead of badge if hidden.
+			if ( ! $show_badge ) {
+
+				$html .= sprintf(
+					'<div class="hustle-recaptcha-copy">%s</div>',
+					$recaptcha[ $recaptcha_version . '_badge_replacement' ]
+				);
+			}
+
+			// The input that will hold the recaptcha's response for backend validation on form submit.
+			$html .= '<input type="hidden" name="recaptcha-response" class="recaptcha-response-input" value="">';
+
+			/**
+			 * Filter the markup for the recaptcha container
+			 *
+			 * @since 4.1.1
+			 *
+			 * @param object $module             Current module. Instance of Hustle_Module_Model.
+			 * @param array  $recaptcha          Module's recaptcha field settings.
+			 * @param array  $recaptcha_settings Global stored recaptcha credentials.
+			 * @param string $render_id          The render ID of the currently rendered module instance.
+			 */
+			$html = apply_filters( 'hustle_get_module_recaptcha_container', $html, $module, $recaptcha, $recaptcha_settings, $render_id );
+		}
+
+		return $html;
+
+	}
+
+	/**
+	 * Whether the current module's recaptcha can be displayed
+	 * Check whether this module has a recaptcha field,
+	 * and if the corresponding credentials were already stored.
+	 *
+	 * @since 4.1.1
+	 * @param $fields This module's fields.
+	 */
+	private function is_recaptcha_active( $fields = [] ) {
+
+		if ( empty( $fields ) ) {
+			$fields = $this->module->emails->form_elements;
+		}
+
+		// The module does have recaptcha.
 		if ( isset( $fields['recaptcha'] ) ) {
 
 			$recaptcha = $fields['recaptcha'];
@@ -1780,60 +1869,13 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 
 			$recaptcha_settings = Hustle_Settings_Admin::get_recaptcha_settings();
 
-			// Prevent the container from rendering if the keys for this version are not set.
+			// Make sure the creds for the selected recaptcha type has been added.
 			if ( ! empty( $recaptcha_settings[ $site_key_key ] ) && ! empty( $recaptcha_settings[ $secret_key_key ] ) ) {
-
-				if ( 'v2_checkbox' === $recaptcha_version ) {
-					$size = $recaptcha['recaptcha_type'];
-					$badge = '';
-					$show_badge = true;
-
-				} else {
-					$size = 'invisible';
-					$show_badge = '1' === $recaptcha[ $recaptcha_version . '_show_badge' ];
-					$badge = 'inline';
-				}
-
-				$recaptcha_classes = isset( $recaptcha['css_classes'] ) ? $recaptcha['css_classes'] : '';
-
-				if ( ! $show_badge ) {
-					$recaptcha_classes .= ' hustle-recaptcha-nobadge';
-				}
-
-				$extra_data = sprintf(
-					'data-size="%s" data-theme="%s" data-badge="%3$s"',
-					esc_attr( $size ),
-					esc_attr( $recaptcha['recaptcha_theme'] ),
-					$badge
-				);
-
-				$html .= sprintf(
-					'<div id="hustle-modal-recaptcha-%1$d-%2$d" class="hustle-recaptcha %3$s" data-required-error="%4$s" data-sitekey="%5$s" data-version=%6$s %7$s></div>',
-					$this->module->id,
-					$render_id,
-					esc_attr( $recaptcha_classes ),
-					esc_attr( $fields['recaptcha']['validation_message'] ),
-					esc_attr( $recaptcha_settings[ $site_key_key ] ),
-					$recaptcha_version,
-					$extra_data
-				);
-
-				// Display custom text instead of badge if hidden.
-				if ( ! $show_badge ) {
-
-					$html .= sprintf(
-						'<div class="hustle-recaptcha-copy">%s</div>',
-						$recaptcha[ $recaptcha_version . '_badge_replacement' ]
-					);
-				}
-
-				// The input that will hold the recaptcha's response for backend validation on form submit.
-				$html .= '<input type="hidden" name="recaptcha-response" class="recaptcha-response-input" value="">';
+				return true;
 			}
 		}
 
-		return $html;
-
+		return false;
 	}
 
 	/**
@@ -1857,10 +1899,25 @@ class Hustle_Module_Renderer extends Hustle_Renderer_Abstract {
 			'style'     => array(),
 			'script'    => array(),
 			'module'    => $this->module,
-			'recaptcha' => Hustle_Settings_Admin::get_recaptcha_settings(),
 		);
 
 		$response['html'] = $this->get_module();
+
+		// Add the recaptcha script inline for previews.
+		if ( $is_preview ) {
+
+			$fields = $this->module->emails->form_elements;
+
+			// Load the recaptcha script if the module has it, and if the credentials are stored.
+			if ( $this->is_recaptcha_active( $fields ) ) {
+
+				$recaptcha = $fields['recaptcha'];
+				$source    = Hustle_Module_Front::add_recaptcha_script( $recaptcha['recaptcha_language'], true, true );
+
+				// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+				$response['script'] = '<script src="' . $source . '" async defer></script>';
+			}
+		}
 
 		// This might be used later for ajax loading.
 		ob_start();

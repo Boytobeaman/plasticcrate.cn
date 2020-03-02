@@ -1,10 +1,4 @@
 <?php
-if ( isset( $capitalize_singular ) ) {
-	$capitalize_singular = $capitalize_singular;
-} else {
-	$capitalize_singular = esc_html__( 'Module', 'wordpress-popup' );
-}
-
 if ( isset( $smallcaps_singular ) ) {
 	$smallcaps_singular = $smallcaps_singular;
 } else {
@@ -25,9 +19,9 @@ if ( isset( $smallcaps_singular ) ) {
 
 			<div class="sui-box-settings-col-1">
 
-				<span class="sui-settings-label"><?php printf( esc_html__( '%s Visibility Rules', 'wordpress-popup' ), esc_html( $capitalize_singular ) ); ?></span>
+				<span class="sui-settings-label"><?php esc_html_e( 'Visibility Rules', 'wordpress-popup' ); ?></span>
 
-				<span class="sui-description"><?php printf( esc_html__( 'Select posts, pages and other conditions under which you want to display this %s module.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?><br />&nbsp;<br /><?php printf( esc_html__( 'By default, your %s modules will be shown on every post & page (except 404 page) if no condition is applied.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+				<span class="sui-description"><?php printf( esc_html__( 'By default, your %s is set to appear everywhere on your website. Alternately, you can add more specific visibility rules to suit your needs.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
 
 				<?php if ( isset( $description_line1 ) && '' !== $description_line1 ) { ?>
 
@@ -45,14 +39,10 @@ if ( isset( $smallcaps_singular ) ) {
 
 				<div id="hustle-visibility-conditions-box">
 
-					<div class="hustle-add-new-visibility-group"></div>
-
-					<?php /*
 					<button class="sui-button sui-button-ghost hustle-add-new-visibility-group">
 						<i class="sui-icon-plus" aria-hidden="true"></i>
 						<?php esc_html_e( 'Add Condition Group', 'wordpress-popup' ); ?>
 					</button>
-					*/ ?>
 
 				</div>
 

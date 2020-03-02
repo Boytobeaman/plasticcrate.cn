@@ -49,11 +49,11 @@ class Hustle_Provider_Admin_Ajax {
 	 */
 	private function validate_ajax() {
 		Opt_In_Utils::validate_ajax_call( self::$_nonce_action );
-		Opt_In_Utils::is_user_allowed_ajax( "hustle_edit_integrations" );
 	}
 
 	public function deactivate() {
 		$this->validate_ajax();
+		Opt_In_Utils::is_user_allowed_ajax( "hustle_edit_integrations" );
 
 		$data  =  Opt_In_Utils::validate_and_sanitize_fields( $_POST['data'], array( 'slug' ) ); // WPCS: CSRF ok.
 		$slug  = $data['slug'];
@@ -214,6 +214,7 @@ class Hustle_Provider_Admin_Ajax {
 
 	public function settings() {
 		$this->validate_ajax();
+		Opt_In_Utils::is_user_allowed_ajax( "hustle_edit_integrations" );
 
 		// Sanitizes the data from $_POST['data'] and validate required fields
 		$data = filter_input( INPUT_POST, 'data', FILTER_DEFAULT );

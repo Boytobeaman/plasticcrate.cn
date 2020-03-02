@@ -27,8 +27,7 @@ class Hustle_Deletion {
 		delete_option( 'hustle_color_index' );
 		delete_option( 'hustle_database_version' );
 		delete_option( 'hustle_unsubscribe_nonces' );
-		delete_option( 'hustle_30_migrated' );
-		delete_option( 'hustle_30_tracking_migrated' );
+		delete_option( 'hustle_migrations' );
 		delete_option( 'hustle_30_migration_data' );
 		delete_option( 'hustle_settings' );
 		delete_option( 'hustle_ss_refresh_counters' );
@@ -37,7 +36,6 @@ class Hustle_Deletion {
 		delete_option( 'hustle_activated_flag' );
 		delete_option( 'hustle_new_welcome_notice_dismissed' );
 		delete_option( 'hustle_popup_migrated' );
-		delete_option( 'hustle_20_migrated' );
 		delete_option( 'hustle_global_unsubscription_settings' );
 		delete_option( 'hustle_global_email_settings' );
 		delete_option( 'hustle_database_version' );

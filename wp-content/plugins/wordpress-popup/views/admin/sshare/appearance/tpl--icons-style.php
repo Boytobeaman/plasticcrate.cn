@@ -13,10 +13,7 @@
 
 			<div class="sui-tabs-menu">
 
-				<label
-					for="hustle-social-icon--default"
-					class="sui-tab-item{{ ( 'flat' === icon_style ) ? ' active' : '' }}"
-				>
+				<label for="hustle-social-icon--default" class="sui-tab-item" >
 					<input
 						type="radio"
 						name="icon_style"
@@ -29,10 +26,7 @@
 					<span class="sui-screen-reader-text"><?php esc_html_e( 'Default', 'wordpress-popup' ); ?></span>
 				</label>
 
-				<label
-					for="hustle-social-icon--outlined"
-					class="sui-tab-item{{ ( 'outline' === icon_style ) ? ' active' : '' }}"
-				>
+				<label for="hustle-social-icon--outlined" class="sui-tab-item" >
 					<input
 						type="radio"
 						name="icon_style"
@@ -45,10 +39,7 @@
 					<span class="sui-screen-reader-text"><?php esc_html_e( 'Outlined', 'wordpress-popup' ); ?></span>
 				</label>
 
-				<label
-					for="hustle-social-icon--circle"
-					class="sui-tab-item{{ ( 'rounded' === icon_style ) ? ' active' : '' }}"
-				>
+				<label for="hustle-social-icon--circle" class="sui-tab-item">
 					<input
 						type="radio"
 						name="icon_style"
@@ -61,10 +52,7 @@
 					<span class="sui-screen-reader-text"><?php esc_html_e( 'Circle', 'wordpress-popup' ); ?></span>
 				</label>
 
-				<label
-					for="hustle-social-icon--square"
-					class="sui-tab-item{{ ( 'squared' === icon_style ) ? ' active' : '' }}"
-				>
+				<label for="hustle-social-icon--square" class="sui-tab-item" >
 					<input
 						type="radio"
 						name="icon_style"

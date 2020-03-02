@@ -178,11 +178,13 @@ class Hustle_Tracking_Model {
 			$db = $wpdb;
 		}
 		$date = Opt_In_Utils::get_current_date();
-		$db->query( $db->prepare(
-			"UPDATE {$this->table_name} SET `counter` = `counter`+1, `date_updated` = %s WHERE `tracking_id` = %d",
-			$date,
-			$id
-		));
+		$db->query(
+			$db->prepare(
+				"UPDATE {$this->table_name} SET `counter` = `counter`+1, `date_updated` = %s WHERE `tracking_id` = %d",
+				$date,
+				$id
+			)
+		);
 	}
 
 	/**
@@ -512,7 +514,7 @@ class Hustle_Tracking_Model {
 	 */
 	public function delete_data( $module_id ) {
 		global $wpdb;
-		return $wpdb->delete(
+		$wpdb->delete(
 			$this->table_name,
 			array( 'module_id' => $module_id ),
 			array( '%d' )
@@ -754,4 +756,117 @@ class Hustle_Tracking_Model {
 			$tracking_id
 		));
 	}
+
+	/**
+	 * Get analytics stats
+	 *
+	 * @since 4.1
+	 *
+	 * @global object $wpdb
+	 * @param int $days_ago
+	 * @return array
+	 */
+	public static function analytics_stats( $days_ago ) {
+		$transient_key = 'hustle_analytics_stats_' . current_time('Y-m-d') . '_' . $days_ago;
+		$cached = get_transient( $transient_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		global $wpdb;
+		$tracking_table = Hustle_Db::tracking_table();
+		$ranges = array_keys( Opt_In_Utils::get_analytic_ranges() );
+		$days_ago = in_array( $days_ago, $ranges, true ) ? $days_ago : 7;
+		$today = new DateTime( current_time('Y-m-d') );
+		$end_date = date( 'Y-m-d H:i:s', $today->format('U') - 1 );
+		$start_date = date( 'Y-m-d H:i:s', $today->format('U') - $days_ago * DAY_IN_SECONDS );
+		$mysql_format = '%Y-%m-%d %H:%i:%s';
+
+		$result = $wpdb->get_results(
+			$wpdb->prepare( "SELECT module_type, action, date_created, counter "
+				. "FROM {$tracking_table} " // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				. "WHERE date_created BETWEEN STR_TO_DATE( %s, %s ) AND STR_TO_DATE( %s, %s)", $start_date, $mysql_format, $end_date, $mysql_format ), ARRAY_A );
+
+
+
+		$final_data = self::get_default_analytics_stats( $days_ago );
+
+		foreach ( $result as $data ) {
+			$day = explode( ' ', $data['date_created'] )[0];
+			$final_data[ $data['module_type'] ][ $data['action'] ][ $day ] += $data['counter'];
+			$final_data[ 'overall' ][ $data['action'] ][ $day ] += $data['counter'];
+			if ( 0 === strpos( $data['module_type'], 'embedded_' ) ) {
+				$final_data[ 'embedded' ][ $data['action'] ][ $day ] += $data['counter'];
+			}
+			if ( 0 === strpos( $data['module_type'], 'social_sharing_' ) ) {
+				$final_data[ 'social_sharing' ][ $data['action'] ][ $day ] += $data['counter'];
+			}
+		}
+		// count rates
+		foreach ( $final_data as $block => $types ) {
+			foreach ( $types as $type => $days ) {
+				if ( 'rate' !== $type ) {
+					continue;
+				}
+				foreach ( $days as $day => $val ) {
+					if ( !empty( $final_data[ $block ]['view'][ $day ] ) && !empty( $final_data[ $block ]['conversion'][ $day ] ) ) {
+						$final_data[ $block ]['rate'][ $day ] = round( 100 * $final_data[ $block ]['conversion'][ $day ] / $final_data[ $block ]['view'][ $day ], 2 );
+					}
+				}
+			}
+		}
+
+		// cache for later.
+		set_transient( $transient_key, $final_data, DAY_IN_SECONDS );
+
+		return $final_data;
+	}
+
+	/**
+	 * Get default analitics stats with zero values
+	 *
+	 * @since 4.1
+	 *
+	 * @param int $days_ago
+	 * @return array
+	 */
+	public static function get_default_analytics_stats( $days_ago ) {
+		$days = [];
+		for ( $i = 1; $i <= $days_ago; $i++ ) {
+			$days[] = date( 'Y-m-d', current_time('U') - $i * DAY_IN_SECONDS );
+		}
+		$all_blocks = [
+			'overall',
+			'popup',
+			'slidein',
+			'embedded',
+			'embedded_inline',
+			'embedded_widget',
+			'embedded_shortcode',
+			'social_sharing',
+			'social_sharing_floating',
+			'social_sharing_inline',
+			'social_sharing_widget',
+			'social_sharing_shortcode',
+		];
+
+		$all_types = [
+			'view',
+			'conversion',
+			'cta_conversion',
+			'optin_conversion',
+			'rate',
+		];
+		$final_data = [];
+		foreach ( $all_blocks as $block ) {
+			foreach ( $all_types as $type ) {
+				foreach ( $days as $day ) {
+					$final_data[ $block ][ $type ][ $day ] = 0;
+				}
+			}
+		}
+
+		return $final_data;
+	}
+
 }

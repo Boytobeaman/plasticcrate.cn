@@ -166,12 +166,12 @@
 
 					<div class="sui-tabs-menu">
 
-						<label class="sui-tab-item{{ 'true' === required ? '' : ' active' }}">
-							<input type="radio" name="required" value="false" data-attribute="required"{{ _.checked( 'true' !== required ) }}>
+						<label class="sui-tab-item">
+							<input type="radio" name="required" value="false" data-attribute="required"{{ _.checked( 'false', required ) }}>
 							<?php esc_html_e( 'Optional', 'wordpress-popup' ); ?></label>
 
-						<label class="sui-tab-item{{ 'true' === required ? ' active' : '' }}">
-							<input type="radio" name="required" value="true" data-attribute="required" {{ _.checked( 'true' === required ) }} data-tab-menu="required">
+						<label class="sui-tab-item">
+							<input type="radio" name="required" value="true" data-attribute="required" {{ _.checked( 'true', required ) }} data-tab-menu="required">
 							<?php esc_html_e( 'Required', 'wordpress-popup' ); ?></label>
 
 					</div>
@@ -310,7 +310,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-recaptcha-type--v2-checkbox" class="sui-tab-item{{ _.class( ( 'v2_checkbox' === version ), ' active' ) }}">
+					<label for="hustle-recaptcha-type--v2-checkbox" class="sui-tab-item">
 						<input type="radio"
 							name="version"
 							data-attribute="version"
@@ -322,7 +322,7 @@
 						<?php esc_html_e( 'V2 Checkbox', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-recaptcha-type--v2-invisible" class="sui-tab-item{{ _.class( ( 'v2_invisible' === version ), ' active' ) }}">
+					<label for="hustle-recaptcha-type--v2-invisible" class="sui-tab-item">
 						<input type="radio"
 							name="version"
 							data-attribute="version"
@@ -334,7 +334,7 @@
 						<?php esc_html_e( 'V2 Invisible', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-recaptcha-type--v3-recaptcha" class="sui-tab-item{{ _.class( ( 'v3_recaptcha' === version ), ' active' ) }}">
+					<label for="hustle-recaptcha-type--v3-recaptcha" class="sui-tab-item">
 						<input type="radio"
 							name="version"
 							data-attribute="version"
@@ -345,24 +345,23 @@
 						/>
 						<?php esc_html_e( 'V3 reCAPTCHA', 'wordpress-popup' ); ?>
 					</label>
-
 				</div>
 
 				<?php
-				$url = add_query_arg(
-					array(
-						'page' => Hustle_Module_Admin::SETTINGS_PAGE,
-						'section' => 'recaptcha',
-					),
-					'admin.php'
-				);
-
-				$unavailable_message = '<div class="sui-notice sui-notice-error"><p>' . sprintf( esc_html__( 'You haven\'t added API keys for this reCAPTCHA type in your global settings. Add your API keys %1$shere%2$s and then come back to configure this field.', 'wordpress-popup' ), '<a href="' . $url . '" target="_blank">', '</a>' ) . '</p></div>';
+				$url                 = add_query_arg( array(
+					'page'    => Hustle_Module_Admin::SETTINGS_PAGE,
+					'section' => 'recaptcha',
+				), 'admin.php' );
+				$unavailable_message =
+					'<div class="sui-notice sui-notice-error"><p>' .
+					/* translators: 1: opening 'a' tag, 2: closing 'a' tag */
+					sprintf( esc_html__( 'You haven\'t added API keys for this reCAPTCHA type in your global settings. Add your API keys %1$shere%2$s and then come back to configure this field.', 'wordpress-popup' ), '<a href="' . $url . '" target="_blank">', '</a>' ) .
+					'</p></div>';
 				?>
 
 				<div class="sui-tabs-content">
 
-					<div class="sui-tab-content<?php echo ( in_array( 'v2_checkbox', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?> {{ _.class( ( 'v2_checkbox' === version ), ' active' ) }}" data-tab-content="recaptcha-version-v2-checkbox-tab">
+					<div class="sui-tab-content<?php echo ( in_array( 'v2_checkbox', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?>" data-tab-content="recaptcha-version-v2-checkbox-tab">
 
 						<?php if ( in_array( 'v2_checkbox', $available_recaptchas, true ) ) : ?>
 
@@ -414,7 +413,7 @@
 
 					</div>
 
-					<div class="sui-tab-content<?php echo ( in_array( 'v2_invisible', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?> {{ _.class( ( 'v2_invisible' === version ), ' active' ) }}" data-tab-content="recaptcha-version-v2-invisible-tab">
+					<div class="sui-tab-content<?php echo ( in_array( 'v2_invisible', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?>" data-tab-content="recaptcha-version-v2-invisible-tab">
 
 						<?php if ( in_array( 'v2_invisible', $available_recaptchas, true ) ) : ?>
 
@@ -508,7 +507,7 @@
 
 					</div>
 
-					<div class="sui-tab-content<?php echo ( in_array( 'v3_recaptcha', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?> {{ _.class( ( 'v3_recaptcha' === version ), ' active' ) }}" data-tab-content="recaptcha-version-v3-recaptcha-tab">
+					<div class="sui-tab-content<?php echo ( in_array( 'v3_recaptcha', $available_recaptchas, true ) ) ? ' sui-tab-boxed' : ''; ?>" data-tab-content="recaptcha-version-v3-recaptcha-tab">
 
 						<?php if ( in_array( 'v3_recaptcha', $available_recaptchas, true ) ) : ?>
 
@@ -815,7 +814,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-time-format--12" class="sui-tab-item{{ ( '12' === time_format ) ? ' active' : '' }}">
+					<label for="hustle-time-format--12" class="sui-tab-item">
 						<input type="radio"
 							name="time_format"
 							data-attribute="time_format"
@@ -825,7 +824,7 @@
 						<?php esc_html_e( '12 hour', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-time-format--24" class="sui-tab-item{{ ( '24' === time_format ) ? ' active' : '' }}">
+					<label for="hustle-time-format--24" class="sui-tab-item">
 						<input type="radio"
 							name="time_format"
 							data-attribute="time_format"

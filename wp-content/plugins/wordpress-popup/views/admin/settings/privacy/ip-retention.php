@@ -14,7 +14,7 @@ $ip_retention_unit   = $settings['ip_retention_number_unit'];
 
 		<div class="sui-tabs-menu">
 
-			<label class="sui-tab-item<?php echo $retain_ip_forever ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="retain_ip_forever"
 				id="hustle-retain-ip-forever--on"
@@ -23,7 +23,7 @@ $ip_retention_unit   = $settings['ip_retention_number_unit'];
 				<?php esc_html_e( 'Forever', 'wordpress-popup' ); ?>
 			</label>
 
-			<label class="sui-tab-item<?php echo ! $retain_ip_forever ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="retain_ip_forever"
 				id="hustle-retain-ip-forever--off"
@@ -35,7 +35,7 @@ $ip_retention_unit   = $settings['ip_retention_number_unit'];
 		</div>
 
 		<div class="sui-tabs-content">
-			<div class="sui-tab-boxed<?php echo ! $retain_ip_forever ? ' active':''; ?>" data-tab-content="ip-retention-number">
+			<div class="sui-tab-boxed" data-tab-content="ip-retention-number">
 				<div class="sui-row">
 					<div class="sui-col-md-6">
 						<input type="number"

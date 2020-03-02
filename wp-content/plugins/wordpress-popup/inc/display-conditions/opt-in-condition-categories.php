@@ -1,77 +1,56 @@
 <?php
 
 class Opt_In_Condition_Categories extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ){
+	public function is_allowed() {
 
-		if ( class_exists('woocommerce') ){
-			if ( is_woocommerce() ) {
-				return true;
-			}
+		$selected_categories = ! empty( $this->args->categories ) ? (array) $this->args->categories : [];
+		$filter_type         = isset( $this->args->filter_type ) && in_array( $this->args->filter_type, array( 'only', 'except' ), true )
+				? $this->args->filter_type : 'except';
+
+		$current_categories = $this->get_current_categories();
+
+		// There was an error retrieving the categories.
+		if ( is_null( $current_categories ) ) {
+			return false;
 		}
 
-		if ( !isset( $this->args->categories ) || empty( $this->args->categories ) ) {
-			if ( !is_singular() ) {
-				if ( !isset($this->args->filter_type) || "except" === $this->args->filter_type ) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
-		} elseif ( in_array("all", $this->args->categories, true) ) {
-			if ( !isset($this->args->filter_type) || "except" === $this->args->filter_type ) {
+		if ( 'except' === $filter_type ) {
+
+			// The current post has no categories.
+			// Matching "all categories except: {any|none}". We're matching only posts with at least 1 category.
+			if ( empty( $current_categories ) ) {
 				return false;
-			} else {
+			}
+
+			return array() === array_intersect( $current_categories, $selected_categories );
+
+		} else {
+
+			// No categories were selected and the current post has no categories.
+			// Matching "only these categories: {none}". We're matching only posts with no categories.
+			if ( empty( $current_categories ) && empty( $selected_categories ) ) {
 				return true;
 			}
-		}
 
-		switch( $this->args->filter_type ){
-			case "only":
-				return array() !== array_intersect( $this->_get_current_categories(), (array) $this->args->categories );
-			case "except":
-				return array() === array_intersect( $this->_get_current_categories(), (array) $this->args->categories );
-			default:
-				return true;
+			return array() !== array_intersect( $current_categories, $selected_categories );
 		}
 	}
 
 	/**
 	 * Returns categories of current page|post
 	 *
-	 * @since 2.0
-	 * @return array
+	 * @since 2.0.0
+	 * @return null|array
 	 */
-	private function _get_current_categories(){
+	private function get_current_categories() {
 		global $post;
-		if( !isset( $post ) ) return array();
+		if ( ! isset( $post ) || ! ( $post instanceof WP_Post ) || 'post' !== $post->post_type || ! is_single() ) {
+			return null;
+		}
 
-		$terms = get_the_terms( $post, "category" );
-		$term_ids = $terms && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
+		$terms    = get_the_terms( $post, 'category' );
+		$term_ids = $terms && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 		return array_map( 'strval', $term_ids );
 	}
 
-	public function label(){
-		if ( isset( $this->args->categories ) && !empty( $this->args->categories ) && is_array( $this->args->categories ) ) {
-			$total = count( $this->args->categories );
-			switch( $this->args->filter_type ){
-				case "only":
-					return ( in_array("all", $this->args->categories, true) )
-						? __("All categories", 'wordpress-popup')
-						: sprintf( __("%d categories", 'wordpress-popup'), $total );
-				case "except":
-					return ( in_array("all", $this->args->categories, true) )
-						? __("No categories", 'wordpress-popup')
-						: sprintf( __("All categories except %d", 'wordpress-popup'), $total );
-
-				default:
-					return null;
-			}
-		} else {
-			return ( !isset($this->args->filter_type) || "except" === $this->args->filter_type )
-				? __("All categories", 'wordpress-popup')
-				: __("No categories", 'wordpress-popup');
-		}
-	}
 }

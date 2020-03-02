@@ -28,7 +28,7 @@ Hustle lets you easily grow your mailing list or display targeted ads across you
 > “Amazing plugin really. Everything you need to create professional ads without spending a dime...amazing integration with MailChimp.” - [Marco Floriano](https://wordpress.org/support/users/marcofloriano/)
 
 ### Get Busy With Social Sharing
-Plus, Hustle now includes top social icons for easily building your following on your favorite social networks. Quickly enable the most popular social networks and use floating social, widgets, and shortcodes to add followers. 
+Plus, Hustle now includes top social icons for easily building your following on your favorite social networks. Quickly enable the most popular social networks and use floating social, widgets, and shortcodes to add followers.
 
 - Facebook
 - Twitter
@@ -75,7 +75,7 @@ Hustle integrates with all the popular email services. Just connect your account
 - SendGrid
 
 ### Gutenberg WordPress Editor Block
-Hustle supports both the Classic Editor plugin and Gutenberg. When you're ready to say goodbye to shortcodes, the Hustle block pulls your opt-ins and embedded content in for you. 
+Hustle supports both the Classic Editor plugin and Gutenberg. When you're ready to say goodbye to shortcodes, the Hustle block pulls your opt-ins and embedded content in for you.
 
 ### Smart Exit-Intent
 Hustle has exit-intent, a favorite of professional marketers, that detects when visitors are about to leave your site and – BOOM! A pop-up or slide-in to grab their attention.
@@ -122,7 +122,7 @@ My superhero friends run the WPMU DEV Blog, your source for the very best WordPr
 Thanks for looking at Hustle, and I look forward to helping you market and grow your business with popups and more.
 
  *Enjoy, The Hustle*
- 
+
 
 == Frequently Asked Questions ==
 
@@ -137,12 +137,28 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 
 == Screenshots ==
 
-1. Easily create pop-ups with amazing animations and preview them as you build. 
+1. Easily create pop-ups with amazing animations and preview them as you build.
 2. All the display conditions you need for targeted marketing.
 3. Quickly create and display a floating social sharing icon bar.
 4. Build beautiful pop-ups with any of the 4 included layouts.
 
 == Changelog ==
+= 7.1.0 =
+* Important! We've fixed visibility conditions! Prior to Hustle 4.1, the visibility engine would require you to set rules for every post type your theme used, not just the ones you specified to make it appear on correct pages. We've updated this behavior to only display modules based on the post types explicitly defined in your conditions. For Example, if you add a “Pages” condition to show your module on 1 page only, you'd no longer have to add other post type conditions to hide your module on them. After updating, we recommend double-checking your Hustle modules' visibility conditions are working as expected.
+* Allow restricting access within Hustle by user roles
+* Add groups to visibility conditions
+* Add "any" and "all" conditionals within groups
+* Allow applying each group to a different display type
+* Allow the conditions to show or hide the module when they are met
+* Add a visibility conditions for Woocommerce, page templates, the user's browser, registration date, user role, static pages, and archive pages
+* Remove "all" and "none" within the conditions' options
+* Support SCRIPT_DEBUG
+* Handle support for some of the old conditions behavior with the new options
+* Allow extending the core's visibility conditions
+* Use a single option for retrieving migration flags
+* Improve error messages when importing modules
+* Prevent the email form field from being removed
+* Improve integrations' support for different field types
 
 = 7.0.4 =
 * Allow saving and using custom palettes
@@ -261,7 +277,7 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 * Increase the amount of customizable elements for colors palettes
 * Add option to give form fields custom classes
 * Fix double opt-in for MailerLite not working
-* Support wildcards and regex in "URL" visibility conditions 
+* Support wildcards and regex in "URL" visibility conditions
 * Fix custom Javascript running twice on page load
 * Preview modules via AJAX
 * Adjust outdated countries in the countries list
@@ -281,7 +297,7 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 
 = 6.0.8.1 =
 * Fix Constant Contact check so the email is searched in the current list only.
-* Accept active lists besides the static ones in Constant Contact. 
+* Accept active lists besides the static ones in Constant Contact.
 * Fix InfusionSoft status being saved as "Non Marketable".
 * Improve process to connect to Hubspot.
 * Improve escaping values on emails list CSV export.
@@ -359,7 +375,7 @@ No! Hustle gives you all the same settings and options as Hustle Pro. The only d
 * Fix Sendgrid library conflict.
 * Fix Custom fields behavior on some providers.
 * Fix PHP error when using category conditions in multiple modules.
-* Fix checkboxes and radios issue when the same embed is twice in the same page. 
+* Fix checkboxes and radios issue when the same embed is twice in the same page.
 * Fix various UI details in dashboard and frontend.
 * Add "upgrade" link on plugins page for Free version.
 

@@ -67,20 +67,30 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			) );
 			$extra_data = array_filter( $extra_data );
 
-			if ( !empty( $extra_data ) ) {
+			if ( ! empty( $extra_data ) ) {
 				$custom_fields = array();
+				$module 	 	= Hustle_Module_Model::instance()->get( $module_id );
+				$form_fields 	= $module->get_form_fields();
 				foreach ( $extra_data as $key => $value ) {
-					$custom_fields[] = array(
-						'name' => $key,
-						'label' => $key,
-					);
+					$type = isset( $form_fields[ $key ] ) ? $this->get_field_type( $form_fields[ $key ]['type'] ) : 'text';
 
+					if( 'date' === $type && isset( $submitted_data[$key] ) && ! empty( $submitted_data[$key] ) ){
+						//hubspot needs date in milisecond unix time.
+						$submitted_data[$key] = strtotime( $submitted_data[$key] ) * 1000;
+					}
+					
+					$custom_fields[] = array(
+						'name' 	=> $key,
+						'label' => $key,
+						'type' 	=> $type,
+					);
 				}
+
 				$addon->add_custom_fields( $custom_fields );
 			}
 
 			$email_exist = $this->get_subscriber( $api, $submitted_data['email'] );
-
+			
 			/**
 			 * Fires before adding subscriber
 			 *
@@ -234,7 +244,7 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 			$list_id 			= $addon_setting_values['list_id'];
 			$existing_member	= false;
 			$member 			= $this->get_subscriber( $api, $submitted_data['email'] );
-
+			$existing_member    = false;
 			if ( $member && ! empty( $member->vid ) && ! empty( $member->{'list-memberships'} ) ) {
 				$lists = wp_list_pluck( $member->{'list-memberships'}, 'static-list-id' );
 
@@ -297,6 +307,37 @@ class Hustle_HubSpot_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return $this->_subscriber[ md5( $data ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 'date';
+				break;
+			case 'number':
+				$type = 'number';
+				break;
+			default:
+				$type = 'text';
+				break;
+		}
+
+		return $type;
 	}
 
 }

@@ -20,7 +20,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label id="hustle-feature-image-left-label" for="hustle-feature-image-left" class="sui-tab-item{{ _.class( 'left' === feature_image_position,' active' ) }}">
+					<label id="hustle-feature-image-left-label" for="hustle-feature-image-left" class="sui-tab-item">
 						<input type="radio"
 							name="feature_image_position"
 							value="left"
@@ -32,7 +32,7 @@
 
 					<?php if ( $is_optin ) { ?>
 
-						<label id="hustle-feature-image-above-label" for="hustle-feature-image-above" class="sui-tab-item{{ _.class( 'above' === feature_image_position,' active' ) }}{{ _.class( 'one' !== form_layout, ' sui-hidden' ) }}">
+						<label id="hustle-feature-image-above-label" for="hustle-feature-image-above" class="sui-tab-item{{ _.class( 'one' !== form_layout, ' sui-hidden' ) }}">
 							<input type="radio"
 								name="feature_image_position"
 								value="above"
@@ -42,7 +42,7 @@
 							<?php esc_attr_e( "Above Content", 'wordpress-popup' ); ?>
 						</label>
 
-						<label id="hustle-feature-image-below-label" for="hustle-feature-image-below" class="sui-tab-item{{ _.class( 'below' === feature_image_position,' active' ) }}{{ _.class( 'one' !== form_layout, ' sui-hidden' ) }}">
+						<label id="hustle-feature-image-below-label" for="hustle-feature-image-below" class="sui-tab-item{{ _.class( 'one' !== form_layout, ' sui-hidden' ) }}">
 							<input type="radio"
 								name="feature_image_position"
 								value="below"
@@ -54,7 +54,7 @@
 
 					<?php } ?>
 
-					<label id="hustle-feature-image-right-label" for="hustle-feature-image-right" class="sui-tab-item{{ _.class( 'right' === feature_image_position,' active' ) }}">
+					<label id="hustle-feature-image-right-label" for="hustle-feature-image-right" class="sui-tab-item">
 						<input type="radio"
 							name="feature_image_position"
 							value="right"
@@ -84,7 +84,7 @@
 
 					<div class="sui-tabs-menu">
 
-						<label for="hustle-feature-image-cover" class="sui-tab-item{{ ( 'cover' === feature_image_fit ) ? ' active' : '' }}">
+						<label for="hustle-feature-image-cover" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_fit"
 								data-attribute="feature_image_fit"
@@ -95,7 +95,7 @@
 							<?php esc_attr_e( "Cover", 'wordpress-popup' ); ?>
 						</label>
 
-						<label for="hustle-feature-image-fill" class="sui-tab-item{{ ( 'fill' === feature_image_fit ) ? ' active' : '' }}">
+						<label for="hustle-feature-image-fill" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_fit"
 								data-attribute="feature_image_fit"
@@ -105,7 +105,7 @@
 							<?php esc_attr_e( "Fill", 'wordpress-popup' ); ?>
 						</label>
 
-						<label for="hustle-feature-image-contain" class="sui-tab-item{{ ( 'contain' === feature_image_fit ) ? ' active' : '' }}">
+						<label for="hustle-feature-image-contain" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_fit"
 								data-attribute="feature_image_fit"
@@ -116,7 +116,7 @@
 							<?php esc_attr_e( "Contain", 'wordpress-popup' ); ?>
 						</label>
 
-						<label for="hustle-feature-image-none" class="sui-tab-item{{ ( 'none' === feature_image_fit ) ? ' active' : '' }}">
+						<label for="hustle-feature-image-none" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_fit"
 								data-attribute="feature_image_fit"
@@ -130,7 +130,7 @@
 
 					<div class="sui-tabs-content">
 
-						<div class="sui-tab-content sui-tab-boxed {{ _.class( ( 'contain' === feature_image_fit || 'cover' === feature_image_fit), 'active' ) }}" data-tab-content="hustle-focus-image">
+						<div class="sui-tab-content sui-tab-boxed" data-tab-content="hustle-focus-image">
 
 							<?php self::static_render( 'admin/commons/sui-wizard/elements/focal-point', array( 'feature_image' => $feature_image ) ); ?>
 
@@ -154,7 +154,7 @@
 
 					<div class="sui-tabs-menu">
 
-						<label for="hustle-feature-image-visible" class="sui-tab-item {{ ! _.isTrue( feature_image_hide_on_mobile ) ? 'active' : '' }}">
+						<label for="hustle-feature-image-visible" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_hide_on_mobile"
 								data-attribute="feature_image_hide_on_mobile"
@@ -164,7 +164,7 @@
 							<?php esc_attr_e( "Visible", 'wordpress-popup' ); ?>
 						</label>
 
-						<label for="hustle-feature-image-hidden" class="sui-tab-item {{ _.isTrue( feature_image_hide_on_mobile ) ? 'active' : '' }}">
+						<label for="hustle-feature-image-hidden" class="sui-tab-item">
 							<input type="radio"
 								name="feature_image_hide_on_mobile"
 								data-attribute="feature_image_hide_on_mobile"

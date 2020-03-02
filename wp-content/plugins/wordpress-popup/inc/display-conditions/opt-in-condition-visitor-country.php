@@ -1,7 +1,7 @@
 <?php
 
 class Opt_In_Condition_Visitor_Country extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ){
+	public function is_allowed(){
 
 		if ( isset( $this->args->countries ) ) {
 
@@ -11,11 +11,7 @@ class Opt_In_Condition_Visitor_Country extends Opt_In_Condition_Abstract {
 				return $this->utils()->test_country( $this->args->countries );
 			}
 		}
-		
-		return true;
-	}
 
-	public function label() {
-		return isset( $this->args->countries ) ? __( 'From specific countrie', 'wordpress-popup') : "";
+		return false;
 	}
 }

@@ -61,31 +61,28 @@
 
 									<div class="sui-tabs-menu">
 
-										<label
-											for="hustle-<?php echo esc_html( $key ); ?>--default-colors"
-											class="sui-tab-item {{ '0' === eval( '<?php echo esc_html( $key ); ?>' +  '_customize_colors' ) ? 'active' : '' }}"
-										>
+										<label for="hustle-<?php echo esc_attr( $key ); ?>--default-colors" class="sui-tab-item" >
+
 											<input
 												type="radio"
 												value="0"
-												name="hustle-<?php echo esc_html( $key ); ?>--colors"
-												id="hustle-<?php echo esc_html( $key ); ?>--default-colors"
-												data-attribute="<?php echo esc_html( $key ); ?>_customize_colors"
+												name="hustle-<?php echo esc_attr( $key ); ?>--colors"
+												id="hustle-<?php echo esc_attr( $key ); ?>--default-colors"
+												data-attribute="<?php echo esc_attr( $key ); ?>_customize_colors"
+												<?php checked( $appearance_settings[ $key . '_customize_colors' ], '0' ); ?>
 											/>
 											<?php esc_html_e( 'Use default colors', 'wordpress-popup' ); ?>
 										</label>
 
-										<label
-											for="hustle-<?php echo esc_html( $key ); ?>--custom-colors"
-											class="sui-tab-item {{ '1' === eval( '<?php echo esc_html( $key ); ?>' +  '_customize_colors' ) ? 'active' : '' }}"
-										>
+										<label for="hustle-<?php echo esc_attr( $key ); ?>--custom-colors" class="sui-tab-item">
 											<input
 												type="radio"
 												value="1"
-												name="hustle-<?php echo esc_html( $key ); ?>--colors"
-												id="hustle-<?php echo esc_html( $key ); ?>--custom-colors"
-												data-attribute="<?php echo esc_html( $key ); ?>_customize_colors"
-												data-tab-menu="hustle-<?php echo esc_html( $key ); ?>--custom-palette"
+												name="hustle-<?php echo esc_attr( $key ); ?>--colors"
+												id="hustle-<?php echo esc_attr( $key ); ?>--custom-colors"
+												data-attribute="<?php echo esc_attr( $key ); ?>_customize_colors"
+												data-tab-menu="hustle-<?php echo esc_attr( $key ); ?>--custom-palette"
+												<?php checked( $appearance_settings[ $key . '_customize_colors' ], '1' ); ?>
 											/>
 											<?php esc_html_e( 'Custom', 'wordpress-popup' ); ?>
 										</label>
@@ -94,12 +91,9 @@
 
 									<div class="sui-tabs-content sui-tabs-content-lg">
 
-										<div
-											class="sui-tab-content {{ '1' === eval( '<?php echo esc_html( $key ); ?>' +  '_customize_colors' ) ? 'active' : 'sui-hidden' }}"
-											data-tab-content="hustle-<?php echo esc_html( $key ); ?>--custom-palette"
-										>
+										<div class="sui-tab-content" data-tab-content="hustle-<?php echo esc_attr( $key ); ?>--custom-palette">
 
-											<div id="hustle-<?php echo esc_html( $key ); ?>-icons-custom-background" class="sui-form-field{{ ( 'flat' === icon_style ) ? ' sui-hidden' : '' }}">
+											<div id="hustle-<?php echo esc_attr( $key ); ?>-icons-custom-background" class="sui-form-field{{ ( 'flat' === icon_style ) ? ' sui-hidden' : '' }}">
 
 												<?php if ( 'outline' === $appearance_settings['icon_style'] ) { ?>
 													<label class="sui-label"><?php esc_html_e( 'Icon border', 'wordpress-popup' ); ?></label>

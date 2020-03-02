@@ -19,6 +19,13 @@ abstract class Opt_In_Condition_Abstract {
 	 */
 	private $_geo;
 
+	/**
+	 * Hustle module
+	 *
+	 * @var Hustle_Model
+	 */
+	public $module;
+
 	public function __construct($args){
 		$this->args = (object)$args;
 	}
@@ -48,10 +55,5 @@ abstract class Opt_In_Condition_Abstract {
 		$this->module_type = $type;
 	}
 
-	/**
-	 * @return string
-	 */
-	abstract public function label();
-
-	abstract public function is_allowed( Hustle_Model $optin );
+	abstract public function is_allowed();
 }

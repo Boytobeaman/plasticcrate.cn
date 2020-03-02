@@ -7,7 +7,7 @@
 
 	<div class="sui-box-settings-col-2">
 
-		<label for="hustle-customize-size" class="sui-toggle">
+		<label for="hustle-customize-size" class="sui-toggle hustle-toggle-with-container" data-toggle-on="customize-size">
 			<input type="checkbox"
 				name="customize_size"
 				data-attribute="customize_size"
@@ -18,7 +18,7 @@
 
 		<label for="hustle-customize-size"><?php esc_html_e( 'Enable custom size', 'wordpress-popup' ); ?></label>
 
-		<div id="hustle-customize-size-toggle-wrapper" class="sui-toggle-content{{ ( _.isTrue( customize_size ) ) ? '' : ' sui-hidden' }}">
+		<div class="sui-toggle-content" data-toggle-content="customize-size">
 
 			<div class="sui-border-frame" style="margin-bottom: 10px;">
 
@@ -30,7 +30,7 @@
 
 						<div class="sui-tabs-menu">
 
-							<label for="hustle-module--desktop-custom-size" class="sui-tab-item{{ ( 'desktop' === apply_custom_size_to ) ? ' active' : '' }}">
+							<label for="hustle-module--desktop-custom-size" class="sui-tab-item">
 								<input type="radio"
 									name="apply_custom_size_to"
 									data-attribute="apply_custom_size_to"
@@ -40,7 +40,7 @@
 								<?php esc_html_e( 'Desktop Only', 'wordpress-popup' ); ?>
 							</label>
 
-							<label for="hustle-module--all-custom-size" class="sui-tab-item{{ ( 'all' === apply_custom_size_to ) ? ' active' : '' }}">
+							<label for="hustle-module--all-custom-size" class="sui-tab-item">
 								<input type="radio"
 									name="apply_custom_size_to"
 									data-attribute="apply_custom_size_to"

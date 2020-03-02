@@ -3,7 +3,7 @@
 Plugin Name: Hustle
 Plugin URI: https://wordpress.org/plugins/wordpress-popup/
 Description: Start collecting email addresses and quickly grow your mailing list with big bold pop-ups, slide-ins, widgets, or in post opt-in forms.
-Version: 7.0.4
+Version: 7.1.0
 Author: WPMU DEV
 Author URI: https://premium.wpmudev.org
 Text Domain: wordpress-popup
@@ -108,7 +108,7 @@ if ( ! class_exists( 'Opt_In' ) ) :
 
 	class Opt_In extends Opt_In_Static{
 
-		const VERSION = '4.0.4';
+		const VERSION = '4.1.0';
 
 		/**
 		 * Text domain for translation.
@@ -228,13 +228,22 @@ if ( ! class_exists( 'Opt_In' ) ) :
 		 */
 		public function autoload( $class ) {
 
-			$dirs = array( 'inc', 'inc/provider', 'inc/display-conditions', 'inc/popup', 'inc/slidein', 'inc/embed', 'inc/sshare' );
+			$dirs = array( 'inc', 'inc/update', 'inc/provider', 'inc/display-conditions', 'inc/popup', 'inc/slidein', 'inc/embed', 'inc/sshare' );
 
 			foreach ( $dirs as $dir ) {
 				$filename = self::$plugin_path  . $dir . DIRECTORY_SEPARATOR . str_replace( '_', '-', strtolower( $class ) ) . '.php';
 				if ( is_readable( $filename ) ) {
 					require_once $filename;
 					return true;
+
+				} else {
+
+					// Include files using 'class' as the filename prefix.
+					$filename = self::$plugin_path  . $dir . DIRECTORY_SEPARATOR . 'class-' . str_replace( '_', '-', strtolower( $class ) ) . '.php';
+					if ( is_readable( $filename ) ) {
+						require_once $filename;
+						return true;
+					}
 				}
 			}
 
@@ -268,19 +277,9 @@ if ( ! class_exists( 'Opt_In' ) ) :
 			/*
              * Triggered after hustle packaged providers were loaded
              *
-             * @since xxx
+             * @since 3.0.5
              */
 			do_action( 'hustle_providers_loaded' );
-		}
-
-		/**
-		 * Show Exit-intent description
-		 *
-		 * @since 3.0.8
-		 * @todo move it somewhere else. No need to have this in this file. It's used in wizard's trigger sections.
-		 */
-		public static function get_exitintent_description() {
-			printf( esc_html__( '%1$sNote:%2$s Exit-intent will show only by detecting mouse movement and not with finger scroll.', 'wordpress-popup' ), '<b>', '</b>' );
 		}
 
 		/**
@@ -756,7 +755,8 @@ if ( is_admin() && Opt_In_Utils::_is_free() ) {
 if ( ! function_exists( 'hustle_activation' ) ) {
 	function hustle_activation() {
 		update_option( 'hustle_activated_flag', 1 );
-		delete_option( Hustle_Db::DB_VERSION_KEY );
+
+		Hustle_Db::maybe_create_tables( true );
 
 		/**
 		 * Add Hustle's custom capabilities.

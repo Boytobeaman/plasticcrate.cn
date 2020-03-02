@@ -269,14 +269,14 @@ class Hustle_Activecampaign_Form_Settings extends Hustle_Provider_Form_Settings_
 		$lists = array();
 
 		// Retrieve lists if "sign_up_to" is not set to "forms".
-		if ( !$this->list_type || 'forms' !== $this->list_type ) {
+		if ( ! $this->list_type || 'forms' !== $this->list_type ) {
 			$_lists = $api->get_lists();
 		} else {
 			// Retrieve forms otherwise
 			$_lists = $api->get_forms();
 		}
 
-		if ( ! is_wp_error( $_lists ) && ! empty( $_lists ) ) {
+		if ( ! empty( $_lists ) ) {
 			$lists = wp_list_pluck( $_lists, 'name', 'id' );
 		}
 

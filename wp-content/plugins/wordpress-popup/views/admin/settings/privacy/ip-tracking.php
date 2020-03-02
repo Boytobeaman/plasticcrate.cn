@@ -10,7 +10,7 @@
 
 		<div class="sui-tabs-menu">
 
-			<label class="sui-tab-item<?php echo $ip_tracking ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="ip_tracking"
 				id="hustle-ip-tracking--on"
@@ -20,7 +20,7 @@
 				<?php esc_html_e( 'Enable', 'wordpress-popup' ); ?>
 			</label>
 
-			<label class="sui-tab-item<?php echo ! $ip_tracking ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="ip_tracking"
 				id="hustle-ip-tracking--off"

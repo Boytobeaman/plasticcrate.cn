@@ -65,7 +65,7 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin' ) ) :
 
 			// All modules types except Social sharing modules. //
 			if ( Hustle_Module_Model::SOCIAL_SHARING_MODULE !== $module->module_type ) {
-	
+
 				$def_content = apply_filters( 'hustle_module_get_' . Hustle_Module_Model::KEY_CONTENT . '_defaults', $module->get_content()->to_array(), $module, $data );
 				$content_data = empty( $data['content'] ) ? $def_content : array_merge( $def_content, $data['content'] );
 
@@ -108,7 +108,7 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin' ) ) :
 				// Display options.
 				$def_display = apply_filters( 'hustle_module_get_' . Hustle_Module_Model::KEY_DISPLAY_OPTIONS . '_defaults', $module->get_display()->to_array(), $module, $data );
 				$display_data = empty( $data['display'] ) ? $def_display : array_merge( $def_display, $data['display'] );
-				
+
 				// Save Display to meta table.
 				$module->update_meta( Hustle_Module_Model::KEY_DISPLAY_OPTIONS, $display_data );
 			}
@@ -124,26 +124,97 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin' ) ) :
 			$shortcode_id = $module->get_new_shortcode_id( $module->module_name );
 			$module->update_meta( Hustle_Module_Model::KEY_SHORTCODE_ID, $shortcode_id );
 
-			// Module's permissions.
-			$module->update_meta( Hustle_Module_Model::KEY_MODULE_META_PERMISSIONS, $this->get_new_edit_roles() );
 		}
 
 		/**
-		 * Get roles for Edit Existing Modules capability
+		 * Export single module
 		 *
-		 * @since 4.0
-		 *
-		 * @return array
+		 * @since 4.0.0
 		 */
-		private function get_new_edit_roles() {
-			$user = wp_get_current_user();
-			$roles = (array) $user->roles;
+		public static function export() {
 
-			$roles_can_create = Hustle_Settings_Admin::get_hustle_settings( 'permission_create' );
-			$roles_can_create = $roles_can_create ? (array) $roles_can_create : array();
+			$nonce = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
+			if ( ! wp_verify_nonce( $nonce, 'hustle_module_export' ) ) {
+				return;
+			}
+			$id = filter_input( INPUT_POST, 'id', FILTER_VALIDATE_INT );
+			if ( ! $id ) {
+				return;
+			}
+			/**
+			 * plugin data
+			 */
+			$plugin = get_plugin_data( WP_PLUGIN_DIR.'/'.Opt_In::$plugin_base_file );
+			/**
+			 * get module
+			 */
+			$module = Hustle_Module_Model::instance()->get( $id );
+			if ( is_wp_error( $module ) ) {
+				return;
+			}
+			/**
+			 * Export data
+			 */
+			$settings = array(
+				'plugin' => array(
+					'name' => $plugin['Name'],
+					'version' => Opt_In::VERSION,
+					'network' => $plugin['Network'],
+				),
+				'timestamp' => time(),
+				'attributes' => $module->get_attributes(),
+				'data' => $module->get_data(),
+				'meta' => array(),
+			);
 
-			$edit_roles = array_intersect( $roles_can_create, $roles );
-			return array_values( $edit_roles );
+			if ( 'optin' === $module->module_mode ) {
+				$integrations = array();
+				$providers = Hustle_Providers::get_instance()->get_providers();
+				foreach ( $providers as $slug => $provider ) {
+					$provider_data = $module->get_provider_settings( $slug, false );
+					if ( $provider_data && $provider->is_connected()
+							&& $provider->is_form_connected( $id ) ) {
+						$integrations[ $slug ] = $provider_data;
+					}
+				}
+
+				$settings['meta']['integrations'] = $integrations;
+			}
+
+			$meta_names = $module->get_module_meta_names();
+			foreach ( $meta_names as $meta_key ) {
+				$settings['meta'][ $meta_key ] = json_decode( $module->get_meta( $meta_key ) );
+			}
+			/**
+			 * Filename
+			 */
+			$filename = sprintf(
+				'hustle-%s-%s-%s-%s.json',
+				$module->module_type,
+				date( 'Ymd-his' ),
+				get_bloginfo( 'name' ),
+				$module->module_name
+			);
+			$filename = strtolower( $filename );
+			$filename = sanitize_file_name( $filename );
+			/**
+			 * Print HTTP headers
+			 */
+			header( 'Content-Description: File Transfer' );
+			header( 'Content-Disposition: attachment; filename=' . $filename );
+			header( 'Content-Type: application/bin; charset=' . get_option( 'blog_charset' ), true );
+			/**
+			 * Check PHP version, for PHP < 3 do not add options
+			 */
+			$version = phpversion();
+			$compare = version_compare( $version, '5.3', '<' );
+			if ( $compare ) {
+				echo wp_json_encode( $settings );
+				exit;
+			}
+			$option = defined( 'JSON_PRETTY_PRINT' )? JSON_PRETTY_PRINT : null;
+			echo wp_json_encode( $settings, $option );
+			exit;
 		}
 	}
 

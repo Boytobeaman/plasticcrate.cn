@@ -139,7 +139,7 @@ class Hustle_Settings_Admin_Ajax {
 	 *
 	 * @since 4.0
 	 */
-	public function save_global_privacy_settings() {
+	public function save_privacy_settings() {
 
 		$filter_args = array(
 			'ip_tracking'						=> FILTER_SANITIZE_STRING,
@@ -165,7 +165,7 @@ class Hustle_Settings_Admin_Ajax {
 		$new_settings = array_merge( $stored_settings, $data );
 
 		Hustle_Settings_Admin::update_hustle_settings( $new_settings, 'privacy' );
-		$this->send_success_notification();
+		wp_send_json_success();
 	}
 
 	/**
@@ -173,39 +173,47 @@ class Hustle_Settings_Admin_Ajax {
 	 *
 	 * @since 4.0.2
 	 */
-	public function save_global_data_settings( $data ) {
+	public function save_data_settings() {
 
-		$reset_settings_uninstall = '0';
-
-		//Settings retention
-		if( isset( $data['reset_settings_uninstall'] ) && '1' ===  $data['reset_settings_uninstall'] ){
-			$reset_settings_uninstall = '1';
-		}
+		$reset_settings_uninstall = filter_input( INPUT_POST, 'reset_settings_uninstall', FILTER_SANITIZE_STRING );
 
 		$value = array(
-			'reset_settings_uninstall' => $reset_settings_uninstall,
+			'reset_settings_uninstall' => '1' === $reset_settings_uninstall ? '1' : '0',
 		);
+
 		Hustle_Settings_Admin::update_hustle_settings( $value, 'data' );
-		$this->send_success_notification();
+		wp_send_json_success();
 	}
 
 	/**
 	 * Save the data under the Top Metric tab.
 	 *
-	 * @since 4.0
-	 *
-	 * @return bool
+	 * @since 4.0.0
 	 */
 	private function save_top_metrics_settings() {
-
-		$metrics = $_POST['metrics']; // WPCS: CSRF ok.
+		$data    = filter_input( INPUT_POST, 'metrics', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+		$metrics = ! empty( $data ) ? array_filter( $data ) : [];
 
 		// Only 3 metrics can be selected. No more.
 		if ( 3 < count( $metrics ) ) {
-			return false;
+			wp_send_json_error( array(
+				'notification' => array(
+					'status'  => 'error',
+					'message' => esc_html__( "You can't select more than 3 metrics.", 'wordpress-popup' ),
+				),
+			));
 		}
 
-		$allowed_metric_keys = array( 'average_conversion_rate', 'today_conversions', 'last_week_conversions', 'last_month_conversions', 'total_conversions', 'most_conversions', 'inactive_modules_count', 'total_modules_count' );
+		$allowed_metric_keys = array(
+			'average_conversion_rate',
+			'today_conversions',
+			'last_week_conversions',
+			'last_month_conversions',
+			'total_conversions',
+			'most_conversions',
+			'inactive_modules_count',
+			'total_modules_count',
+		);
 
 		$data_to_store = array();
 		foreach ( $metrics as $name ) {
@@ -215,8 +223,7 @@ class Hustle_Settings_Admin_Ajax {
 		}
 
 		Hustle_Settings_Admin::update_hustle_settings( $data_to_store, 'top_metrics' );
-
-		return true;
+		wp_send_json_success();
 	}
 
 	/**
@@ -252,39 +259,45 @@ class Hustle_Settings_Admin_Ajax {
 		$settings_to_save['secret'] = $settings_to_save['v2_checkbox_secret_key'];
 
 		Hustle_Settings_Admin::update_hustle_settings( $settings_to_save, 'recaptcha' );
+
+		wp_send_json_success( array(
+			'notification' => array(
+				'status' => 'success',
+				'message' => esc_html__( "reCAPTCHA configured successfully. You can now add reCAPTCHA field to your opt-in forms where you want the reCAPTCHA to appear.", 'wordpress-popup' ),
+			),
+			'callback' => 'actionSaveRecaptcha',
+		) );
 	}
 
 	/**
 	 * Save the Accessibility settings.
 	 *
-	 * @since 4.0
-	 *
-	 * @param array $data Submitted data to be saved
+	 * @since 4.0.0
 	 */
-	private function save_accessibility_settings( $data ) {
-		$color = null;
-		if ( isset( $data['accessibility_color'] ) ) {
-			$color = filter_var( $data['accessibility_color'], FILTER_VALIDATE_BOOLEAN );
-		}
-		if ( is_null( $color ) ) {
+	private function save_accessibility_settings() {
+
+		$accessibility_color = filter_input( INPUT_POST, 'hustle-accessibility-color', FILTER_VALIDATE_BOOLEAN );
+
+		if ( is_null( $accessibility_color ) ) {
 			wp_send_json_error();
 		}
 		$value = array(
-			'accessibility_color' => $color,
+			'accessibility_color' => $accessibility_color,
 		);
+
 		Hustle_Settings_Admin::update_hustle_settings( $value, 'accessibility' );
+
+		wp_send_json_success( [ 'url' => true ] );
 	}
 
 	/**
 	 * Save the Unsubscribe settings.
 	 *
-	 * @since 4.0
-	 *
-	 * @param array $data Submitted data to be saved
-	 * @return bool
+	 * @since 4.0.0
 	 */
-	private function save_unsubscribe_settings( $data ) {
+	private function save_unsubscribe_settings() {
 
+		$data = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
 		$email_body = wp_json_encode( $data['email_message'] );
 		$sanitized_data = Opt_In_Utils::validate_and_sanitize_fields( $data );
 
@@ -314,7 +327,7 @@ class Hustle_Settings_Admin_Ajax {
 		);
 		Hustle_Settings_Admin::update_hustle_settings( $value, 'unsubscribe' );
 
-		return true;
+		wp_send_json_success();
 
 	}
 
@@ -342,181 +355,276 @@ class Hustle_Settings_Admin_Ajax {
 	 * @todo Handle error messages
 	 */
 	public function ajax_settings_save() {
-		Opt_In_Utils::validate_ajax_call( 'hustle-settings' );
+		Opt_In_Utils::validate_ajax_call( 'hustle_settings_save' );
 		Opt_In_Utils::is_user_allowed_ajax( 'hustle_edit_settings' );
 
 		$tab = filter_input( INPUT_POST, 'target', FILTER_SANITIZE_STRING );
 
 		switch ( $tab ) {
 			case 'permissions':
-				$data = isset( $_POST['data'] ) ? $_POST['data'] : array(); // WPCS: CSRF ok.
-				$roles = Opt_In_Utils::get_user_roles();
-
-				foreach ( $data as $key => $value ) {
-
-					$permission = '';
-					$value = ! empty( $value ) ? $value : array();
-
-					// "Edit" permission role for each module.
-					if ( preg_match( '/^module\-(\d+)$/', $key, $matches ) ) {
-						$update_edit_module = true;
-						$id = $matches[1];
-						$module = Hustle_Module_Model::instance()->get( $id );
-						if ( ! is_wp_error( $module ) ) {
-							$module->update_edit_role( $value );
-						}
-
-					} elseif ( 'create' === $key ) {
-						// Global "Create" permission role.
-						$permission = 'permission_create';
-						Hustle_Settings_Admin::update_hustle_settings( $value, $permission );
-
-					} elseif ( 'edit_integrations' === $key ) {
-						// Global "Edit Integration" role.
-						$permission = 'permission_edit_integrations';
-						Hustle_Settings_Admin::update_hustle_settings( $value, $permission );
-
-					} elseif ( 'access_emails' === $key ) {
-						// Global "Access Email List" role.
-						$permission = 'permission_access_emails';
-						Hustle_Settings_Admin::update_hustle_settings( $value, $permission );
-
-					} elseif ( 'edit_settings' === $key ) {
-						// Global "Edit Settings" role.
-						$permission = 'permission_edit_settings';
-						Hustle_Settings_Admin::update_hustle_settings( $value, $permission );
-
-					} else {
-						continue;
-					}
-
-					if ( ! empty( $permission ) ) {
-						$cap = str_replace( 'permission_', 'hustle_', $permission );
-						foreach ( $roles as $role_key => $role_name ) {
-							if ( 'administrator' === $role_key ) {
-								continue;
-							}
-							// get the role object
-							$role = get_role( $role_key );
-
-							if ( ! $role ) {
-								continue;
-							}
-
-							if ( in_array( $role_key, $value, true ) ) {
-								// add capability
-								$role->add_cap( $cap );
-							} else {
-								// remove capability
-								$role->remove_cap( $cap );
-							}
-						}
-					}
-				}
-
-				if ( ! empty( $update_edit_module ) ) {
-					// add/remove hustle_edit_module capability
-					Opt_In_Utils::update_hustle_edit_module_capability();
-				}
-
-				// add/remove hustle_menu capability
-				$hustle_capabilities = array(
-					'hustle_edit_module',
-					'hustle_create',
-					'hustle_edit_integrations',
-					'hustle_access_emails',
-					'hustle_edit_settings',
-				);
-
-				foreach ( $roles as $role_key => $role_name ) {
-					$role = get_role( $role_key );
-					$capabilities = $role->capabilities;
-					if ( ! empty( array_intersect( array_keys( $capabilities ), $hustle_capabilities ) ) ) {
-						$role->add_cap( 'hustle_menu' );
-					} else {
-						$role->remove_cap( 'hustle_menu' );
-					}
-				}
-				/**
-				 * success
-				 */
-				$this->send_success_notification();
+				$this->save_permissions_settings();
 				break;
 
 			case 'general':
-				$data = filter_input( INPUT_POST, 'data', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-				if ( isset( $data['sender_email_address'] ) && ! is_email( $data['sender_email_address'] ) ) {
-					wp_send_json_error();
-				}
-
-				$value = Hustle_Settings_Admin::get_general_settings();
-				$new_value = shortcode_atts( $value, $data );
-
-				Hustle_Settings_Admin::update_hustle_settings( $new_value, 'general' );
-				$this->send_success_notification();
-
+				$this->save_general_settings();
 				break;
 
 			case 'top_metrics':
-				$saved = $this->save_top_metrics_settings();
-				if ( $saved ) {
-					$this->send_success_notification();
-				} else {
-					wp_send_json_error();
-				}
+				$this->save_top_metrics_settings();
 				break;
 
 			case 'analytics':
-				$data = isset( $_POST['data'] ) ? $_POST['data'] : array(); // WPCS: CSRF ok.
-				if ( isset( $data['enabled'] ) ) {
-					$value = Hustle_Settings_Admin::get_hustle_settings( 'analytics' );
-					$value['enabled'] = $data['enabled'];
-					$reload = true;
-				} else {
-					$value = array(
-						'enabled' => '1',
-						'title' => isset( $data['title'] )? filter_var( $data['title'], FILTER_SANITIZE_STRING ):'',
-						'role' => isset( $data['role'] )? filter_var( $data['role'], FILTER_SANITIZE_STRING ):'',
-						'modules' => isset( $data['modules'] )? $data['modules']:array(),
-					);
-					$reload = false;
-				}
-
-				Hustle_Settings_Admin::update_hustle_settings( $value, 'analytics' );
-				$this->send_success_notification( '', $reload );
+				$this->save_dashboard_analytics_settings();
 				break;
 
 			case 'recaptcha':
 				$this->save_recaptcha_settings();
-				$success_message = __( "reCAPTCHA configured successfully. You can now add reCAPTCHA field to your opt-in forms where you want the reCAPTCHA to appear.", 'wordpress-popup' );
-				$this->send_success_notification( $success_message );
 				break;
 
 			case 'accessibility':
-				$data = isset( $_POST['data'] ) ? $_POST['data'] : array(); // WPCS: CSRF ok.
-				$this->save_accessibility_settings( $data );
-				$this->send_success_notification();
+				$this->save_accessibility_settings();
 				break;
 
 			case 'unsubscribe':
-				parse_str( $_POST['data'], $data ); // WPCS: CSRF ok.
-				$this->save_unsubscribe_settings( $data );
-				$this->send_success_notification();
+				$this->save_unsubscribe_settings();
 				break;
 
 			case 'privacy':
-				$this->save_global_privacy_settings();
-				break;
-			case 'data':
-				$data = isset( $_POST['data'] ) ? $_POST['data'] : array(); // WPCS: CSRF ok.
-				$this->save_global_data_settings( $data );
+				$this->save_privacy_settings();
 				break;
 
-			default: // Failed
-				wp_send_json_error();
+			case 'data':
+				$this->save_data_settings();
+				break;
+
+			default:
+				break;
 		}
 
-		wp_send_json_error();
+		// The action is not listed. No one should land here if following the regular plugin's paths.
+		wp_send_json_error([
+			'notification' => [
+				'status'  => 'error',
+				'message' => esc_html__( "The action you're trying to perform was not found.", 'wordpress-popup' ),
+			],
+		]);
+	}
+
+
+	/**
+	 * Handles saving the "Permissions" settings.
+	 *
+	 * @since 4.1.0
+	 */
+	private function save_permissions_settings() {
+
+		// Handle per module roles. We'll go with per permission next.
+		$current_modules_ids = filter_input( INPUT_POST, 'modules_ids', FILTER_SANITIZE_STRING );
+		$modules_ids         = empty( $current_modules_ids ) ? [] : explode( ',', $current_modules_ids );
+
+		if ( ! empty( $modules_ids ) ) {
+			$modules_roles = filter_input( INPUT_POST, 'modules', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+
+			foreach ( $modules_ids as $module_id ) {
+
+				$module = Hustle_Module_Model::instance()->get( $module_id );
+				if ( ! is_wp_error( $module ) ) {
+
+					$selected_roles = isset( $modules_roles[ $module_id ] ) ? $modules_roles[ $module_id ] : [];
+					$module->update_edit_roles( $selected_roles );
+				}
+			}
+		}
+
+		// Handling per permissions roles here.
+		$filter         = [
+			'filter' => FILTER_SANITIZE_STRING,
+			'flags'  => FILTER_REQUIRE_ARRAY,
+		];
+		$filter_options = array(
+			'create'            => $filter,
+			'edit_integrations' => $filter,
+			'access_emails'     => $filter,
+			'edit_settings'     => $filter,
+		);
+		$incoming       = filter_input_array( INPUT_POST, $filter_options );
+
+		// If the role can create modules, it can also edit them.
+		$incoming['edit'] = $incoming['create'];
+
+		// Capability related to each incoming input.
+		$hustle_capabilities = array(
+			'create'            => 'hustle_create',
+			'edit'              => 'hustle_edit_module',
+			'edit_integrations' => 'hustle_edit_integrations',
+			'access_emails'     => 'hustle_access_emails',
+			'edit_settings'     => 'hustle_edit_settings',
+		);
+
+		$existing_roles = Opt_In_Utils::get_user_roles();
+
+		// Loop through the submitted capabilities.
+		foreach ( $incoming as $capability => $selected_roles ) {
+
+			if ( ! is_array( $selected_roles ) ) {
+				// The filter failed. No roles were selected.
+				$incoming[ $capability ] = [];
+				$selected_roles          = [];
+
+			} else {
+
+				// Loop through the selected roles of this capability. Unset any invalid role.
+				foreach ( $selected_roles as $key => $role_slug ) {
+
+					if ( ! isset( $existing_roles[ $role_slug ] ) ) {
+						unset( $incoming[ $capability ][ $key ] );
+					}
+				}
+			}
+
+			// Update roles capabilities.
+			foreach ( $existing_roles as $role_slug => $role_name ) {
+				if ( Opt_In_Utils::is_admin_role( $role_slug ) ) {
+					continue;
+				}
+
+				$role = get_role( $role_slug );
+
+				$cap = $hustle_capabilities[ $capability ];
+				if ( in_array( $role_slug, $selected_roles, true ) ) {
+					// Add capability.
+					$role->add_cap( $cap );
+
+				} else {
+
+					// Check if this role can edit at least one module before removing the cap.
+					if ( 'edit' === $capability ) {
+
+						if ( ! Hustle_Module_Model::can_role_edit_one_module( $role_slug ) ) {
+							// Remove capability.
+							$role->remove_cap( $cap );
+						} else {
+							$role->add_cap( $cap );
+						}
+					} else {
+						// Remove capability.
+						$role->remove_cap( $cap );
+					}
+				}
+			}
+		}
+
+		// Store per permission roles.
+		Hustle_Settings_Admin::update_hustle_settings( $incoming, 'permissions' );
+
+		wp_send_json_success();
+
+	}
+
+	/**
+	 * Handles saving the "General" settings.
+	 *
+	 * @since 4.1.0
+	 */
+	private function save_general_settings() {
+
+		// Retrieve the stored data.
+		$stored_values = Hustle_Settings_Admin::get_general_settings();
+
+		// Sanitize the incoming data.
+		foreach ( $stored_values as $key => $value ) {
+			if ( 'sender_email_address' !== $key ) {
+				$new_value = filter_input( INPUT_POST, $key, FILTER_SANITIZE_STRING );
+			} else {
+				$new_value = filter_input( INPUT_POST, $key, FILTER_VALIDATE_EMAIL );
+			}
+
+			// Update it if valid.
+			if ( false !== $new_value && ! is_null( $new_value ) ) {
+				$stored_values[ $key ] = $new_value;
+			}
+		}
+
+		Hustle_Settings_Admin::update_hustle_settings( $stored_values, 'general' );
+		wp_send_json_success();
+	}
+
+	/**
+	 * Handles saving the "Dashboard Analytics" settings.
+	 *
+	 * @since 4.1.0
+	 */
+	private function save_dashboard_analytics_settings() {
+
+		$reload = false;
+		$value  = Hustle_Settings_Admin::get_hustle_settings( 'analytics' );
+
+		// Handle enable/disable action.
+		$enable_toggled = filter_input( INPUT_POST, 'enabled', FILTER_SANITIZE_STRING );
+		if ( false !== $enable_toggled && ! is_null( $enable_toggled ) ) {
+			$value['enabled'] = $enable_toggled;
+			$reload           = true;
+
+		} else {
+
+			// Handle storing the actual settings.
+			$filter_args   = array(
+				'modules' => array(
+					'filter' => FILTER_SANITIZE_STRING,
+					'flags'  => FILTER_REQUIRE_ARRAY,
+				),
+				'role'    => array(
+					'filter' => FILTER_SANITIZE_STRING,
+					'flags'  => FILTER_REQUIRE_ARRAY,
+				),
+				'title'   => FILTER_SANITIZE_STRING,
+			);
+			$filtered_data = filter_input_array( INPUT_POST, $filter_args );
+
+			// Use defaults if the filter fails or the value isn't set.
+			$modules        = ! empty( $filtered_data['modules'] ) ? array_filter( $filtered_data['modules'] ) : [];
+			$selected_roles = ! empty( $filtered_data['role'] ) ? $filtered_data['role'] : [];
+			$title          = is_string( $filtered_data['title'] ) ? $filtered_data['title'] : '';
+
+			$value = array(
+				'enabled' => '1',
+				'title'   => $title,
+				'modules' => $modules,
+				'role'    => Opt_In_Utils::get_admin_roles(),
+			);
+
+			// Store the roles if they exist.
+			$roles = Opt_In_Utils::get_user_roles();
+			foreach ( $selected_roles as $role_slug ) {
+				if ( isset( $roles[ $role_slug ] ) ) {
+					$value['role'][ $role_slug ] = $roles[ $role_slug ];
+				}
+			}
+
+			// Update roles capability.
+			foreach ( $roles as $role_key => $role_name ) {
+				$role = get_role( $role_key );
+				if ( Opt_In_Utils::is_admin_role( $role_key ) || ! $role ) {
+					continue;
+				}
+				$cap = 'hustle_analytics';
+				if ( in_array( $role_key, $selected_roles, true ) ) {
+					// add capability.
+					$role->add_cap( $cap );
+				} else {
+					// remove capability.
+					$role->remove_cap( $cap );
+				}
+			}
+		}
+
+		Hustle_Settings_Admin::update_hustle_settings( $value, 'analytics' );
+
+		if ( ! $reload ) {
+			wp_send_json_success();
+		} else {
+			wp_send_json_success( [ 'url' => true ] );
+		}
 	}
 
 	/**
@@ -527,23 +635,23 @@ class Hustle_Settings_Admin_Ajax {
 	public function handle_palette_actions() {
 
 		Opt_In_Utils::validate_ajax_call( 'hustle_palette_action' );
+		Opt_In_Utils::is_user_allowed_ajax( 'hustle_edit_settings' );
 
 		$palette_id = filter_input( INPUT_POST, 'id', FILTER_SANITIZE_STRING );
 		$action = filter_input( INPUT_POST, 'hustleAction', FILTER_SANITIZE_STRING );
 
-		$url = add_query_arg(
-			array(
-				'page' => Hustle_Module_Admin::SETTINGS_PAGE,
-				'section' => 'palettes',
-			),
-			'admin.php'
+		$args = array(
+			'page'    => Hustle_Module_Admin::SETTINGS_PAGE,
+			'section' => 'palettes',
 		);
-		$response = array( 'url' => $url );
 
-		switch( $action ) {
+		switch ( $action ) {
 
 			case 'delete':
-				Hustle_Settings_Admin::delete_custom_palette( $palette_id );
+				$name                 = Hustle_Settings_Admin::delete_custom_palette( $palette_id );
+				$args['show-notice']  = 'success';
+				$args['notice']       = 'palette_deleted';
+				$args['deleted-name'] = rawurlencode( $name );
 				break;
 
 			case 'go-to-step':
@@ -552,13 +660,19 @@ class Hustle_Settings_Admin_Ajax {
 				if ( '2' === $step ) {
 					$this->action_edit_palette_go_second_step();
 				} else {
-					$this->action_edit_palette_save();
+					$id                  = $this->action_edit_palette_save();
+					$args['show-notice'] = 'success';
+					$args['notice']      = 'palette_saved';
+					$args['saved-id']    = rawurlencode( $id );
 				}
 				break;
 
 			default:
 				break;
 		}
+
+		$url      = add_query_arg( $args, 'admin.php' );
+		$response = array( 'url' => $url );
 
 		wp_send_json_success( $response );
 	}
@@ -650,22 +764,9 @@ class Hustle_Settings_Admin_Ajax {
 			$palette_data['name'] = $palette_name ? $palette_name : wp_rand();
 		}
 
-		Hustle_Settings_Admin::save_custom_palette( $palette_data );
+		$id = Hustle_Settings_Admin::save_custom_palette( $palette_data );
+
+		return $id;
 	}
 
-	/**
-	 * Call wp_send_json_success with the expected response
-	 *
-	 * @since 4.0
-	 *
-	 * @param string $message
-	 * @param boolean $reload
-	 */
-	private function send_success_notification( $message = '', $reload = false ) {
-		$response = array(
-			'message' => $message, //if it's empty - use optinVars.messages.settings_saved
-			'reload'  => $reload,
-		);
-		wp_send_json_success( $response );
-	}
 }

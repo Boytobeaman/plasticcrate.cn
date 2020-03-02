@@ -65,7 +65,7 @@ if (  $total > $entries_per_page ) {
 			'<li><a class="%s" href="%s">%d</a></li>',
 			esc_attr( $paged === $i? 'sui-active' : '' ),
 			esc_url( $u ),
-			$i++
+			esc_html( $i++ )
 		);
 	} while ( ( $i - 1 ) * $entries_per_page < $total );
 }

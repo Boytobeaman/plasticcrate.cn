@@ -1,3 +1,6 @@
+<?php
+$settings = Hustle_Settings_Admin::get_privacy_settings();
+?>
 <div id="privacy-box" class="sui-box" data-tab="privacy" <?php if ( 'privacy' !== $section ) echo 'style="display: none;"'; ?>>
 
 	<div class="sui-box-header">
@@ -35,7 +38,11 @@
 
 		<div class="sui-actions-right">
 
-			<button class="sui-button sui-button-blue hustle-settings-save" data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle-settings' ) ); ?>">
+			<button 
+				class="sui-button sui-button-blue hustle-settings-save"
+				data-form-id="hustle-privacy-settings-form"
+				data-target="privacy"
+			>
 				<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
 				<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
 			</button>

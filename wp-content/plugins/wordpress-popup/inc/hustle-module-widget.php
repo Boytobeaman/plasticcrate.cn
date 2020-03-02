@@ -50,7 +50,7 @@ class Hustle_Module_Widget extends WP_Widget {
 
 		$module = Hustle_Module_Collection::instance()->return_model_from_id( $instance['module_id'] );
 
-		if ( ! $module || ! $module->active || ! $module->is_display_type_active( Hustle_Module_Model::WIDGET_MODULE ) ) {
+		if ( is_wp_error( $module ) || ! $module || ! $module->active || ! $module->is_display_type_active( Hustle_Module_Model::WIDGET_MODULE ) ) {
 			return;
 		}
 

@@ -71,7 +71,6 @@ $order_by_array = array(
 					'show' => ( $count > $limit ),
 					'filterclass' => 'hustle-open-inline-filter',
 					'filter' => array(),
-					'is_bottom'		=> ! empty( $is_bottom ),
 				)
 			); ?>
 

@@ -81,14 +81,20 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 				'lastname' => '',
 			) );
 			$extra_data = array_filter( $extra_data );
-
 			if ( ! empty( $extra_data ) ) {
-				$custom_fields = array();
+				$module 		= Hustle_Module_Model::instance()->get( $module_id );
+				$form_fields 	= $module->get_form_fields();
+				$custom_fields 	= array();
 				foreach ( $extra_data as $key => $value ) {
+					$type = isset( $form_fields[ $key ] ) ? $this->get_field_type( $form_fields[ $key ]['type'] ) : 'text';
+
+					if( 'date' === $type && 'Y-m-d' !== $form_fields[ $key ]['date_format'] && ! empty( $submitted_data[$key] ) ){
+						$submitted_data[$key] = date( "Y-m-d", strtotime( $submitted_data[$key] ) );
+					}
 					$custom_fields[] = array(
 						'label' => $key,
 						'name' => $key,
-						'type' => 'text',
+						'type' => $type,
 					);
 
 					// Make the fields' names lowercase so they match the "alias" from Mautic's side.
@@ -292,5 +298,41 @@ class Hustle_Mautic_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return $this->_subscriber[ md5( $data ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 'date';
+				break;
+			case 'number':
+				break;
+			case 'phone':
+				break;
+			case 'url':
+				break;
+			case 'time':
+				break;
+			default:
+				$type = 'text';
+				break;
+		}
+
+		return $type;
 	}
 }

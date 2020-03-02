@@ -48,15 +48,6 @@ if ( ! class_exists( 'Hustle_SShare_Admin' ) ) :
 				'is_active' => (bool) $this->module->active,
 			);
 		}
-
-		/**
-		 * Override the function that enqueues recaptcha scripts.
-		 * We don't need recaptcha in Social Sharing modules' pages.
-		 *
-		 * @since 4.0.4
-		 * @return void
-		 */
-		public function enqueue_recaptcha_script() {}
 	}
 
 endif;

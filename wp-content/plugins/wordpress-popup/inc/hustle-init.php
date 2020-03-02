@@ -11,7 +11,7 @@ class Hustle_Init {
 		Hustle_Db::maybe_create_tables();
 
 		// Hustle Migration.
-		$hustle_migration = new Hustle_Migration( $hustle );
+		Hustle_Migration::get_instance();
 
 		// Admin
 		if( is_admin() ) {
@@ -29,7 +29,7 @@ class Hustle_Init {
 			new Hustle_Embedded_Admin( $hustle );
 
 			new Hustle_SShare_Admin( $hustle ); // $hustle is unused here. Adding while the abstract class requires it.
-			
+
 			// Global Integrations page
 			new Hustle_Providers_Admin( $hustle );
 
@@ -38,7 +38,7 @@ class Hustle_Init {
 			new Hustle_Settings_Page( $hustle );
 			new Hustle_Settings_Admin_Ajax();
 		}
-		
+
 		new Hustle_General_Data_Protection();
 		// Front
 		$module_front = new Hustle_Module_Front($hustle);

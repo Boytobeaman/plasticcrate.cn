@@ -17,7 +17,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-cta-style--flat" class="sui-tab-item <?php if ( 'flat' === $settings['cta_style'] ) echo 'active'; ?>">
+					<label for="hustle-cta-style--flat" class="sui-tab-item">
 						<input
 							type="radio"
 							name="cta_style"
@@ -29,7 +29,7 @@
 						<?php esc_html_e( 'Flat', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-cta-style--outlined" class="sui-tab-item <?php if ( 'outlined' === $settings['cta_style'] ) echo 'active'; ?>">
+					<label for="hustle-cta-style--outlined" class="sui-tab-item">
 						<input
 							type="radio"
 							name="cta_style"
@@ -46,7 +46,7 @@
 
 				<div class="sui-tabs-content">
 
-					<div class="sui-tab-content sui-tab-boxed <?php if ( 'outlined' === $settings['cta_style'] ) echo 'active'; ?>" data-tab-content="hustle-cta-style">
+					<div class="sui-tab-content sui-tab-boxed" data-tab-content="hustle-cta-style">
 
 						<div class="sui-row">
 

@@ -12,7 +12,7 @@ $submission_erasure_enabled = '1' === $settings['retain_sub_on_erasure'];
 
 		<div class="sui-tabs-menu">
 
-			<label for="retain_sub_on_erasure-true" class="sui-tab-item<?php echo $submission_erasure_enabled ? ' active' : ''; ?>">
+			<label for="retain_sub_on_erasure-true" class="sui-tab-item">
 				<input type="radio"
 					name="retain_sub_on_erasure"
 					value="1"
@@ -21,7 +21,7 @@ $submission_erasure_enabled = '1' === $settings['retain_sub_on_erasure'];
 				<?php esc_html_e( 'Retain Submission', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="retain_sub_on_erasure-false" class="sui-tab-item<?php echo $submission_erasure_enabled ? '' : ' active'; ?>">
+			<label for="retain_sub_on_erasure-false" class="sui-tab-item">
 				<input type="radio"
 					name="retain_sub_on_erasure"
 					value="0"

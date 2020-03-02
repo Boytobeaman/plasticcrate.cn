@@ -239,8 +239,6 @@ class Hustle_SShare_Model extends Hustle_Module_Model {
 		$result = array();
 
 		$networks_endpoint = self::get_networks_counter_endpoint( false, $current_link );
-		$curl_handle = array();
-		$mh = curl_multi_init();
 
 		foreach( $social_networks as $network ) {
 
@@ -250,26 +248,13 @@ class Hustle_SShare_Model extends Hustle_Module_Model {
 				continue;
 			}
 
-			$curl_handle[ $network ] = curl_init();
-			curl_setopt( $curl_handle[ $network ], CURLOPT_URL, $url );
-			curl_setopt( $curl_handle[ $network ], CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT'] );
-			curl_setopt( $curl_handle[ $network ], CURLOPT_RETURNTRANSFER, 1 );
-			curl_setopt( $curl_handle[ $network ], CURLOPT_SSL_VERIFYPEER, false );
-			curl_setopt( $curl_handle[ $network ], CURLOPT_CONNECTTIMEOUT, 5 );
-			curl_multi_add_handle( $mh, $curl_handle[ $network ] );
-		}
+			$response = wp_remote_get( $url );
+			$response_body = wp_remote_retrieve_body( $response );
 
-		$running = null;
-		do {
-			curl_multi_exec( $mh, $running );
-		} while( $running > 0 );
-
-		foreach( $curl_handle as $network => $content ) {
-			$result[ $network ] = curl_multi_getcontent( $content );
-			curl_multi_remove_handle( $mh, $content );
+			if ( $response_body ) {
+				$result[ $network ] = $response_body;
+			}
 		}
-		// Finish
-		curl_multi_close( $mh );
 
 		return $result;
 	}

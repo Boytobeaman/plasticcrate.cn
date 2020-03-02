@@ -52,6 +52,8 @@ if ( ! function_exists( 'hustle_pagination_one' ) ) {
 					$content
 				);
 				break;
+			default:
+				break;
 		}
 
 		printf(
@@ -68,9 +70,13 @@ if ( ! function_exists( 'hustle_pagination_one' ) ) {
  * Setup pager values
  *
  * @since 4.0.0
- *
  */
 $args = array();
+
+// Add the current section to the pagination URL. For example, for Settings -> permissions.
+if ( ! empty( $section ) ) {
+	$args['section'] = $section;
+}
 
 foreach ( $filter as $key => $value ) {
 

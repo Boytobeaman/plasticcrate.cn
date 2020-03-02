@@ -22,48 +22,84 @@ class Hustle_Activecampaign_Api {
 	 * @param array $args
 	 * @return object|WP_Error
 	 */
-	private function _request( $verb = "GET", $action, $args = array() ){
+	private function _request( $verb = 'GET', $action, $args = array() ) {
+
+		$utils = Hustle_Provider_Utils::get_instance();
+
 		$url = $this->_url;
 
-		$apidata = array(
+		$args = array_merge( array(
 			'api_action' => $action,
 			'api_key' => $this->_key,
-			'api_output' => 'serialize',
+			'api_output' => 'json',
+		), $args );
+
+		$headers = array(
+			'Content-Type' => 'application/x-www-form-urlencoded',
 		);
 
-		$url = add_query_arg( $apidata, $url );
+		$_args = array(
+			'method'  => $verb,
+			'headers' => $headers,
+		);
 
-		$request = curl_init($url); // initiate curl object
-		curl_setopt($request, CURLOPT_HEADER, false); // set to 0 to eliminate header info from response
-		curl_setopt($request, CURLOPT_RETURNTRANSFER, true); // Returns response data instead of TRUE(1)
-		curl_setopt($request, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
+		$request_data = $args;
 
+		if ( 'GET' === $verb ) {
+			$url .= ( '?' . http_build_query( $args ) );
+		} else {
+			$_args['body'] = $args;
+		}
 
-		if( array() !== $args ){
-			if( "POST" === $verb ){
-				curl_setopt($request, CURLOPT_POSTFIELDS, http_build_query( array_merge( $apidata, $args ) ) );
-				curl_setopt($request, CURLOPT_HTTPHEADER, array(
-					'Content-Type: application/x-www-form-urlencoded'
-				));
-			}else{
-				$url = add_query_arg($args, $url);
-				curl_setopt($request, CURLOPT_URL, $url);
+		$utils->_last_url_request = $url;
+		$utils->_last_data_sent = $args;
+
+		$res = wp_remote_request( $url, $_args );
+
+		if ( is_wp_error( $res ) || ! $res ) {
+			Opt_In_Utils::maybe_log( __METHOD__, $res );
+			throw new Exception(
+				__( 'Failed to process request, make sure your API URL and API KEY are correct and your server has internet connection.', 'wordpress-popup' )
+			);
+		}
+
+		if ( isset( $res['response']['code'] ) ) {
+			$status_code = $res['response']['code'];
+			$msg         = '';
+			if ( $status_code > 400 ) {
+				if ( isset( $res['response']['message'] ) ) {
+					$msg = $res['response']['message'];
+				}
+
+				if ( 404 === $status_code ) {
+					throw new Exception( sprintf( __( 'Failed to processing request : %s', 'wordpress-popup' ), $msg ) );
+				}
+
+				throw new Exception( sprintf( __( 'Failed to processing request : %s', 'wordpress-popup' ), $msg ) );
 			}
 		}
 
-		$response = (string)curl_exec($request); //execute curl fetch and store results in $response
+		$body = wp_remote_retrieve_body( $res );
 
-		curl_close($request);
+		// probably silent mode
+		if ( ! empty( $body ) ) {
+			$res = json_decode( $body, true );
 
-		//logging data
-		$utils = Hustle_Provider_Utils::get_instance();
-		$utils->_last_url_request = $url;
-		$utils->_last_data_received = $response;
-		$utils->_last_data_sent = $args;
+			// auto validate
+			if ( ! empty( $res ) ) {
+				if ( ! isset( $res['result_code'] ) || 1 !== $res['result_code'] ) {
+					$message = '';
+					if ( isset( $res['result_message'] ) && ! empty( $res['result_message'] ) ) {
+						$message = ' ' . $res['result_message'];
+					}
+					throw new Exception( sprintf( __( 'Failed to get ActiveCampaign data.%1$s', 'wordpress-popup' ), $message ) );
+				}
+			}
+		}
 
-		return unserialize($response);
+		$utils->_last_data_received = $res;
 
+		return $res;
 	}
 
 	/**
@@ -93,24 +129,38 @@ class Hustle_Activecampaign_Api {
 	 *
 	 * @return array|WP_Error
 	 */
-	public function get_lists(){
-		$res = $this->_get( "list_list", array(
-			'ids' => 'all',
-			'global_fields' => 0
-		) );
+	public function get_lists() {
 
-		if( is_wp_error( $res ) || ! is_array( $res ) )
-			return $res;
+		try {
+			$res = $this->_get( 'list_list', array(
+				'ids' => 'all',
+				'global_fields' => 0
+			) );
 
-		//$res = $res;
-		$res2 = array();
-		foreach ($res as $key => $value) {
-			if( is_numeric( $key ) ) {
-				array_push($res2, $value);
+			$res2 = array();
+			foreach ($res as $key => $value) {
+				if( is_numeric( $key ) ) {
+					array_push($res2, $value);
+				}
 			}
+
+		} catch( Exception $e ) {
+			return array();
 		}
 
 		return $res2;
+	}
+
+	/**
+	 * Get Account Detail
+	 *
+	 * @since 4.1
+	 *
+	 * @return array|mixed|object
+	 */
+	public function get_account() {
+
+		return $this->_get( 'account_view' );
 	}
 
 	/**
@@ -143,16 +193,19 @@ class Hustle_Activecampaign_Api {
 	 * @return array
 	 */
 	public function get_forms() {
-		$res = $this->_get( "form_getforms" );
-
-		if( is_wp_error( $res ) || ! is_array( $res ) )
-			return $res;
 
 		$res2 = array();
-		foreach ( $res as $key => $value ) {
-			if( is_numeric( $key ) ) {
-				array_push( $res2, $value );
+		try {
+			$res = $this->_get( "form_getforms" );
+
+			foreach ( $res as $key => $value ) {
+				if( is_numeric( $key ) ) {
+					array_push( $res2, $value );
+				}
 			}
+
+		} catch( Exception $e ) {
+			return array();
 		}
 
 		return $res2;
@@ -209,28 +262,35 @@ class Hustle_Activecampaign_Api {
 	 * Checks email in a list
 	 */
 	public function email_exist( $email, $id, $type = 'list' ) {
-		$res = $this->_post( 'contact_view_email', array( 'email' => $email ) );
 
-		// See if duplicate exists.
-		if (
-			! empty( $res )
-			&& ! empty( $res['id'])
-			&& !empty($res['lists'])
-		) {
-			if ( 'list' === $type ) {
-				// Also make sure duplicate is in active list.
-				foreach ($res['lists'] as $response_list) {
-					if ($response_list['listid'] === $id) {
-						// Duplicate exists.
+		try{
+
+			$res = $this->_get( 'contact_view_email', array( 'email' => $email ) );
+
+			// See if duplicate exists.
+			if (
+				! empty( $res )
+				&& ! empty( $res['id'])
+				&& !empty($res['lists'])
+			) {
+				if ( 'list' === $type ) {
+					// Also make sure duplicate is in active list.
+					foreach ( $res['lists'] as $response_list ) {
+						if ( $response_list['listid'] === $id ) {
+							// Duplicate exists.
+							return true;
+						}
+					}
+				} else {
+					// Or active form if checking on a form
+					if ( $id === $res['formid'] ) {
 						return true;
 					}
 				}
-			} else {
-				// Or active form if checking on a form
-				if ( $id === $res['formid'] ) {
-					return true;
-				}
 			}
+
+		} catch( Exception $e ) {
+			return false;
 		}
 
 		// Otherwise assume no duplicate.
@@ -239,11 +299,10 @@ class Hustle_Activecampaign_Api {
 
 	public function add_custom_fields( $custom_fields, $list, Hustle_Module_Model $module ) {
 		if ( ! empty( $custom_fields ) ) {
-			foreach ( $custom_fields as $key => $label ) {
-				$key = strtoupper( $key );
+			foreach ( $custom_fields as $key => $value ) {
 				$field_data = array(
-					'title' => $label,
-					'type' => 1, // We only support text type for now,
+					'title' => $value['label'],
+					'type' => $value['type'], // support for text and date field,
 					'perstag' => $key,
 					'p[0]' => 0,
 					'req' => 0,

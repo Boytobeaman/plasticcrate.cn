@@ -205,53 +205,55 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 			$module    = Hustle_Module_Model::instance()->get( $module_id );
 			$action    = filter_input( INPUT_POST, 'hustleAction', FILTER_SANITIZE_STRING );
 
-			if ( is_wp_error( $module ) && 'import' !== $action ) {
+			try {
+
+				if ( is_wp_error( $module ) && 'import' !== $action ) {
+					throw new Exception(  __( 'Invalid module.', 'wordpress-popup' ) );
+				}
+
+				$context = filter_input( INPUT_POST, 'context', FILTER_SANITIZE_STRING );
+
+				switch ( $action ) {
+					case 'toggle-status':
+						$this->action_toggle_module_status( $module );
+					break;
+
+					case 'clone':
+						$this->action_duplicate_module( $module );
+					break;
+
+					case 'import':
+						$this->action_import_module( $module );
+					break;
+
+					case 'delete':
+						$this->action_delete_module( $module, $context );
+					break;
+
+					case 'toggle-tracking':
+						$this->action_toggle_tracking( $module );
+					break;
+
+					case 'reset-tracking':
+						$this->action_reset_tracking( $module );
+					break;
+
+					default:
+						throw new Exception(  __( 'Invalid action.', 'wordpress-popup' ) );
+				}
+
+			} catch ( Exception $e ) {
+
+				$message = 'invalid_permissions' !== $e->getMessage() ? $e->getMessage() : __( "You don't have enough permission to do this.", 'wordpress-popup' );
+
 				wp_send_json_error(
 					array(
 						'notification' => array(
 							'status' => 'error',
-							'message' => __( 'Invalid module.', 'wordpress-popup' ),
+							'message' => $message,
 						)
 					)
 				);
-			}
-
-			$context = filter_input( INPUT_POST, 'context', FILTER_SANITIZE_STRING );
-
-			switch ( $action ) {
-				case 'toggle-status':
-					$this->action_toggle_module_status( $module );
-				break;
-
-				case 'clone':
-					$this->action_duplicate_module( $module );
-				break;
-
-				case 'import':
-					$this->action_import_module( $module );
-				break;
-
-				case 'delete':
-					$this->action_delete_module( $module, $context );
-				break;
-
-				case 'toggle-tracking':
-					$this->action_toggle_tracking( $module );
-				break;
-
-				case 'reset-tracking':
-					$this->action_reset_tracking( $module );
-				break;
-
-				default:
-					wp_send_json_error(
-						array(
-							'notification' => array(
-								'status' => 'error',
-								'message' => __( 'Invalid action.', 'wordpress-popup' ),
-							)
-						)
-					);
 			}
 		}
 
@@ -261,8 +263,13 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 4.0.3
 		 *
 		 * @param Hustle_Module_Model $module
+		 * @throws Exception
 		 */
 		private function action_toggle_module_status( Hustle_Module_Model $module ) {
+
+			if ( ! Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module->module_id ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
 
 			$is_published = '1' === $module->active;
 
@@ -284,8 +291,13 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 4.0.3
 		 *
 		 * @param Hustle_Module_Model $module
+		 * @throws Exception
 		 */
 		private function action_duplicate_module( Hustle_Module_Model $module ) {
+
+			if ( ! Opt_In_Utils::is_user_allowed( 'hustle_create', $module->module_id ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
 
 			$module->duplicate_module();
 
@@ -304,31 +316,36 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 *
 		 * @since 4.0.0
 		 * @since 4.0.3 $module param added. Callback for handle_single_action() instead of the ajax request.
-		 * @param Hustle_Module_Model|WP_Error $module
+		 *
+		 * @param Hustle_Module_Model|WP_Error $module WP_Error in case the import is creating a new module. Hustle_Module_Model otherwise.
+		 * @throws Exception This is caught by the parent function.
 		 */
 		private function action_import_module( $module ) {
 
+			$is_new_module = is_wp_error( $module );
+
+			if ( ! $is_new_module && ! Opt_In_Utils::is_user_allowed( 'hustle_create', $module->module_id ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
+
+			$module_type = filter_input( INPUT_POST, 'type', FILTER_SANITIZE_STRING );
+
+			if ( ! $module_type || ! in_array( $module_type, Hustle_Module_Model::get_module_types(), true ) ) {
+				throw new Exception( __( "The module's type is not valid.", 'wordpress-popup' ) );
+			}
+
+			// Send error if the user can't create new modules but is importing a new one.
+			if ( $is_new_module && ! Hustle_Module_Admin::can_create_new_module( $module_type ) ) {
+
+				$url = add_query_arg( array(
+					'page' => Hustle_Module_Admin::get_listing_page_by_module_type( $module_type ),
+					Hustle_Module_Admin::UPGRADE_MODAL_PARAM => 'true',
+				), 'admin.php' );
+
+				wp_send_json_error( array( 'redirect_url' => $url ) );
+			}
+
 			try {
-
-				$module_type = filter_input( INPUT_POST, 'type', FILTER_SANITIZE_STRING );
-
-				$is_new_module = is_wp_error( $module );
-
-				if ( ! $module_type || ! in_array( $module_type, Hustle_Module_Model::get_module_types(), true ) ) {
-					throw new Exception( __( "The module's type is not valid.", 'wordpress-popup' ) );
-				}
-
-				// Send error if the user can't create new modules but is importing a new one.
-				if ( $is_new_module && ! Hustle_Module_Admin::can_create_new_module( $module_type ) ) {
-
-					$url = add_query_arg( array(
-						'page' => Hustle_Module_Admin::get_listing_page_by_module_type( $module_type ),
-						Hustle_Module_Admin::UPGRADE_MODAL_PARAM => 'true',
-					), 'admin.php' );
-
-					wp_send_json_error( array( 'redirect_url' => $url ) );
-				}
-
 				// Get the file containing the module data.
 				$file = isset( $_FILES['import_file'] ) ? $_FILES['import_file'] : false;
 
@@ -345,26 +362,21 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 					'test_type' => false,
 				);
 				$wp_file = wp_handle_upload( $file, $overrides );
-
-				$must_be_json_error = __( 'The file must be a JSON string.', 'wordpress-popup' );
-				if ( empty( $wp_file['file'] ) ) {
-					throw new Exception( $must_be_json_error );
-				}
 				$filename = $wp_file['file'];
 				$file_content = file_get_contents( $filename ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 
-				// Import file if it's json format.
+				// Import file if it's json format
 				$data = array();
 				if ( strpos( $filename, '.json' ) || strpos( $filename, '.JSON' ) ) {
 					$data = json_decode( $file_content, true );
 
 				} else {
-					throw new Exception( $must_be_json_error );
+					throw new Exception( __( 'The file must be a JSON string.', 'wordpress-popup' ) );
 				}
 
 				// Make sure the file to import comes from 4.0 or greater.
 				if ( ! isset( $data['plugin'] ) || ! isset( $data['plugin']['version'] ) ) {
-					throw new Exception( __( 'The module must come from a newer Hustle version.', 'wordpress-popup' ) );
+					throw new Exception( __( 'The file is either invalid or doesn\'t have any configurations. Please check your file or upload another file.', 'wordpress-popup' ) );
 
 				}
 
@@ -405,6 +417,7 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 					'message'  => $e->getMessage(),
 				] );
 			}
+
 		}
 
 		/**
@@ -414,8 +427,13 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 *
 		 * @param Hustle_Module_Model $module
 		 * @param string $context 'dashboard'|'listing'
+		 * @throws Exception
 		 */
 		private function action_delete_module( $module, $context ) {
+
+			if ( ! Opt_In_Utils::is_user_allowed( 'hustle_create' ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
 
 			$module->delete();
 
@@ -436,8 +454,13 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 4.0.3
 		 *
 		 * @param Hustle_Module_Model $module
+		 * @throws Exception
 		 */
 		private function action_toggle_tracking( Hustle_Module_Model $module ) {
+
+			if ( ! Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module->module_id ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
 
 			$was_tracking_enabled = false;
 			$message = '';
@@ -491,9 +514,13 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 4.0.3
 		 *
 		 * @param Hustle_Module_Model $module
-		 * @return void
+		 * @throws Exception
 		 */
 		private function action_reset_tracking( Hustle_Module_Model $module ) {
+
+			if ( ! Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module->module_id ) ) {
+				throw new Exception( 'invalid_permissions' );
+			}
 
 			$tracking = Hustle_Tracking_Model::get_instance();
 			$tracking->delete_data( $module->module_id );
@@ -564,7 +591,7 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		private function import_into_existing_module( $module, $module_type, $data ) {
 
 			// Check if the current user can do this.
-			$is_allowed = $module->is_allowed_for_current_user();
+			$is_allowed = Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module->id );
 			if ( ! $is_allowed ) {
 				throw new Exception( sprintf( __( 'Access denied. You do not have permission to perform this action.', 'wordpress-popup' ) ) );
 			}
@@ -665,34 +692,52 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 				if ( $module->module_type !== $type && in_array( $type, array( 'popup', 'embedded', 'slidein' ), true ) ) {
 					continue;
 				}
+
+				$can_edit   = Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $id );
+				$can_create = Opt_In_Utils::is_user_allowed( 'hustle_create' );
+
 				switch ( $hustle ) {
 					case 'publish':
-						$module->activate();
+						if ( $can_edit ) {
+							$module->activate();
+						}
 					break;
 
 					case 'unpublish':
-						$module->deactivate();
+						if ( $can_edit ) {
+							$module->deactivate();
+						}
 					break;
 
 					case 'clone':
-						$module->duplicate_module();
+						if ( $can_create ) {
+							$module->duplicate_module();
+						}
 					break;
 
 					case 'delete':
-						$module->delete();
+						if ( $can_create ) {
+							$module->delete();
+						}
 					break;
 
 					case 'disable-tracking':
-						$module->disable_type_track_mode( $type, true );
+						if ( $can_edit ) {
+							$module->disable_type_track_mode( $type, true );
+						}
 					break;
 
 					case 'enable-tracking':
-						$module->enable_type_track_mode( $type, true );
+						if ( $can_edit ) {
+							$module->enable_type_track_mode( $type, true );
+						}
 					break;
 
 					case 'reset-tracking':
-						$tracking = Hustle_Tracking_Model::get_instance();
-						$tracking->delete_data( $id );
+						if ( $can_edit ) {
+							$tracking = Hustle_Tracking_Model::get_instance();
+							$tracking->delete_data( $id );
+						}
 					break;
 
 					default:
@@ -780,39 +825,34 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 3.0.7
 		 */
 		public function get_new_condition_ids() {
+			global $wpdb;
+
 			$post_type = filter_input( INPUT_POST, 'postType', FILTER_SANITIZE_STRING );
 			$search = filter_input( INPUT_POST, 'search' );
 			$result = array();
 			$limit = 30;
 
 			if ( ! empty( $post_type ) ) {
-				if ( in_array( $post_type, array( 'tag', 'category' ), true ) ) {
+				if ( in_array( $post_type, array( 'tag', 'category', 'wc_category', 'wc_tag' ), true ) ) {
 					$args = array(
 					'hide_empty' => false,
-					'search' => $search,
 					'number' => $limit,
 					);
+					if ( $search ) {
+						$args['search'] = $search;
+					}
 					if ( 'tag' === $post_type ) {
 						$args['taxonomy'] = 'post_tag';
+					} else if ( 'wc_category' === $post_type ) {
+						$args['taxonomy'] = 'product_cat';
+					} else if ( 'wc_tag' === $post_type ) {
+						$args['taxonomy'] = 'product_tag';
 					}
 					$result = array_map( array( 'Hustle_Module_Page_Abstract', 'terms_to_select2_data' ), get_categories( $args ) );
 				} else {
 					global $wpdb;
 					$result = $wpdb->get_results( $wpdb->prepare( "SELECT ID as id, post_title as text FROM {$wpdb->posts} "
 					. "WHERE post_type = %s AND post_status = 'publish' AND post_title LIKE %s LIMIT " . intval( $limit ), $post_type, '%'. $search . '%' ) );
-
-					$obj = get_post_type_object( $post_type );
-					$all_items = ! empty( $obj ) && ! empty( $obj->labels->all_items )
-						? $obj->labels->all_items : __( 'All Items', 'wordpress-popup' );
-					/**
-				 * Add ALL Items option
-				 */
-					$all = new stdClass();
-					$all->id = 'all';
-					$all->text = $all_items;
-					if ( empty( $search ) || false !== stripos( $all_items, $search ) ) {
-						array_unshift( $result, $all );
-					}
 				}
 			}
 

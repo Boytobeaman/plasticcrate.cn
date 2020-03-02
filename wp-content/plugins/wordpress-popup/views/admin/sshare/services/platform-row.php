@@ -45,7 +45,7 @@
 
 						<div class="sui-tabs-menu">
 
-							<label for="hustle-{{platform}}-counter--click" class="sui-tab-item{{ ( 'click' === type ) ? ' active' : '' }}">
+							<label for="hustle-{{platform}}-counter--click" class="sui-tab-item">
 								<input
 									type="radio"
 									value="click"
@@ -53,12 +53,12 @@
 									data-attribute="{{platform}}_type"
 									data-tab-menu="{{platform}}-type-click"
 									id="hustle-{{platform}}-counter--click"
-									{{ _.selected( ( 'click' === type ), true) }}
+									{{ _.checked( ( 'click' === type ), true) }}
 								/>
 								<?php esc_html_e( 'Click', 'wordpress-popup' ); ?>
 							</label>
 
-							<label for="hustle-{{platform}}-counter--native" class="sui-tab-item{{ ( 'native' === type ) ? ' active' : '' }}">
+							<label for="hustle-{{platform}}-counter--native" class="sui-tab-item">
 								<input
 									type="radio"
 									value="native"
@@ -66,7 +66,7 @@
 									data-attribute="{{platform}}_type"
 									data-tab-menu="{{platform}}-type-native"
 									id="hustle-{{platform}}-counter--native"
-									{{ _.selected( ( 'native' === type ), true) }}
+									{{ _.checked( ( 'native' === type ), true) }}
 								/>
 								<?php esc_html_e( 'Native', 'wordpress-popup' ); ?>
 							</label>
@@ -75,7 +75,7 @@
 
 						<# if ( 'twitter' === platform ) { #>
 							<div class="sui-tabs-content">
-								<div class="sui-tab-content {{ ( 'native' === type ) ? 'active' : '' }}" data-tab-content="{{platform}}-type-native">
+								<div class="sui-tab-content" data-tab-content="{{platform}}-type-native">
 									<span class="sui-description">
 										<?php printf(
 												esc_html__( 'Twitter deprecated its native counter functionality. Sign-up to %1$sthis service%2$s in order to retrieve your Twitter stats. Keep in mind that this only tracks new shares after you register your site.', 'wordpress-popup' ),

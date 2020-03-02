@@ -215,13 +215,6 @@ class Hustle_Module_Collection extends Hustle_Collection {
 			'filter' => $filters,
 		), $limit );
 
-		// get edit_roles
-		$edit_roles = array();
-		foreach ( $modules as $key => $module ) {
-			$meta_edit_roles = $module->get_meta( $module::KEY_MODULE_META_PERMISSIONS );
-			$meta_edit_roles = !empty( $meta_edit_roles ) ? json_decode( $meta_edit_roles ) : array();
-			$edit_roles[ $module->id ] = $meta_edit_roles;
-		}
 		$results = array(
 			'count' => $count,
 			'page' => $page,
@@ -229,7 +222,6 @@ class Hustle_Module_Collection extends Hustle_Collection {
 			'modules' => $modules,
 			'show_pager' => $count > $limit,
 			'filter' => $filters,
-			'edit_roles' => $edit_roles,
 		);
 		return $results;
 	}
@@ -247,8 +239,9 @@ class Hustle_Module_Collection extends Hustle_Collection {
 	 */
 	public function return_model_from_id( $id ) {
 
+		$error = new WP_Error( 'not_found', __( 'Module not found.', 'wordpress-popup' ) );
 		if ( empty( $id ) ) {
-			return array();
+			return $error;
 		}
 
 		$module = Hustle_Module_Model::instance();
@@ -264,7 +257,7 @@ class Hustle_Module_Collection extends Hustle_Collection {
 			return $model_instance;
 		}
 
-		return array();
+		return $error;
 	}
 
 	public function get_all_id_names(){

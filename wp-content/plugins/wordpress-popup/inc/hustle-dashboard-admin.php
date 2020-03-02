@@ -21,6 +21,21 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 
 		$this->page_template_path = 'admin/dashboard';
 
+		// Analytics.
+		add_action( 'wp_dashboard_setup', array( $this, 'analytics_widget_setup' ) );
+	}
+
+	/**
+	 * Actions to be performed on Dashboard page.
+	 *
+	 * @since 4.0.4
+	 */
+	public function run_action_on_page_load() {
+
+		add_action( 'admin_enqueue_scripts', [ 'Hustle_Module_Front', 'add_hui_scripts' ] );
+		add_action( 'admin_footer', [ $this, 'maybe_print_forminator_scripts' ] );
+
+		Hustle_Modules_Common_Admin::export();
 	}
 
 	/**
@@ -33,24 +48,38 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 
 		$parent_menu_title = Opt_In_Utils::_is_free() ? __( 'Hustle', 'wordpress-popup' ) : __( 'Hustle Pro', 'wordpress-popup' );
 
-		// Parent menu
+		// Parent menu.
 		add_menu_page( $parent_menu_title , $parent_menu_title , $this->page_capability, 'hustle', array( $this, 'render_main_page' ), Opt_In::$plugin_url . 'assets/images/icon.svg' );
 
 		parent::register_admin_menu();
 	}
 
 	/**
-	 * Actions to be performed on Dashboard page.
+	 * Setup the Hustle analytics dashboard widgets.
 	 *
-	 * @since 4.0.4
-	 *
-	 * @return void
+	 * @since 4.1
 	 */
-	protected function on_current_page_actions() {
+	public function analytics_widget_setup() {
+		$analytic_settings = Hustle_Settings_Admin::get_hustle_settings( 'analytics' );
+		$analytics_enabled = !empty( $analytic_settings['enabled'] );
+		if ( $analytics_enabled && current_user_can( 'hustle_analytics' ) ) {
+			$title = !empty( $analytic_settings['title'] ) ? $analytic_settings['title'] : __( 'Hustle Analytics', 'wordpress-popup' );
+			wp_add_dashboard_widget( 'hustle_analytics', esc_html( $title ), array( $this, 'render_analytics_widget' ), $analytic_settings );
+		}
+	}
 
-		// For preview.
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_recaptcha_script' ] );
-		add_action( 'admin_footer', array( $this, 'maybe_print_forminator_scripts' ) );
+	/**
+	 * Outputs the Analytics dashboard widget
+	 *
+	 * @since 4.1
+	 */
+	public function render_analytics_widget( $post, $analytic_settings ) {
+		Opt_In::static_render(
+			'admin/widget-analytics',
+			array(
+				'settings' => $analytic_settings,
+			)
+		);
 	}
 
 	/**
@@ -128,6 +157,28 @@ class Hustle_Dashboard_Admin extends Hustle_Admin_Page_Abstract {
 			'need_migrate' => Hustle_Migration::check_tracking_needs_migration(),
 			'sui' => Opt_In::get_sui_summary_config(),
 		);
+	}
+
+	/**
+	 * Add data to the current json array.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param array $current_array Currently registered data.
+	 * @return array
+	 */
+	public function register_current_json( $current_array ) {
+
+		// Register translated strings for datepicker preview.
+		$current_array['messages']['days_and_months'] = [
+			'days_full'    => Opt_In_Utils::get_week_days(),
+			'days_short'   => Opt_In_Utils::get_week_days( 'short' ),
+			'days_min'     => Opt_In_Utils::get_week_days( 'min' ),
+			'months_full'  => Opt_In_Utils::get_months(),
+			'months_short' => Opt_In_Utils::get_months( 'short' ),
+		];
+
+		return $current_array;
 	}
 
 	/**

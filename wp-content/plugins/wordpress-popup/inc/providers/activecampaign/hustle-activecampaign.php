@@ -149,7 +149,8 @@ class Hustle_Activecampaign extends Hustle_Provider_Abstract {
 		$is_submit = isset( $submitted_data['api_url'] ) && isset( $submitted_data['api_key'] );
 		$global_multi_id = $this->get_global_multi_id( $submitted_data );
 
-		$api_url_valid = $api_key_valid = true;
+		$api_url_valid = true;
+		$api_key_valid = true;
 
 		if ( $is_submit ) {
 
@@ -161,7 +162,8 @@ class Hustle_Activecampaign extends Hustle_Provider_Abstract {
 
 			if ( ! $api_key_validated ) {
 				$error_message = $this->provider_connection_falied();
-				$api_url_valid = $api_key_valid = false;
+				$api_url_valid = false;
+				$api_key_valid = false;
 				$has_errors = true;
 			}
 
@@ -352,11 +354,11 @@ class Hustle_Activecampaign extends Hustle_Provider_Abstract {
 			// Check if credentials are valid
 			$api = self::api( $api_url, $api_key );
 			if ( $api ) {
-				$_lists =  $api->get_lists();
+				$account = $api->get_account();
 			}
 
-			if ( is_wp_error( $_lists ) || ! $_lists ) {
-				Hustle_Provider_Utils::maybe_log( __METHOD__, __( 'Invalid Activecampaign API credentials.', 'wordpress-popup' ) );
+			if ( is_wp_error( $account ) || ! $account ) {
+				Hustle_Api_Utils::maybe_log( __METHOD__, __( 'Invalid Activecampaign API credentials.', 'wordpress-popup' ) );
 				return false;
 			}
 

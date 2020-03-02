@@ -17,7 +17,7 @@ $reset_settings_uninstall = '1' === $settings['reset_settings_uninstall']; ?>
 
 					<label
 						for="hustle-uninstall-settings--preserve"
-						class="sui-tab-item <?php echo ! $reset_settings_uninstall ? ' active':''; ?>"
+						class="sui-tab-item"
 					>
 						<input
 							type="radio"
@@ -32,7 +32,7 @@ $reset_settings_uninstall = '1' === $settings['reset_settings_uninstall']; ?>
 
 					<label
 						for="hustle-uninstall-settings--reset"
-						class="sui-tab-item <?php echo $reset_settings_uninstall ? ' active':''; ?>"
+						class="sui-tab-item"
 					>
 						<input
 							type="radio"
@@ -49,7 +49,7 @@ $reset_settings_uninstall = '1' === $settings['reset_settings_uninstall']; ?>
 
 				<div class="sui-tabs-content">
 
-					<div class="<?php echo $reset_settings_uninstall ? ' active' : ''; ?>" data-tab-content="data-reset-notice">
+					<div data-tab-content="data-reset-notice">
 
 						<?php
 						$this->render(

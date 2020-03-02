@@ -151,9 +151,10 @@ class Hustle_Module_Front {
 		 */
 
 		//Register popup requirements
+		$url_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'debug' : 'min';
 		wp_register_script(
 			'hustle_front',
-			Opt_In::$plugin_url . 'assets/js/front.min.js',
+			Opt_In::$plugin_url . 'assets/js/front.' . $url_suffix . '.js',
 			array( 'jquery', 'underscore' ),
 			Opt_In::VERSION,
 			true
@@ -650,19 +651,19 @@ class Hustle_Module_Front {
 		}
 		wp_register_style(
 			'hstl-roboto',
-			'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i',
+			'https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:300,300i,400,400i,500,500i,700,700i&display=swap',
 			array(),
 			Opt_In::VERSION
 		);
 		wp_register_style(
 			'hstl-opensans',
-			'https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i',
+			'https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i&display=swap',
 			array(),
 			Opt_In::VERSION
 		);
 		wp_register_style(
 			'hstl-source-code-pro',
-			'https://fonts.googleapis.com/css?family=Source+Code+Pro',
+			'https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap',
 			array(),
 			Opt_In::VERSION
 		);
@@ -900,8 +901,6 @@ class Hustle_Module_Front {
 	 * Render the modules' wrapper to render the actual module using their shortcodes.
 	 *
 	 * @since the beginning of time.
-	 * @since 3.0.7 Now the shortcode accepts using the module_id using the attribute 'module_id'.
-	 * Before, it used the attribute 'id' but it was actually the module's name.
 	 *
 	 * @param array $atts
 	 * @param string $content
@@ -940,7 +939,7 @@ class Hustle_Module_Front {
 
 		$module = Hustle_Module_Collection::instance()->return_model_from_id( $module->module_id );
 
-		if ( ! $module->is_display_type_active( Hustle_Module_Model::SHORTCODE_MODULE ) ) {
+		if ( is_wp_error( $module ) || ! $module->is_display_type_active( Hustle_Module_Model::SHORTCODE_MODULE ) ) {
 			return '';
 		}
 

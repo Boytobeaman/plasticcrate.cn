@@ -9,7 +9,7 @@ $email_subject = isset( $email['email_subject'] ) ? $email['email_subject'] : ''
 $email_body = isset( $email['email_body'] ) ? $email['email_body'] : '';
 ?>
 
-<div id="email-copy-row" class="sui-box-settings-row">
+<div class="sui-box-settings-row">
 
 	<div class="sui-box-settings-col-1">
 		<span class="sui-settings-label"><?php esc_html_e( 'Unsubscribe Email Copy', 'wordpress-popup' ); ?></span>
@@ -29,7 +29,7 @@ $email_body = isset( $email['email_body'] ) ? $email['email_body'] : '';
 		</label>
 		<label class="sui-toggle-label" for="wph-unsub-edit-email"><?php esc_html_e( 'Enable custom email copy', 'wordpress-popup' ); ?></label>
 
-		<div class="sui-border-frame sui-toggle-content" data-toggle-content="unsub-email">
+		<div class="sui-border-frame sui-toggle-content" data-toggle-content="unsub-email" style="display:none;">
 
 			<!-- Email subject -->
 			<div class="sui-form-field">

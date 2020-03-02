@@ -1,32 +1,27 @@
-# BEGIN Imagify: webp file type
-<IfModule mod_mime.c>
-	AddType image/webp .webp
-</IfModule>
-# END Imagify: webp file type
-
 # BEGIN WpFastestCache
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
 RewriteCond %{HTTPS} =on
-RewriteCond %{HTTP_HOST} ^www.chinaboxsale.com
+RewriteCond %{HTTP_HOST} ^www.plasticcrate.cn
 # Start WPFC Exclude
 # End WPFC Exclude
 # Start_WPFC_Exclude_Admin_Cookie
-RewriteCond %{HTTP:Cookie} !wordpress_logged_in_[^\=]+\=3rdpartyuser|luxingchao
+RewriteCond %{HTTP:Cookie} !wordpress_logged_in_[^\=]+\=luxingchao
 # End_WPFC_Exclude_Admin_Cookie
-RewriteCond %{HTTP_HOST} ^www.chinaboxsale.com
-RewriteCond %{HTTP_USER_AGENT} !(facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Mediatoolkitbot)
+RewriteCond %{HTTP_HOST} ^www.plasticcrate.cn
+RewriteCond %{HTTP_USER_AGENT} !(facebookexternalhit|WP_FASTEST_CACHE_CSS_VALIDATOR|Twitterbot|LinkedInBot|WhatsApp|Mediatoolkitbot)
 RewriteCond %{HTTP_USER_AGENT} !(WP\sFastest\sCache\sPreload(\siPhone\sMobile)?\s*Bot)
 RewriteCond %{REQUEST_METHOD} !POST
 RewriteCond %{REQUEST_URI} !(\/){2}$
 RewriteCond %{REQUEST_URI} \/$
 RewriteCond %{QUERY_STRING} !.+
+RewriteCond %{HTTP:Cookie} !wordpress_logged_in
 RewriteCond %{HTTP:Cookie} !comment_author_
 RewriteCond %{HTTP:Cookie} !safirmobilswitcher=mobil
 RewriteCond %{HTTP:Profile} !^[a-z0-9\"]+ [NC]
 RewriteCond %{DOCUMENT_ROOT}/wp-content/cache/all/$1/index.html -f [or]
-RewriteCond /data/wwwroot/www.chinaboxsale.com/wp-content/cache/all/$1/index.html -f
+RewriteCond /data/wwwroot/www.plasticcrate.cn/wp-content/cache/all/$1/index.html -f
 RewriteRule ^(.*) "/wp-content/cache/all/$1/index.html" [L]
 </IfModule>
 <FilesMatch "index\.(html|htm)$">
@@ -61,6 +56,12 @@ AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
 AddOutputFilterByType DEFLATE font/opentype font/ttf font/eot font/otf
 </IfModule>
 # END GzipWpFastestCache
+# BEGIN Imagify: webp file type
+<IfModule mod_mime.c>
+	AddType image/webp .webp
+</IfModule>
+# END Imagify: webp file type
+
 # BEGIN LBCWpFastestCache
 <FilesMatch "\.(webm|ogg|mp4|ico|pdf|flv|jpg|jpeg|png|gif|webp|js|css|swf|x-html|css|xml|js|woff|woff2|otf|ttf|svg|eot)(\.gz)?$">
 <IfModule mod_expires.c>

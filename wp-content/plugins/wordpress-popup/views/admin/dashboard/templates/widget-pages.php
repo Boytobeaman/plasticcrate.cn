@@ -83,9 +83,13 @@ $sshare_count = Hustle_Module_Collection::instance()->get_all( null, array(
 			</a>
 		<?php } ?>
 
-		<div class="sui-actions-right">
-			<p><small><strong><a href="<?php echo esc_url( add_query_arg( $query_array, 'admin.php' ) ); ?>" style="color: #888888;"><?php printf( esc_html__( 'View all %s', 'wordpress-popup' ), esc_html( strtolower( $widget_name ) ) ); ?></a></strong></small></p>
-		</div>
+		<?php if ( $sshare_count ) : ?>
+
+			<div class="sui-actions-right">
+				<p><small><strong><a href="<?php echo esc_url( add_query_arg( $query_array, 'admin.php' ) ); ?>" style="color: #888888;"><?php printf( esc_html__( 'View all %s', 'wordpress-popup' ), esc_html( strtolower( $widget_name ) ) ); ?></a></strong></small></p>
+			</div>
+
+		<?php endif; ?>
 
 	</div>
 

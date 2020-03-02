@@ -3,7 +3,7 @@
 } else {
 	$smallcaps_singular = esc_html__( 'module', 'wordpress-popup' );
 }
-$post_types = Opt_In_Utils::get_post_types();
+$post_types = wp_list_pluck( Opt_In_Utils::get_post_types(), 'label', 'name' );
 ?>
 
 <div id="hustle-dialog--visibility-options" class="sui-dialog sui-dialog-alt" aria-hidden="true" tabindex="-1">
@@ -27,9 +27,40 @@ $post_types = Opt_In_Utils::get_post_types();
 
 			</div>
 
-			<div class="sui-box-body sui-box-body-slim sui-block-content-center">
+			<div class="sui-box-body sui-box-body-slim sui-block-content-center" style="padding-bottom: 0;">
 
 				<p id="dialogTitle"><small><?php printf( esc_html__( 'Choose the visibility conditions which you want to apply on the %s.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></small></p>
+
+				<?php if ( Opt_In_Utils::is_woocommerce_active() ) { ?>
+
+					<div class="sui-tabs">
+
+						<div role="tablist" class="sui-tabs-menu">
+
+							<button
+								type="button"
+								role="tab"
+								id="hustle-general-conditions"
+								class="sui-tab-item active"
+								aria-controls="hustle-general-conditions"
+								aria-selected="true"
+							><?php esc_html_e( 'General', 'wordpress-popup' ); ?></button>
+
+							<button
+								type="button"
+								role="tab"
+								id="hustle-wc-conditions"
+								class="sui-tab-item"
+								aria-controls="hustle-wc-conditions"
+								aria-selected="false"
+								tabindex="-1"
+							><?php esc_html_e( 'Woocommerce', 'wordpress-popup' ); ?></button>
+
+						</div>
+
+					</div>
+
+				<?php } ?>
 
 			</div>
 
@@ -37,159 +68,67 @@ $post_types = Opt_In_Utils::get_post_types();
 
 				<ul class="sui-spacing-slim">
 
-					<li><label for="hustle-condition--posts" class="sui-box-selector">
-						<input type="checkbox"
-							value="posts"
-							name="visibility_options"
-							id="hustle-condition--posts"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Posts', 'wordpress-popup' ); ?></span>
-					</label></li>
+					<?php
+						// devide before CTP and after that
+						$first_conditions = [
+							'posts' => __( 'Posts', 'wordpress-popup' ),
+							'pages' => __( 'Pages', 'wordpress-popup' ),
+						];
+						$last_conditions = [
+							'categories' => __( 'Categories', 'wordpress-popup' ),
+							'tags' => __( 'Tags', 'wordpress-popup' ),
+							'archive_pages' => __( 'Archive Pages', 'wordpress-popup' ),
+							'wp_conditions' => __( 'Static Pages', 'wordpress-popup' ),
+							'user_roles' => __( 'User Roles', 'wordpress-popup' ),
+							'page_templates' => __( 'Page Templates', 'wordpress-popup' ),
+							'visitor_device' => __( 'Visitor\'s Device', 'wordpress-popup' ),
+							'on_browser' => __( 'Visitor\'s Browser', 'wordpress-popup' ),
+							'visitor_logged_in_status' => __( 'Logged in status', 'wordpress-popup' ),
+							'visitor_country' => __( 'Visitor\'s Country', 'wordpress-popup' ),
+							'source_of_arrival' => __( 'Source of Arrival', 'wordpress-popup' ),
+							'from_referrer' => __( 'Referrer', 'wordpress-popup' ),
+							'on_url' => __( 'Specific URL', 'wordpress-popup' ),
+							'user_registration' => __( 'After Registration', 'wordpress-popup' ),
+							'shown_less_than' => __( 'Number of times visitor has seen', 'wordpress-popup' ),
+							'visitor_commented' => __( 'Visitor Commented Before', 'wordpress-popup' ),
+						];
+						$conditions = array_merge( $first_conditions, $post_types, $last_conditions );
 
-					<li><label for="hustle-condition--pages" class="sui-box-selector">
-						<input type="checkbox"
-							value="pages"
-							name="visibility_options"
-							id="hustle-condition--pages"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Pages', 'wordpress-popup' ); ?></span>
-					</label></li>
+						if ( Opt_In_Utils::is_woocommerce_active() ) {
+							// devide before CTP and after that
+							$first_wc_conditions = [
+								'wc_pages' => __( 'All Woocommerce Pages', 'wordpress-popup' ),
+							];
+							$last_wc_conditions = [
+								'wc_categories' => __( 'WooCommerce Categories', 'wordpress-popup' ),
+								'wc_tags' => __( 'WooCommerce Tags', 'wordpress-popup' ),
+								'wc_archive_pages' => __( 'WooCommerce Archives', 'wordpress-popup' ),
+								'wc_static_pages' => __( 'WooCommerce Static Pages', 'wordpress-popup' ),
+							];
+							$conditions = array_merge( $first_wc_conditions, $conditions, $last_wc_conditions );
+						}
 
-					<!-- CPT -->
-					<?php foreach ( $post_types as $post_type => $data ) { ?>
-						<li><label for="hustle-condition--<?php echo esc_attr($post_type); ?>" class="sui-box-selector">
+						/**
+						 * Visibility Conditions
+						 *
+						 * @since 4.1
+						 *
+						 * @param array $conditions Visibility Conditions.
+						 */
+						$conditions = apply_filters( 'hustle_visibility_condition_options', $conditions );
+
+						foreach ( $conditions as $key => $label ) {
+					?>
+						<li class="<?php echo 'wc_' === substr( $key, 0, 3 ) || 'product' === $key ? 'wc' :  'general'; ?>_condition"><label for="hustle-condition--<?php echo esc_attr( $key ); ?>" class="sui-box-selector">
 							<input type="checkbox"
-								value="<?php echo esc_attr($post_type); ?>"
+								value="<?php echo esc_attr( $key ); ?>"
 								name="visibility_options"
-								id="hustle-condition--<?php echo esc_attr($post_type); ?>"
+								id="hustle-condition--<?php echo esc_attr( $key ); ?>"
 								class="hustle-visibility-condition-option" />
-							<span><?php echo esc_html($data['label']); ?></span>
+							<span><?php echo esc_html( $label ); ?></span>
 						</label></li>
+
 					<?php } ?>
-
-					<li><label for="hustle-condition--categories" class="sui-box-selector">
-						<input type="checkbox"
-							value="categories"
-							name="visibility_options"
-							id="hustle-condition--categories"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Category', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--tags" class="sui-box-selector">
-						<input type="checkbox"
-							value="tags"
-							name="visibility_options"
-							id="hustle-condition--tags"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Tags', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--visitor_logged_in_status" class="sui-box-selector">
-						<input type="checkbox"
-							value="visitor_logged_in_status"
-							name="visibility_options"
-							id="hustle-condition--visitor_logged_in_status"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "Visitor's logged in status", 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--shown_less_than" class="sui-box-selector">
-						<input type="checkbox"
-							value="shown_less_than"
-							name="visibility_options"
-							id="hustle-condition--shown_less_than"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Number of times visitor has seen', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--visitor_device" class="sui-box-selector">
-						<input type="checkbox"
-							value="visitor_device"
-							name="visibility_options"
-							id="hustle-condition--visitor_device"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "Visitor's Device", 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--from_referrer" class="sui-box-selector">
-						<input type="checkbox"
-							value="from_referrer"
-							name="visibility_options"
-							id="hustle-condition--from_referrer"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Referrer', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--source_of_arrival" class="sui-box-selector">
-						<input type="checkbox"
-							value="source_of_arrival"
-							name="visibility_options"
-							id="hustle-condition--source_of_arrival"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Source of Arrival', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--on_url" class="sui-box-selector">
-						<input type="checkbox"
-							value="on_url"
-							name="visibility_options"
-							id="hustle-condition--on_url"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Specific URL', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--visitor_commented" class="sui-box-selector">
-						<input type="checkbox"
-							value="visitor_commented"
-							name="visibility_options"
-							id="hustle-condition--visitor_commented"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( 'Visitor Commented Before', 'wordpress-popup' ); ?></span>
-					</label></li>
-
-					<li><label for="hustle-condition--visitor_country" class="sui-box-selector">
-						<input type="checkbox"
-							value="visitor_country"
-							name="visibility_options"
-							id="hustle-condition--visitor_country"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "Visitor's Country", 'wordpress-popup' ); ?></span>
-					</label></li>
-					<li><label for="hustle-condition--page_404" class="sui-box-selector">
-						<input type="checkbox"
-							value="page_404"
-							name="visibility_options"
-							id="hustle-condition--page_404"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "404 page", 'wordpress-popup' ); ?></span>
-					</label></li>
-					<!--
-					<li><label for="hustle-condition--user_roles" class="sui-box-selector">
-						<input type="checkbox"
-							value="user_roles"
-							name="visibility_options"
-							id="hustle-condition--user_roles"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "Visitor's role", 'wordpress-popup' ); ?></span>
-					</label></li>
-					<li><label for="hustle-condition--user_registration" class="sui-box-selector">
-						<input type="checkbox"
-							value="user_registration"
-							name="visibility_options"
-							id="hustle-condition--user_registration"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "After user registration", 'wordpress-popup' ); ?></span>
-					</label></li>
-					<li><label for="hustle-condition--page_templates" class="sui-box-selector">
-						<input type="checkbox"
-							value="page_templates"
-							name="visibility_options"
-							id="hustle-condition--page_templates"
-							class="hustle-visibility-condition-option" />
-						<span><?php esc_html_e( "Page templates", 'wordpress-popup' ); ?></span>
-					</label></li>
-					-->
 
 				</ul>
 

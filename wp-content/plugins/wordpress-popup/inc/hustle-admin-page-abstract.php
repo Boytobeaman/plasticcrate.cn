@@ -51,31 +51,10 @@ if ( ! class_exists( 'Hustle_Admin_Page_Abstract' ) ) :
 			$this->init();
 
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
-
-			// Things to execute only when the current page is this one.
-			if ( ! empty( $this->current_page ) && ( $this->current_page === $this->page || $this->current_page === $this->page_edit ) ) {
-
-				// Register variables for the js side only if this is the requested page.
-				add_filter( 'hustle_optin_vars', array( $this, 'register_current_json' ) );
-
-				$this->on_current_page_actions();
-			}
 		}
 
 		// Extend to setup things on construct.
 		abstract protected function init();
-
-		/**
-		 * Things to do only when the current page belongs to this one.
-		 * To be overridden.
-		 *
-		 * @since 4.0.4
-		 */
-		protected function on_current_page_actions() {
-
-			// For preview.
-			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_recaptcha_script' ] );
-		}
 
 		/**
 		 * Register the js variables to be localized for this page.
@@ -98,8 +77,7 @@ if ( ! class_exists( 'Hustle_Admin_Page_Abstract' ) ) :
 
 			$this->page_slug = add_submenu_page( 'hustle', $this->page_title, $this->page_menu_title, $this->page_capability, $this->page,  array( $this, 'render_main_page' ) );
 
-			// Used only in entries.
-			add_action( 'load-' . $this->page_slug, array( $this, 'run_action_on_page_load' ) );
+			add_action( 'load-' . $this->page_slug, array( $this, 'current_page_loaded' ) );
 		}
 
 		/**
@@ -113,12 +91,24 @@ if ( ! class_exists( 'Hustle_Admin_Page_Abstract' ) ) :
 		}
 
 		/**
+		 * Perform actions during the 'load-{page}' hook.
+		 *
+		 * @since 4.0.4
+		 */
+		public function current_page_loaded() {
+
+			// Register variables for the js side only if this is the requested page.
+			add_filter( 'hustle_optin_vars', array( $this, 'register_current_json' ) );
+
+			$this->run_action_on_page_load();
+		}
+
+		/**
 		 * Method called when the action 'load-' . $this->page_slug runs.
 		 *
 		 * @since 4.0.0
 		 */
 		public function run_action_on_page_load() {}
-
 
 		/**
 		 * Print forminator scripts for preview.
@@ -134,28 +124,6 @@ if ( ! class_exists( 'Hustle_Admin_Page_Abstract' ) ) :
 				forminator_print_front_scripts( FORMINATOR_VERSION );
 
 			}
-		}
-
-		/**
-		 * Enqueue the recaptcha script for preview.
-		 * Used only in Dashboard, Listings, and Wizard pages, excluding Sshare ones.
-		 *
-		 * @since 4.0.4
-		 * @return void
-		 */
-		public function enqueue_recaptcha_script() {
-
-			$language = '';
-
-			// We're in wizards.
-			if ( ! empty( $this->module ) ) {
-
-				$form_fields = $this->module->get_form_fields();
-				$language    = ! empty( $form_fields['recaptcha']['recaptcha_language'] ) ? $form_fields['recaptcha']['recaptcha_language'] : '';
-			}
-
-			Hustle_Module_Front::add_recaptcha_script( $language, true );
-			Hustle_Module_Front::add_hui_scripts();
 		}
 	}
 

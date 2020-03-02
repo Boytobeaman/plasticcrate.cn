@@ -1,6 +1,4 @@
-<?php
-// VIEW: Mobiles only
-?>
+<?php // VIEW: Mobiles only. ?>
 <div class="hui-pagination hui-pagination-mobile">
 
 	<div class="sui-pagination-wrap">
@@ -25,8 +23,7 @@
 
 <div class="sui-pagination-box">
 
-	<?php
-	// VIEW: Desktop only ?>
+	<?php // VIEW: Desktop only. ?>
 	<div class="sui-box sui-pagination-desktop">
 
 		<?php
@@ -34,7 +31,7 @@
 			'admin/commons/sui-listing/elements/bulk-actions',
 			array(
 				'module_type' => $module_type,
-				'is_bottom'		=> ! empty( $is_bottom ),
+				'is_bottom'   => ! empty( $is_bottom ),
 			)
 		);
 		?>
@@ -47,9 +44,9 @@
 			self::static_render(
 				'admin/commons/sui-listing/elements/pagination-list',
 				array(
-					'total' => $total,
-					'page' => $page,
-					'paged' => intval( $paged ),
+					'total'            => $total,
+					'page'             => $page,
+					'paged'            => intval( $paged ),
 					'entries_per_page' => $entries_per_page,
 				)
 			);

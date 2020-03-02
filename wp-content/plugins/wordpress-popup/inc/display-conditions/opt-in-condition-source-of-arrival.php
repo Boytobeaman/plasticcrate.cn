@@ -1,21 +1,43 @@
 <?php
 
 class Opt_In_Condition_Source_Of_Arrival extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ) {
+	public function is_allowed() {
 
-		$is_external_source_allowed = true;
-		$is_search_source_allowed = true;
+		$is_allowed = null;
 
-		if ( isset( $this->args->source_external ) && 'true' === $this->args->source_external ) {
+		// Check is source is external one
+		if ( ! $is_allowed && isset( $this->args->source_direct ) && 'true' === $this->args->source_direct ) {
+			$is_allowed = $is_allowed || '' === $this->utils()->get_referrer();
+		}
+
+		// Check is source is external one
+		if ( ! $is_allowed && isset( $this->args->source_external ) && 'true' === $this->args->source_external ) {
 			$internal = preg_replace( '#^https?://#', '', get_option( 'home' ) );
-			$is_external_source_allowed = ! $this->utils()->test_referrer( $internal );
+			//if not direct and not internal source
+			$is_allowed = $is_allowed || '' !== $this->utils()->get_referrer() && ! $this->utils()->test_referrer( $internal );
 		}
 
-		if ( isset( $this->args->source_search ) && 'true' === $this->args->source_search ) {
-			$is_search_source_allowed = $this->is_from_searchengine_ref();
+		// Check is source is internal one
+		if ( ! $is_allowed && isset( $this->args->source_internal ) && 'true' === $this->args->source_internal ) {
+			$internal = preg_replace( '#^https?://#', '', get_option( 'home' ) );
+			$is_allowed = $is_allowed || $this->utils()->test_referrer( $internal );
 		}
 
-		return $is_external_source_allowed && $is_search_source_allowed;
+		// Check is source is a search
+		if ( ! $is_allowed && isset( $this->args->source_search ) && 'true' === $this->args->source_search ) {
+			$is_allowed = $is_allowed || $this->is_from_searchengine_ref();
+		}
+
+		// Check is source is not a search
+		if ( ! $is_allowed && isset( $this->args->source_not_search ) && 'true' === $this->args->source_not_search ) {
+			$is_allowed = $is_allowed || ! $this->is_from_searchengine_ref();
+		}
+
+		if ( is_null( $is_allowed ) ) {
+			return true;
+		}
+
+		return $is_allowed;
 	}
 
 	/**
@@ -85,8 +107,5 @@ class Opt_In_Condition_Source_Of_Arrival extends Opt_In_Condition_Abstract {
 		}
 
 		return $response;
-	}
-	public function label(){
-		return __("Only from search engine", 'wordpress-popup');
 	}
 }

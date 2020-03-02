@@ -8,6 +8,7 @@ $module_name = $module->module_name;
 $appearance_settings = $module->get_design()->to_array();
 $display_settings = $module->get_display()->to_array();
 $content_settings = $module->get_content()->to_array();
+$visibility_settings = $module->get_visibility()->to_array();
 
 $capitalize_singular = esc_html__( 'Social Share', 'wordpress-popup' );
 $capitalize_plural   = esc_html__( 'Social Shares', 'wordpress-popup' );
@@ -63,9 +64,9 @@ self::static_render(
 				'template' => 'admin/commons/sui-wizard/templates/tab-visibility',
 				'support'  => array(
 					'section'     => $section,
-					'capitalize_singular' => $capitalize_singular,
 					'is_active'           => $is_active,
 					'module_type'         => $module_type,
+					'settings'            => $visibility_settings,
 					'smallcaps_singular'  => $smallcaps_singular,
 				),
 			),

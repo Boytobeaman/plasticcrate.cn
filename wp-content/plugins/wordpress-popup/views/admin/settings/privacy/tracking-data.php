@@ -1,7 +1,7 @@
 <?php
-$retain_tracking_forever = '1' === $settings['retain_tracking_forever'];
+$retain_tracking_forever   = '1' === $settings['retain_tracking_forever'];
 $tracking_retention_number = $settings['tracking_retention_number'];
-$tracking_retention_unit = $settings['tracking_retention_number_unit'];
+$tracking_retention_unit   = $settings['tracking_retention_number_unit'];
 ?>
 
 <div class="sui-box-settings-row">
@@ -20,7 +20,7 @@ $tracking_retention_unit = $settings['tracking_retention_number_unit'];
 
 			<div class="sui-tabs-menu">
 
-				<label class="sui-tab-item<?php echo $retain_tracking_forever ? ' active':''; ?>">
+				<label class="sui-tab-item">
 					<input type="radio"
 					name="retain_tracking_forever"
 					id="hustle-retain-tracking-forever--on"
@@ -29,7 +29,7 @@ $tracking_retention_unit = $settings['tracking_retention_number_unit'];
 					<?php esc_html_e( 'Forever', 'wordpress-popup' ); ?>
 				</label>
 
-				<label class="sui-tab-item<?php echo ! $retain_tracking_forever ? ' active' : ''; ?>">
+				<label class="sui-tab-item">
 					<input type="radio"
 					name="retain_tracking_forever"
 					id="hustle-retain-tracking-forever--off"
@@ -41,8 +41,7 @@ $tracking_retention_unit = $settings['tracking_retention_number_unit'];
 			</div>
 
 			<div class="sui-tabs-content">
-
-				<div class="sui-tab-boxed<?php echo ! $retain_tracking_forever ? ' active':''; ?>" data-tab-content="tracking-retention-number">
+				<div class="sui-tab-boxed" data-tab-content="tracking-retention-number">
 					<div class="sui-row">
 						<div class="sui-col-md-6">
 							<input type="number"

@@ -1,4 +1,6 @@
 <?php
+// TODO: Include this in the admin's options templating file.
+
 $args = array( 'role' => 'alert' );
 
 // Set unique identifier to notice.
@@ -21,7 +23,7 @@ if ( ! empty( $dismiss ) ) {
 
 // Set custom sui class(es).
 if ( ! empty( $sui_class ) ) {
-	$args['class'] .= ' sui-notice-' . esc_attr( $class );
+	$args['class'] .= ' sui-notice-' . esc_attr( $sui_class );
 }
 
 // Set custom class(es).
@@ -47,9 +49,11 @@ if ( ! empty( $style ) ) {
 foreach ( $args as $key => $value ) {
 	$attrs[] = $key . '="' . $value . '"';
 }
+
+$attrs_string = implode( ' ', $attrs );
 ?>
 
-<div <?php echo implode( ' ', wp_kses_post( $attrs ) ); ?>>
+<div <?php echo $attrs_string; ?>>
 
 	<?php if ( isset( $content ) ) { ?>
 

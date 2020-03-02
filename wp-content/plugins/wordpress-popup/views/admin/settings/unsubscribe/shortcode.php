@@ -1,4 +1,4 @@
-<div id="shortcode-row" class="sui-box-settings-row">
+<div class="sui-box-settings-row">
 
 	<div class="sui-box-settings-col-1">
 		<span class="sui-settings-label"><?php esc_html_e( 'Shortcode', 'wordpress-popup' ); ?></span>

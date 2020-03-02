@@ -7,54 +7,81 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // TEMPLATE: Visibility Group ?>
 <script id="hustle-visibility-group-box-tpl" type="text/template">
 
-	<div id="hustle-visibility-group-{{ groupId }}" class="sui-box-builder" style="margin-bottom: 0;">
+	<div id="hustle-visibility-group-{{ groupId }}" class="sui-box-builder">
 
 		<div class="sui-box-builder-header">
 
 			<div class="sui-builder-conditions">
 
 				<div class="sui-builder-conditions-rule">
+					<select
+						name="show_or_hide_conditions"
+						class="sui-select-sm visibility-group-show-hide"
+						data-group-attribute="show_or_hide_conditions"
+						data-group-id="{{ groupId }}"
+					>
+						<option value="show" {{ _.selected( ( 'show' === show_or_hide_conditions ), true) }}><?php esc_html_e( 'Show', 'wordpress-popup' ); ?></option>
+						<option value="hide" {{ _.selected( ( 'hide' === show_or_hide_conditions ), true) }}><?php esc_html_e( 'Hide', 'wordpress-popup' ); ?></option>
+					</select>
 
-					<span class="sui-builder-text"><?php printf( esc_html__( 'Shows %s if the following conditions are met.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+					<span class="sui-builder-text"><?php esc_html_e( 'when', 'wordpress-popup' ); ?></span>
 
-					<input type="hidden" name="filter_type" data-attribute="filter_type" data-group-id="{{ groupId }}" value="any">
-
-					<!-- <span class="sui-builder-text"><?php printf( esc_html__( 'Shows %s if', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+					<input type="hidden" name="filter_type" data-group-attribute="filter_type" data-group-id="{{ groupId }}" value="any">
 
 					<select
 						name="filter_type"
 						class="sui-select-sm visibility-group-filter-type"
+						data-group-attribute="filter_type"
 						data-group-id="{{ groupId }}"
 					>
-						<option value="all" {{ _.selected( ( 'all' === filter_type ), true) }}><?php esc_html_e( 'all' ); ?></option>
-						<option value="any" {{ _.selected( ( 'any' === filter_type ), true) }}><?php esc_html_e( 'some' ); ?></option>
-						<option value="none" {{ _.selected( ( 'none' === filter_type ), true) }}><?php esc_html_e( 'none' ); ?></option>
+						<option value="all" {{ _.selected( ( 'all' === filter_type ), true) }}><?php esc_html_e( 'all', 'wordpress-popup' ); ?></option>
+						<option value="any" {{ _.selected( ( 'any' === filter_type ), true) }}><?php esc_html_e( 'any', 'wordpress-popup' ); ?></option>
 					</select>
 
-					<span class="sui-builder-text"><?php esc_html_e( 'of the following conditions are met.', 'wordpress-popup' ); ?></span> -->
+					<span class="sui-builder-text"><?php esc_html_e( 'of the following conditions match.', 'wordpress-popup' ); ?></span>
 
 				</div>
 
-				<?php if ( false ) : // To be added. ?>
-					<div class="sui-builder-conditions-actions">
+				<div class="sui-builder-conditions-actions">
 
-						<button
-							class="sui-button-icon sui-button-red hustle-remove-visibility-group"
-							data-group-id="{{ groupId }}"
-						>
-							<i class="sui-icon-trash" aria-hidden="true"></i>
-							<span class="sui-screen-reader-text"><?php esc_html_e( 'Delete visibility group', 'wordpress-popup' ); ?></span>
-						</button>
+					<button
+						class="sui-button-icon sui-button-red hustle-remove-visibility-group"
+						data-group-id="{{ groupId }}"
+					>
+						<i class="sui-icon-trash" aria-hidden="true"></i>
+						<span class="sui-screen-reader-text"><?php esc_html_e( 'Delete visibility group', 'wordpress-popup' ); ?></span>
+					</button>
 
-					</div>
-				<?php endif; ?>
+				</div>
 
 			</div>
 
-			<?php if ( false && 'embedded' === $module_type ) { ?>
+			<?php if ( in_array( $module_type, [ 'social_sharing', 'embedded' ], true ) ) { ?>
 				<div class="sui-builder-options sui-options-inline">
 
-					<span class="sui-builder-text"><?php esc_html_e( 'Apply on', 'wordpress-popup' ); ?></span>
+					<span class="sui-builder-text"><?php esc_html_e( 'Apply on', 'wordpress-popup' ); ?>
+						<button class="sui-button-icon sui-tooltip sui-tooltip-constrained" data-tooltip="<?php esc_attr_e( 'Choose the display options to apply these visibility conditions on. Note that the visibility rules will only affect the options which are active on the Display Options page.', 'wordpress-popup' ); ?>" style="width: 22px; height: 22px;">
+							<i class="sui-icon-info" aria-hidden="true"></i>
+						</button>
+					</span>
+
+					<?php if ( 'social_sharing' === $module_type ) { ?>
+						<label
+							for="hustle-apply-on-float-{{ groupId }}"
+							class="sui-checkbox sui-checkbox-sm"
+						>
+							<input
+								type="checkbox"
+								id="hustle-apply-on-float-{{ groupId }}"
+								class="visibility-group-apply-on hustle-group-element"
+								data-property="apply_on_floating"
+								data-group-id="{{ groupId }}"
+								{{ _.checked( apply_on_floating, true ) }}
+							/>
+							<span aria-hidden="true"></span>
+							<span><?php esc_html_e( 'Floating Social', 'wordpress-popup' ); ?></span>
+						</label>
+					<?php } ?>
 
 					<label
 						for="hustle-apply-on-inline-{{ groupId }}"
@@ -88,60 +115,25 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 						<span><?php esc_html_e( 'Widget', 'wordpress-popup' ); ?></span>
 					</label>
 
-				</div>
-			<?php } ?>
-
-			<?php if ( false && 'social_sharing' === $module_type ) { ?>
-				<div class="sui-builder-options sui-options-inline">
-
-					<span class="sui-builder-text"><?php esc_html_e( 'Apply on', 'wordpress-popup' ); ?></span>
-
 					<label
-						for="hustle-apply-on-float-{{ groupId }}"
+						for="hustle-apply-on-shortcode-{{ groupId }}"
 						class="sui-checkbox sui-checkbox-sm"
 					>
 						<input
 							type="checkbox"
-							id="hustle-apply-on-float-{{ groupId }}"
+							id="hustle-apply-on-shortcode-{{ groupId }}"
 							class="visibility-group-apply-on hustle-group-element"
-							data-property="apply_on_float"
+							data-property="apply_on_shortcode"
 							data-group-id="{{ groupId }}"
-							{{ _.checked( apply_on_float, true ) }}
+							{{ _.checked( apply_on_shortcode, true ) }}
 						/>
 						<span aria-hidden="true"></span>
-						<span><?php esc_html_e( 'Floating Social', 'wordpress-popup' ); ?></span>
-					</label>
+						<span><?php esc_html_e( 'Shortcode', 'wordpress-popup' ); ?></span>
 
-					<label
-						for="hustle-apply-on-inline-{{ groupId }}"
-						class="sui-checkbox sui-checkbox-sm"
-					>
-						<input
-							type="checkbox"
-							id="hustle-apply-on-inline-{{ groupId }}"
-							class="visibility-group-apply-on hustle-group-element"
-							data-property="apply_on_inline"
-							data-group-id="{{ groupId }}"
-							{{ _.checked( apply_on_inline, true ) }}
-						/>
-						<span aria-hidden="true"></span>
-						<span><?php esc_html_e( 'Inline Content', 'wordpress-popup' ); ?></span>
-					</label>
+						<button class="sui-button-icon sui-tooltip sui-tooltip-constrained" data-tooltip="<?php printf( esc_attr__( 'By default, the shortcode displays your %1$s wherever you add it. However, you can apply visibility rules on your %1$s shortcode for better control. For example, you can use visibility rules to show your %1$s to logged-in users only or visitors from a specific country only.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?>" style="width: 22px; height: 22px;">
+							<i class="sui-icon-info" aria-hidden="true"></i>
+						</button>
 
-					<label
-						for="hustle-apply-on-widget-{{ groupId }}"
-						class="sui-checkbox sui-checkbox-sm"
-					>
-						<input
-							type="checkbox"
-							id="hustle-apply-on-widget-{{ groupId }}"
-							class="visibility-group-apply-on hustle-group-element"
-							data-property="apply_on_widget"
-							data-group-id="{{ groupId }}"
-							{{ _.checked( apply_on_widget, true ) }}
-						/>
-						<span aria-hidden="true"></span>
-						<span><?php esc_html_e( 'Widget', 'wordpress-popup' ); ?></span>
 					</label>
 
 				</div>
@@ -159,7 +151,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 			<div class="sui-box-builder-message-block">
 
-				<span class="sui-box-builder-message"><?php printf( esc_html__( 'You don’t have any visibility condition yet. Currently, the %s will be visible everywhere across your website.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
+				<span class="sui-box-builder-message"><?php printf( esc_html__( 'No visibility condition added yet. Currently, your %s will appear everywhere on your website.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></span>
 
 				<?php echo Opt_In_Utils::render_image_markup( esc_url( $image_1x ), esc_url( $image_2x ), 'sui-image sui-image-center' ); // WPCS: XSS ok. ?>
 
@@ -208,31 +200,29 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Posts ?>
 <script id="hustle-visibility-rule-tpl--posts" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( "Show %s on", 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( "Choose posts", 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-posts-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-posts"
 					value="except"
 					id="{{ groupId }}-{{ type }}-filter_type-posts-except"
-					data-tab-menu="except"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'All posts except', 'wordpress-popup' ); ?>
 			</label>
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-posts-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-posts"
 					value="only"
 					id="{{ groupId }}-{{ type }}-filter_type-posts-only"
-					data-tab-menu="only"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these posts', 'wordpress-popup' ); ?>
@@ -250,7 +240,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					multiple="multiple"
 					data-val="{{ posts }}"
 					data-attribute="posts"
-					placeholder="<?php esc_html_e( 'Start typing the name of posts...', 'wordpress-popup' ); ?>">
+					data-placeholder="<?php esc_html_e( 'Start typing the name of posts...', 'wordpress-popup' ); ?>">
 
 					<# _.each( optinVars.posts, function( post ) { #>
 						<option value="{{ post.id }}"
@@ -273,31 +263,29 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Pages ?>
 <script id="hustle-visibility-rule-tpl--pages" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( "Show %s on", 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( "Choose pages", 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-pages-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-pages"
 					value="except"
 					id="{{ groupId }}-{{ type }}-filter_type-pages-except"
-					data-tab-menu="except"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'All pages except', 'wordpress-popup' ); ?>
 			</label>
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-pages-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-pages"
 					value="only"
 					id="{{ groupId }}-{{ type }}-filter_type-pages-only"
-					data-tab-menu="only"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these pages', 'wordpress-popup' ); ?>
@@ -315,7 +303,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					multiple="multiple"
 					data-val="{{ pages }}"
 					data-attribute="pages"
-					placeholder="<?php esc_html_e( 'Start typing the name of pages...', 'wordpress-popup' ); ?>">
+					data-placeholder="<?php esc_html_e( 'Start typing the name of pages...', 'wordpress-popup' ); ?>">
 
 					<# _.each( optinVars.pages, function( page ) { #>
 						<option value="{{ page.id }}"
@@ -337,31 +325,29 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 <?php
 // RULE: CPT ?>
 <script id="hustle-visibility-rule-tpl--post_type" type="text/template">
-	<label class="sui-label"><?php printf( esc_html__( "Show %s on", 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php printf( esc_html__( "Choose %s", 'wordpress-popup' ), '{{ postTypeLabel }}' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-{{postType}}-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-{{postType}}"
 					value="except"
 					id="{{ groupId }}-{{ type }}-filter_type-{{postType}}-except"
-					data-tab-menu="except"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'except' ) }} />
 				<?php printf( esc_html__( 'All %s except', 'wordpress-popup' ), '{{ postTypeLabel }}' ); ?>
 			</label>
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-{{postType}}-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-{{postType}}"
 					value="only"
 					id="{{ groupId }}-{{ type }}-filter_type-{{postType}}-only"
-					data-tab-menu="only"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'only' ) }} />
 				<?php printf( esc_html__( 'Only these %s', 'wordpress-popup' ), '{{ postTypeLabel }}' ); ?>
@@ -379,7 +365,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					multiple="multiple"
 					data-val="{{ selected_cpts }}"
 					data-attribute="selected_cpts"
-					placeholder="<?php printf( esc_html__( 'Start typing the name of %s...', 'wordpress-popup' ), '{{ postTypeLabel }}' ); ?>">
+					data-placeholder="<?php printf( esc_html__( 'Start typing the name of %s...', 'wordpress-popup' ), '{{ postTypeLabel }}' ); ?>">
 
 					<# _.each( optinVars.post_types[postType].data, function( post ) { #>
 						<option value="{{ post.id }}"
@@ -402,31 +388,29 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Categories ?>
 <script id="hustle-visibility-rule-tpl--categories" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( "Show %s on", 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( "Choose categories", 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-categories-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-categories"
 					value="except"
 					id="{{ groupId }}-{{ type }}-filter_type-categories-except"
-					data-tab-menu="except"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'All categories except', 'wordpress-popup' ); ?>
 			</label>
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-categories-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-categories"
 					value="only"
 					id="{{ groupId }}-{{ type }}-filter_type-categories-only"
-					data-tab-menu="only"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these categories', 'wordpress-popup' ); ?>
@@ -444,7 +428,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					multiple="multiple"
 					data-val="{{ categories }}"
 					data-attribute="categories"
-					placeholder="<?php esc_html_e( 'Start typing the name of categories...', 'wordpress-popup' ); ?>">
+					data-placeholder="<?php esc_html_e( 'Start typing the name of categories...', 'wordpress-popup' ); ?>">
 
 					<# _.each( optinVars.cats, function( cat ) { #>
 						<option value="{{ cat.id }}" {{ _.selected( _.contains( categories, cat.id.toString() ), true ) }}>
@@ -453,6 +437,8 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					<# } ); #>
 
 				</select>
+
+				<span class="sui-description"><?php esc_html_e( 'Note that this condition affects the posts with selected categories and doesn\'t include category archives.', 'wordpress-popup' ); ?></span>
 
 			</div>
 
@@ -466,31 +452,29 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Tags ?>
 <script id="hustle-visibility-rule-tpl--tags" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( "Show %s on", 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( "Choose tags", 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-tags-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-tags"
 					value="except"
 					id="{{ groupId }}-{{ type }}-filter_type-tags-except"
-					data-tab-menu="except"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'All tags except', 'wordpress-popup' ); ?>
 			</label>
 
 			<label for="{{ groupId }}-{{ type }}-filter_type-tags-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+				class="sui-tab-item">
 				<input type="radio"
 					name="{{ groupId }}-{{ type }}-filter_type-tags"
 					value="only"
 					id="{{ groupId }}-{{ type }}-filter_type-tags-only"
-					data-tab-menu="only"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these tags', 'wordpress-popup' ); ?>
@@ -508,7 +492,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					multiple="multiple"
 					data-val="{{ tags }}"
 					data-attribute="tags"
-					placeholder="<?php esc_html_e( 'Start typing the name of tags...', 'wordpress-popup' ); ?>">
+					data-placeholder="<?php esc_html_e( 'Start typing the name of tags...', 'wordpress-popup' ); ?>">
 
 					<# _.each( optinVars.tags, function( tag ) {  #>
 						<option value="{{ tag.id }}" {{ _.selected( _.contains( tags, tag.id.toString() ), true ) }}>
@@ -517,6 +501,8 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 					<# } ); #>
 
 				</select>
+
+				<span class="sui-description"><?php esc_html_e( 'Note that this condition affects the posts with selected tags and doesn\'t include tag archives.', 'wordpress-popup' ); ?></span>
 
 			</div>
 
@@ -536,23 +522,23 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 		<div class="sui-tabs-menu">
 
-			<label for="visitor-logged-status--logged_in"
-				class="sui-tab-item{{ _.class( 'logged_in' === show_to, ' active' ) }}">
+			<label for="{{ groupId }}-visitor-logged-status--logged_in"
+				class="sui-tab-item">
 				<input type="radio"
-					name="show_to"
+					name="{{ groupId }}-show_to"
 					value="logged_in"
-					id="visitor-logged-status--logged_in"
+					id="{{ groupId }}-visitor-logged-status--logged_in"
 					data-attribute="show_to"
 					{{ _.checked( show_to, 'logged_in' ) }} />
 				<?php esc_html_e( 'Logged in', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="visitor-logged-status--logged_out"
-				class="sui-tab-item{{ _.class( 'logged_out' === show_to, ' active' ) }}">
+			<label for="{{ groupId }}-visitor-logged-status--logged_out"
+				class="sui-tab-item">
 				<input type="radio"
-					name="show_to"
+					name="{{ groupId }}-show_to"
 					value="logged_out"
-					id="visitor-logged-status--logged_out"
+					id="{{ groupId }}-visitor-logged-status--logged_out"
 					data-attribute="show_to"
 					{{ _.checked( show_to, 'logged_out' ) }} />
 				<?php esc_html_e( 'Logged out', 'wordpress-popup' ); ?>
@@ -568,19 +554,62 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Number of times visitor has seen ?>
 <script id="hustle-visibility-rule-tpl--shown_less_than" type="text/template">
 
-	<label class="sui-label"><?php esc_html_e( 'Less than the specified number', 'wordpress-popup' ); ?></label>
+<div class="sui-row">
 
-	<input
-		type="number"
-		min="1"
-		max="999"
-		maxlength="3"
-		value="{{ less_than }}"
-		placeholder="<?php esc_html_e( 'E.g. 10', 'wordpress-popup' ); ?>"
-		id="shown_less_than_value"
-		class="sui-form-control"
-		data-attribute="less_than"
-	/>
+	<div class="sui-col">
+
+		<label class="sui-label"><?php esc_html_e( 'Condition', 'wordpress-popup' ); ?></label>
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-visitor-seen--less_than"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-less_or_more"
+						value="less_than"
+						id="{{ groupId }}-visitor-seen--less_than"
+						data-attribute="less_or_more"
+						{{ _.checked( less_or_more, 'less_than' ) }} />
+					<?php esc_html_e( 'Less than', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-visitor-seen--more_than"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-less_or_more"
+						value="more_than"
+						id="{{ groupId }}-visitor-seen--more_than"
+						data-attribute="less_or_more"
+						{{ _.checked( less_or_more, 'more_than' ) }} />
+					<?php esc_html_e( 'More than', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+		</div>
+	</div>
+
+	<div class="sui-col">
+
+		<label class="sui-label"><?php esc_html_e( 'Number of views', 'wordpress-popup' ); ?></label>
+
+		<input
+			type="number"
+			min="1"
+			max="999"
+			maxlength="3"
+			value="{{ less_than }}"
+			placeholder="<?php esc_html_e( 'E.g. 10', 'wordpress-popup' ); ?>"
+			id="{{ groupId }}-shown_less_than_value"
+			class="sui-form-control"
+			data-attribute="less_than"
+		/>
+
+	</div>
+
+</div>
 
 </script>
 
@@ -588,21 +617,21 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Visitor's Device ?>
 <script id="hustle-visibility-rule-tpl--visitor_device" type="text/template">
 
-	<label class="sui-label"><?php esc_html_e( 'Device', 'wordpress-popup' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose device', 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
 			<label
-				for="hustle-{{ type }}-rule--visitor-device-mobiles"
-				class="sui-tab-item{{ _.class( 'mobile' === filter_type, ' active' ) }}"
+				for="{{ groupId }}-{{ type }}-rule--visitor-device-mobiles"
+				class="sui-tab-item"
 			>
 				<input
 					type="radio"
-					name="hustle-{{ type }}-rule--visitor-device"
+					name="{{ groupId }}-{{ type }}-rule--visitor-device"
 					value="mobile"
-					id="hustle-{{ type }}-rule--visitor-device-mobiles"
+					id="{{ groupId }}-{{ type }}-rule--visitor-device-mobiles"
 					data-tab-menu="mobiles"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'mobile' ) }}
@@ -611,14 +640,14 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			</label>
 
 			<label
-				for="hustle-{{ type }}-rule--visitor-device-desktops"
-				class="sui-tab-item{{ _.class( 'not_mobile' === filter_type, ' active' ) }}"
+				for="{{ groupId }}-{{ type }}-rule--visitor-device-desktops"
+				class="sui-tab-item"
 			>
 				<input
 					type="radio"
-					name="hustle-{{ type }}-rule--visitor-device"
+					name="{{ groupId }}-{{ type }}-rule--visitor-device"
 					value="not_mobile"
-					id="hustle-{{ type }}-rule--visitor-device-desktops"
+					id="{{ groupId }}-{{ type }}-rule--visitor-device-desktops"
 					data-attribute="filter_type"
 					{{ _.checked( filter_type, 'not_mobile' ) }}
 				/>
@@ -629,7 +658,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 		<div class="sui-tabs-content">
 
-			<div class="sui-tab-content{{ _.class( 'mobile' === filter_type, ' active' ) }}" data-tab-content="mobiles">
+			<div class="sui-tab-content" data-tab-content="mobiles">
 
 				<div class="sui-notice">
 					<p style="margin: 0;"><?php esc_html_e( 'Mobile devices include both Phone and Tablet.', 'wordpress-popup' ); ?></p>
@@ -647,29 +676,31 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Referrer ?>
 <script id="hustle-visibility-rule-tpl--from_referrer" type="text/template">
 
+	<label class="sui-label"><?php esc_html_e( 'Choose referrer', 'wordpress-popup' ); ?></label>
+
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--visitor-referrer-true"
-				class="sui-tab-item{{ _.class( 'true' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--visitor-referrer-true"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--visitor-referrer"
+					name="{{ groupId }}-{{ type }}-rule--visitor-referrer"
 					value="true"
-					id="hustle-{{ type }}-rule--visitor-referrer-true"
-					data-tab-menu="true"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--visitor-referrer-true"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, true ) }} />
 				<?php esc_html_e( 'Specific referrer', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--visitor-referrer-false"
-				class="sui-tab-item{{ _.class( 'false' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--visitor-referrer-false"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--visitor-referrer"
+					name="{{ groupId }}-{{ type }}-rule--visitor-referrer"
 					value="false"
-					id="hustle-{{ type }}-rule--visitor-referrer-false"
-					data-tab-menu="false"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--visitor-referrer-false"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, false ) }} />
 				<?php esc_html_e( 'Not a specific referrer', 'wordpress-popup' ); ?>
 			</label>
 
@@ -697,28 +728,58 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Source of Arrival ?>
 <script id="hustle-visibility-rule-tpl--source_of_arrival" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( 'Show %s if', 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose source of arrival', 'wordpress-popup' ); ?></label>
 
 	<div style="margin-top: 10px;">
 
-		<label for="hustle-{{ type }}-rule--source-external"
+		<label for="{{ groupId }}-{{ type }}-rule--source-direct"
+			class="sui-checkbox sui-checkbox-sm sui-checkbox-stacked">
+			<input type="checkbox"
+				data-attribute="source_direct"
+				{{ _.checked( source_direct, true ) }}
+				id="{{ groupId }}-{{ type }}-rule--source-direct" />
+			<span aria-hidden="direct"></span>
+			<span><?php esc_html_e( 'Direct', 'wordpress-popup' ); ?></span>
+		</label>
+
+		<label for="{{ groupId }}-{{ type }}-rule--source-external"
 			class="sui-checkbox sui-checkbox-sm sui-checkbox-stacked">
 			<input type="checkbox"
 				data-attribute="source_external"
 				{{ _.checked( source_external, true ) }}
-				id="hustle-{{ type }}-rule--source-external" />
+				id="{{ groupId }}-{{ type }}-rule--source-external" />
 			<span aria-hidden="external"></span>
-			<span><?php esc_html_e( 'User didn’t arrive from an internal page', 'wordpress-popup' ); ?></span>
+			<span><?php esc_html_e( 'An external page', 'wordpress-popup' ); ?></span>
 		</label>
 
-		<label for="hustle-{{ type }}-rule--source-search"
+		<label for="{{ groupId }}-{{ type }}-rule--source-internal"
+			class="sui-checkbox sui-checkbox-sm sui-checkbox-stacked">
+			<input type="checkbox"
+				data-attribute="source_internal"
+				{{ _.checked( source_internal, true ) }}
+				id="{{ groupId }}-{{ type }}-rule--source-internal" />
+			<span aria-hidden="internal"></span>
+			<span><?php esc_html_e( 'An internal page', 'wordpress-popup' ); ?></span>
+		</label>
+
+		<label for="{{ groupId }}-{{ type }}-rule--source-search"
 			class="sui-checkbox sui-checkbox-sm sui-checkbox-stacked">
 			<input type="checkbox"
 				data-attribute="source_search"
 				{{ _.checked( source_search, true ) }}
-				id="hustle-{{ type }}-rule--source-search" />
+				id="{{ groupId }}-{{ type }}-rule--source-search" />
 			<span aria-hidden="search"></span>
-			<span><?php esc_html_e( 'User arrived via a search engine', 'wordpress-popup' ); ?></span>
+			<span><?php esc_html_e( 'A search engine', 'wordpress-popup' ); ?></span>
+		</label>
+
+		<label for="{{ groupId }}-{{ type }}-rule--source-not-search"
+			class="sui-checkbox sui-checkbox-sm sui-checkbox-stacked">
+			<input type="checkbox"
+				data-attribute="source_not_search"
+				{{ _.checked( source_not_search, true ) }}
+				id="{{ groupId }}-{{ type }}-rule--source-not-search" />
+			<span aria-hidden="not_search"></span>
+			<span><?php esc_html_e( 'Not a search engine', 'wordpress-popup' ); ?></span>
 		</label>
 
 	</div>
@@ -729,31 +790,31 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Specific URL ?>
 <script id="hustle-visibility-rule-tpl--on_url" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( 'Show %s on', 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose specific urls', 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--specific-url-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-url-except"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-url"
+					name="{{ groupId }}-{{ type }}-rule--specific-url"
 					value="except"
-					id="hustle-{{ type }}-rule--specific-url-except"
-					data-tab-menu="except"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--specific-url-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'All URLs except', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--specific-url-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-url-only"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-url"
+					name="{{ groupId }}-{{ type }}-rule--specific-url"
 					value="only"
-					id="hustle-{{ type }}-rule--specific-url-only"
-					data-tab-menu="only"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--specific-url-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these URLs', 'wordpress-popup' ); ?>
 			</label>
 
@@ -778,6 +839,67 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 </script>
 
 <?php
+// RULE: Visitor's Browser ?>
+<script id="hustle-visibility-rule-tpl--on_browser" type="text/template">
+
+	<label class="sui-label"><?php esc_html_e( 'Choose visitor’s browser', 'wordpress-popup' ); ?></label>
+
+	<div class="sui-side-tabs">
+
+		<div class="sui-tabs-menu">
+
+			<label for="{{ groupId }}-{{ type }}-rule--specific-browser-except"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--specific-browser"
+					value="except"
+					id="{{ groupId }}-{{ type }}-rule--specific-browser-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
+				<?php esc_html_e( 'All browser except', 'wordpress-popup' ); ?>
+			</label>
+
+			<label for="{{ groupId }}-{{ type }}-rule--specific-browser-only"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--specific-browser"
+					value="only"
+					id="{{ groupId }}-{{ type }}-rule--specific-browser-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
+				<?php esc_html_e( 'Only these browsers', 'wordpress-popup' ); ?>
+			</label>
+
+		</div>
+
+		<div class="sui-tabs-content">
+
+			<div class="sui-tab-content active">
+
+				<select multiple="multiple"
+					data-placeholder="<?php esc_attr_e( 'Start typing the name of browsers...', 'wordpress-popup' ); ?>"
+					id="not_in_a_browser_browsers"
+					class="sui-select sui-select-lg"
+					data-val="browsers"
+					data-attribute="browsers">
+
+						<# _.each( _.keys( optinVars.browsers ), function( key ) { #>
+
+							<option value="{{ key }}">{{ optinVars.browsers[key] }}</option>
+
+						<# }); #>
+
+				</select>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</script>
+
+<?php
 // RULE: Visitor Commented Before ?>
 <script id="hustle-visibility-rule-tpl--visitor_commented" type="text/template">
 
@@ -788,25 +910,25 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--comments-true"
-				class="sui-tab-item{{ _.class( 'true' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--comments-true"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--comments"
+					name="{{ groupId }}-{{ type }}-rule--comments"
 					value="true"
-					id="hustle-{{ type }}-rule--comments-true"
-					data-tab-menu="true"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--comments-true"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'true' ) }} />
 				<?php esc_html_e( 'True', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--comments-false"
-				class="sui-tab-item{{ _.class( 'false' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--comments-false"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--comments"
+					name="{{ groupId }}-{{ type }}-rule--comments"
 					value="false"
-					id="hustle-{{ type }}-rule--comments-false"
-					data-tab-menu="false"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--comments-false"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'false' ) }} />
 				<?php esc_html_e( 'False', 'wordpress-popup' ); ?>
 			</label>
 
@@ -824,31 +946,31 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 // RULE: Visitor's Country ?>
 <script id="hustle-visibility-rule-tpl--visitor_country" type="text/template">
 
-	<label class="sui-label"><?php esc_html_e( 'Visitor’s country', 'wordpress-popup' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose visitor’s county', 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--country-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--country-except"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--country"
+					name="{{ groupId }}-{{ type }}-rule--country"
 					value="except"
-					id="hustle-{{ type }}-rule--country-except"
-					data-tab-menu="except"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--country-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
 				<?php esc_html_e( 'Any country except', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--country-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--country-only"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--country"
+					name="{{ groupId }}-{{ type }}-rule--country"
 					value="only"
-					id="hustle-{{ type }}-rule--country-only"
-					data-tab-menu="only"
-					data-attribute="filter_type" />
+					id="{{ groupId }}-{{ type }}-rule--country-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
 				<?php esc_html_e( 'Only these countries', 'wordpress-popup' ); ?>
 			</label>
 
@@ -859,7 +981,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			<div class="sui-tab-content active">
 
 				<select multiple="multiple"
-					placeholder="<?php esc_attr_e( 'Start typing the name of countries...', 'wordpress-popup' ); ?>"
+					data-placeholder="<?php esc_attr_e( 'Start typing the name of countries...', 'wordpress-popup' ); ?>"
 					id="not_in_a_country_countries"
 					class="sui-select sui-select-lg"
 					data-val="countries"
@@ -881,36 +1003,37 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 </script>
 
+
 <?php
 // RULE: Specific roles ?>
-<!--<script id="hustle-visibility-rule-tpl--user_roles" type="text/template">
+<script id="hustle-visibility-rule-tpl--user_roles" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( 'Show %s for', 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose user roles', 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--specific-roles-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-roles-except"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-roles"
+					name="{{ groupId }}-{{ type }}-rule--specific-roles"
 					value="except"
-					id="hustle-{{ type }}-rule--specific-roles-except"
-					data-tab-menu="except"
-					data-attribute="filter_type" />
-				<?php esc_html_e( 'All Roles except', 'wordpress-popup' ); ?>
+					id="{{ groupId }}-{{ type }}-rule--specific-roles-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
+				<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--specific-roles-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-roles-only"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-roles"
+					name="{{ groupId }}-{{ type }}-rule--specific-roles"
 					value="only"
-					id="hustle-{{ type }}-rule--specific-roles-only"
-					data-tab-menu="only"
-					data-attribute="filter_type" />
-				<?php esc_html_e( 'Only these Roles', 'wordpress-popup' ); ?>
+					id="{{ groupId }}-{{ type }}-rule--specific-roles-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
+				<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
 			</label>
 
 		</div>
@@ -920,8 +1043,8 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			<div class="sui-tab-content active">
 
 				<select multiple="multiple"
-					placeholder="<?php esc_attr_e( 'Start typing the name of roles...', 'wordpress-popup' ); ?>"
-					id="not_a_role"
+					data-placeholder="<?php esc_attr_e( 'Start typing the user roles...', 'wordpress-popup' ); ?>"
+					id="{{ groupId }}-not_a_role"
 					class="sui-select sui-select-lg"
 					data-val="roles"
 					data-attribute="roles">
@@ -934,22 +1057,22 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 				</select>
 
-				<span class="sui-description"><?php esc_html_e( 'Enter role name.', 'wordpress-popup' ); ?></span>
-
 			</div>
 
 		</div>
 
 	</div>
 
-</script>-->
+</script>
 <?php
 // RULE: User registration based visibility ?>
-<!--<script id="hustle-visibility-rule-tpl--user_registration" type="text/template">
+<script id="hustle-visibility-rule-tpl--user_registration" type="text/template">
 
-	<div>
+	<?php $days_past = __( 'day(s) past the registration day', 'wordpress-popup' ); ?>
+
+	<div style="margin-bottom: 20px;">
 		<label class="sui-label">
-			<?php esc_html_e( 'Show from number of days after user registration.', 'wordpress-popup' ); ?>
+			<?php esc_html_e( 'From', 'wordpress-popup' ); ?>
 		</label>
 		<input
 			type="number"
@@ -957,19 +1080,16 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			max="999"
 			maxlength="3"
 			value="{{ from_date }}"
-			placeholder="<?php esc_html_e( 'E.g. 10', 'wordpress-popup' ); ?>"
-			id="shown_from_date"
-			class="sui-form-control"
+			id="{{ groupId }}-shown_from_date"
+			class="sui-form-control sui-input-sm sui-field-has-suffix"
 			data-attribute="from_date"
 		/>
-		<span class="sui-description">
-			<?php esc_html_e( "Enter '0' to show immediately after registration.", 'wordpress-popup' ); ?>
-		</span>
+		<span class="sui-field-suffix" aria-hidden="true"><?php echo esc_html( $days_past ); ?></span>
 	</div>
 
-	<div style="margin-top: 10px;">
+	<div style="margin-bottom: 29px;">
 		<label class="sui-label">
-			<?php esc_html_e( 'Show to number of days after user registration.', 'wordpress-popup' ); ?>
+			<?php esc_html_e( 'Up to', 'wordpress-popup' ); ?>
 		</label>
 		<input
 			type="number"
@@ -977,47 +1097,47 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			max="999"
 			maxlength="3"
 			value="{{ to_date }}"
-			placeholder="<?php esc_html_e( 'E.g. 10', 'wordpress-popup' ); ?>"
-			id="shown_to_date"
-			class="sui-form-control"
+			id="{{ groupId }}-shown_to_date"
+			class="sui-form-control sui-input-sm sui-field-has-suffix"
 			data-attribute="to_date"
 		/>
-		<span class="sui-description">
-			<?php esc_html_e( "Enter '0' to show forever after registered.", 'wordpress-popup' ); ?>
-		</span>
+		<span class="sui-field-suffix" aria-hidden="true"><?php echo esc_html( $days_past ); ?></span>
 	</div>
+	<span class="sui-description">
+		<?php esc_html_e( 'Note: "0" in the From field means immediately after registration and "0" in the Up to field means forever.', 'wordpress-popup' ); ?>
+	</span>
 
-</script>-->
+</script>
 <?php
 // RULE: User template based visibility ?>
-<!--<script id="hustle-visibility-rule-tpl--page_templates" type="text/template">
+<script id="hustle-visibility-rule-tpl--page_templates" type="text/template">
 
-	<label class="sui-label"><?php printf( esc_html__( 'Show %s for', 'wordpress-popup' ), '{{ typeName }}' ); ?></label>
+	<label class="sui-label"><?php esc_html_e( 'Choose page templates', 'wordpress-popup' ); ?></label>
 
 	<div class="sui-side-tabs">
 
 		<div class="sui-tabs-menu">
 
-			<label for="hustle-{{ type }}-rule--specific-templates-except"
-				class="sui-tab-item{{ _.class( 'except' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-templates-except"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-templates"
+					name="{{ groupId }}-{{ type }}-rule--specific-templates"
 					value="except"
-					id="hustle-{{ type }}-rule--specific-templates-except"
-					data-tab-menu="except"
-					data-attribute="filter_type" />
-				<?php esc_html_e( 'All Templates except', 'wordpress-popup' ); ?>
+					id="{{ groupId }}-{{ type }}-rule--specific-templates-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
+				<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
 			</label>
 
-			<label for="hustle-{{ type }}-rule--specific-templates-only"
-				class="sui-tab-item{{ _.class( 'only' === filter_type, ' active' ) }}">
+			<label for="{{ groupId }}-{{ type }}-rule--specific-templates-only"
+				class="sui-tab-item">
 				<input type="radio"
-					name="hustle-{{ type }}-rule--specific-templates"
+					name="{{ groupId }}-{{ type }}-rule--specific-templates"
 					value="only"
-					id="hustle-{{ type }}-rule--specific-templates-only"
-					data-tab-menu="only"
-					data-attribute="filter_type" />
-				<?php esc_html_e( 'Only these Templates', 'wordpress-popup' ); ?>
+					id="{{ groupId }}-{{ type }}-rule--specific-templates-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
+				<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
 			</label>
 
 		</div>
@@ -1027,7 +1147,7 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 			<div class="sui-tab-content active">
 
 				<select multiple="multiple"
-					placeholder="<?php esc_attr_e( 'Start typing the name of templates...', 'wordpress-popup' ); ?>"
+					data-placeholder="<?php esc_attr_e( 'Start typing the name of page templates...', 'wordpress-popup' ); ?>"
 					id="not_a_template"
 					class="sui-select sui-select-lg"
 					data-val="templates"
@@ -1041,7 +1161,65 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 				</select>
 
-				<span class="sui-description"><?php esc_html_e( 'Enter role name.', 'wordpress-popup' ); ?></span>
+			</div>
+
+		</div>
+
+	</div>
+
+</script>
+
+<?php
+// RULE: Static Pages ?>
+<script id="hustle-visibility-rule-tpl--wp_conditions" type="text/template">
+
+	<label class="sui-label"><?php esc_html_e( 'Choose static pages', 'wordpress-popup' ); ?></label>
+
+	<div class="sui-side-tabs">
+
+		<div class="sui-tabs-menu">
+
+			<label for="{{ groupId }}-{{ type }}-rule--static-page-except"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--static-page"
+					value="except"
+					id="{{ groupId }}-{{ type }}-rule--static-page-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
+				<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
+			</label>
+
+			<label for="{{ groupId }}-{{ type }}-rule--static-page-only"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--static-page"
+					value="only"
+					id="{{ groupId }}-{{ type }}-rule--static-page-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
+				<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
+			</label>
+
+		</div>
+
+		<div class="sui-tabs-content">
+
+			<div class="sui-tab-content active">
+
+
+				<select multiple="multiple"
+					data-placeholder="<?php esc_attr_e( 'Start typing the name of static pages...', 'wordpress-popup' ); ?>"
+					class="sui-select sui-select-lg"
+					data-attribute="wp_conditions">
+
+						<# _.each( _.keys( optinVars.wp_conditions ), function( key ) { #>
+
+							<option value="{{ key }}">{{ optinVars.wp_conditions[key] }}</option>
+
+						<# }); #>
+
+				</select>
 
 			</div>
 
@@ -1049,11 +1227,363 @@ $image_2x = self::$plugin_url . 'assets/images/hustle-visibility@2x.png';
 
 	</div>
 
-</script>-->
-<?php
-// RULE: 404 page ?>
-<script id="hustle-visibility-rule-tpl--page_404" type="text/template">
+</script>
 
-	<label class="sui-label"><?php printf( esc_html__( 'Shows the %s on the 404 page.', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></label>
+<?php
+// RULE: Archive pages ?>
+<script id="hustle-visibility-rule-tpl--archive_pages" type="text/template">
+
+	<label class="sui-label"><?php esc_html_e( 'Choose archive pages', 'wordpress-popup' ); ?></label>
+
+	<div class="sui-side-tabs">
+
+		<div class="sui-tabs-menu">
+
+			<label for="{{ groupId }}-{{ type }}-rule--archive-page-except"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--archive-page"
+					value="except"
+					id="{{ groupId }}-{{ type }}-rule--archive-page-except"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'except' ) }} />
+				<?php esc_html_e( 'All archives except', 'wordpress-popup' ); ?>
+			</label>
+
+			<label for="{{ groupId }}-{{ type }}-rule--archive-page-only"
+				class="sui-tab-item">
+				<input type="radio"
+					name="{{ groupId }}-{{ type }}-rule--archive-page"
+					value="only"
+					id="{{ groupId }}-{{ type }}-rule--archive-page-only"
+					data-attribute="filter_type"
+					{{ _.checked( filter_type, 'only' ) }} />
+				<?php esc_html_e( 'Only these archives', 'wordpress-popup' ); ?>
+			</label>
+
+		</div>
+
+		<div class="sui-tabs-content">
+
+			<div class="sui-tab-content active">
+
+
+				<select multiple="multiple"
+					data-placeholder="<?php esc_attr_e( 'Start typing the name of archives...', 'wordpress-popup' ); ?>"
+					class="sui-select sui-select-lg"
+					data-attribute="archive_pages">
+
+						<# _.each( _.keys( optinVars.archive_pages ), function( key ) { #>
+
+							<option value="{{ key }}">{{ optinVars.archive_pages[key] }}</option>
+
+						<# }); #>
+
+				</select>
+
+			</div>
+
+		</div>
+
+	</div>
 
 </script>
+
+
+	<?php // RULE: WooCommerce Page ?>
+	<script id="hustle-visibility-rule-tpl--wc_pages" type="text/template">
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-all-pages"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-pages"
+						value="all"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-all-pages"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'all' ) }} />
+					<?php esc_html_e( 'All WooCommerce pages', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-none-pages"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-pages"
+						value="none"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-none-pages"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'none' ) }} />
+					<?php esc_html_e( 'None', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+			<div class="sui-tabs-content">
+
+				<div class="sui-tab-content active">
+
+					<span class="sui-description"><?php esc_html_e( 'Use this condition to affect either all or none of the WooCommerce pages.', 'wordpress-popup' ); ?></span>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</script>
+
+	<?php // RULE: WooCommerce Categories ?>
+	<script id="hustle-visibility-rule-tpl--wc_categories" type="text/template">
+
+		<label class="sui-label"><?php esc_html_e( 'Choose WooCommerce categories', 'wordpress-popup' ); ?></label>
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-categories-except"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-categories"
+						value="except"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-categories-except"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'except' ) }} />
+					<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-categories-only"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-categories"
+						value="only"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-categories-only"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'only' ) }} />
+					<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+			<div class="sui-tabs-content">
+
+				<div class="sui-tab-content active">
+
+					<select name=""
+						id="{{ groupId }}-{{ type }}-filter_type-wc-categories"
+						class="sui-select sui-select-lg hustle-select-ajax"
+						multiple="multiple"
+						data-val="{{ wc_categories }}"
+						data-attribute="wc_categories"
+						data-placeholder="<?php esc_html_e( 'Start typing the name of WooCommerce categories...', 'wordpress-popup' ); ?>">
+
+						<# _.each( optinVars.wc_cats, function( cat ) { #>
+							<option value="{{ cat.id }}" {{ _.selected( _.contains( wc_categories, cat.id.toString() ), true ) }}>
+								{{ cat.text }}
+							</option>
+						<# } ); #>
+
+					</select>
+
+					<span class="sui-description"><?php esc_html_e( 'Note that this condition affects the products with selected categories and doesn\'t include product category archives.', 'wordpress-popup' ); ?></span>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</script>
+
+	<?php // RULE: WooCommerce Tags ?>
+	<script id="hustle-visibility-rule-tpl--wc_tags" type="text/template">
+
+		<label class="sui-label"><?php esc_html_e( 'Choose WooCommerce tags', 'wordpress-popup' ); ?></label>
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-tags-except"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-tags"
+						value="except"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-tags-except"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'except' ) }} />
+					<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-{{ type }}-filter_type-wc-tags-only"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-filter_type-wc-tags"
+						value="only"
+						id="{{ groupId }}-{{ type }}-filter_type-wc-tags-only"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'only' ) }} />
+					<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+			<div class="sui-tabs-content">
+
+				<div class="sui-tab-content active">
+
+					<select name=""
+						id="{{ groupId }}-{{ type }}-filter_type-wc-tags"
+						class="sui-select sui-select-lg hustle-select-ajax"
+						multiple="multiple"
+						data-val="{{ wc_tags }}"
+						data-attribute="wc_tags"
+						data-placeholder="<?php esc_html_e( 'Start typing the name of WooCommerce tags...', 'wordpress-popup' ); ?>">
+
+						<# _.each( optinVars.wc_tags, function( tag ) { #>
+							<option value="{{ tag.id }}" {{ _.selected( _.contains( wc_tags, tag.id.toString() ), true ) }}>
+								{{ tag.text }}
+							</option>
+						<# } ); #>
+
+					</select>
+
+					<span class="sui-description"><?php esc_html_e( 'Note that this condition affects the products with selected tags and doesn\'t include product tag archives.', 'wordpress-popup' ); ?></span>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</script>
+
+	<?php // RULE: WC Archive pages ?>
+	<script id="hustle-visibility-rule-tpl--wc_archive_pages" type="text/template">
+
+		<label class="sui-label"><?php esc_html_e( 'Choose WooCommerce archives', 'wordpress-popup' ); ?></label>
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-{{ type }}-rule--wc-archive-page-except"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-rule--wc-archive-page"
+						value="except"
+						id="{{ groupId }}-{{ type }}-rule--wc-archive-page-except"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'except' ) }} />
+					<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-{{ type }}-rule--wc-archive-page-only"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-rule--wc-archive-page"
+						value="only"
+						id="{{ groupId }}-{{ type }}-rule--wc-archive-page-only"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'only' ) }} />
+					<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+			<div class="sui-tabs-content">
+
+				<div class="sui-tab-content active">
+
+
+					<select multiple="multiple"
+						data-placeholder="<?php esc_attr_e( 'Start typing the name of WooCommerce archives...', 'wordpress-popup' ); ?>"
+						class="sui-select sui-select-lg"
+						data-attribute="wc_archive_pages">
+
+							<# _.each( _.keys( optinVars.wc_archive_pages ), function( key ) { #>
+
+								<option value="{{ key }}">{{ optinVars.wc_archive_pages[key] }}</option>
+
+							<# }); #>
+
+					</select>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</script>
+
+	<?php // RULE: WC Static Pages ?>
+	<script id="hustle-visibility-rule-tpl--wc_static_pages" type="text/template">
+
+		<label class="sui-label"><?php esc_html_e( 'Choose WooCommerce static pages', 'wordpress-popup' ); ?></label>
+
+		<div class="sui-side-tabs">
+
+			<div class="sui-tabs-menu">
+
+				<label for="{{ groupId }}-{{ type }}-rule--wc-static-page-except"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-rule--wc-static-page"
+						value="except"
+						id="{{ groupId }}-{{ type }}-rule--wc-static-page-except"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'except' ) }} />
+					<?php esc_html_e( 'All except', 'wordpress-popup' ); ?>
+				</label>
+
+				<label for="{{ groupId }}-{{ type }}-rule--wc-static-page-only"
+					class="sui-tab-item">
+					<input type="radio"
+						name="{{ groupId }}-{{ type }}-rule--wc-static-page"
+						value="only"
+						id="{{ groupId }}-{{ type }}-rule--wc-static-page-only"
+						data-attribute="filter_type"
+						{{ _.checked( filter_type, 'only' ) }} />
+					<?php esc_html_e( 'Only these', 'wordpress-popup' ); ?>
+				</label>
+
+			</div>
+
+			<div class="sui-tabs-content">
+
+				<div class="sui-tab-content active">
+
+
+					<select multiple="multiple"
+						data-placeholder="<?php esc_attr_e( 'Start typing the name of WooCommerce static pages...', 'wordpress-popup' ); ?>"
+						class="sui-select sui-select-lg"
+						data-attribute="wc_static_pages">
+
+							<# _.each( _.keys( optinVars.wc_static_pages ), function( key ) { #>
+
+								<option value="{{ key }}">{{ optinVars.wc_static_pages[key] }}</option>
+
+							<# }); #>
+
+					</select>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</script>
+
+<?php
+
+/**
+ * Visibility Conditions: Action for adding JS-templates on Admin area and other JS-code
+ *
+ * @since 4.1
+ */
+do_action( 'hustle_visibility_condition_templates' );

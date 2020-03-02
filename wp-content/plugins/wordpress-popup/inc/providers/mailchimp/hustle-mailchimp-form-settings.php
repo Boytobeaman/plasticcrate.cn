@@ -209,11 +209,6 @@ class Hustle_Mailchimp_Form_Settings extends Hustle_Provider_Form_Settings_Abstr
 
 		$this->addon_form_settings = $this->get_form_settings_values( false );
 
-		if ( empty( $this->addon_form_settings['list_id'] ) ) {
-			error_log( 'missing list id on second step' );
-			//go to previous step. this should be set.
-		}
-
 		$groups = $this->get_groups( $this->addon_form_settings['list_id'] );
 
 		// If the selected list doesn't have groups, close the modal. No need for this step.
@@ -688,6 +683,9 @@ class Hustle_Mailchimp_Form_Settings extends Hustle_Provider_Form_Settings_Abstr
 			case 'hidden' :
 				$class = 'sui-select';
 				$choose_prompt = __( 'Default Interest', 'wordpress-popup' );
+				break;
+
+			default:
 				break;
 		}
 

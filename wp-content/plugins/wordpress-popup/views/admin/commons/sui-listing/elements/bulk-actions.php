@@ -1,28 +1,32 @@
+<?php
+$can_create = Opt_In_Utils::is_user_allowed( 'hustle_create' );
+?>
 <form class="hustle-bulk-actions-container sui-bulk-actions">
 
-	<?php if ( ! $is_bottom ) : ?>
-
-		<label for="hustle-check-all" class="sui-checkbox">
-			<input type="checkbox" id="hustle-check-all" class="hustle-check-all">
-			<span aria-hidden="true"></span>
-			<span class="sui-screen-reader-text"><?php esc_html_e( 'Select all', 'wordpress-popup' ); ?></span>
-		</label>
-
-	<?php endif; ?>
+	<label class="sui-checkbox">
+		<input type="checkbox" class="hustle-check-all">
+		<span aria-hidden="true"></span>
+		<span class="sui-screen-reader-text"><?php esc_html_e( 'Select all', 'wordpress-popup' ); ?></span>
+	</label>
 
 	<select
 		name="hustle_action"
+		id="hustle-bulk-action-select<?php echo $is_bottom ? '-bottom' : '-top'; ?>"
 		class="sui-select-sm sui-select-inline"
 		data-width="200"
 		data-placeholder="<?php esc_html_e( 'Bulk actions', 'wordpress-popup' ); ?>"
 	>
 		<option value="publish" data-icon="upload-cloud"><?php esc_html_e( 'Publish', 'wordpress-popup' ); ?></option>
 		<option value="unpublish" data-icon="unpublish"><?php esc_html_e( 'Unpublish', 'wordpress-popup' ); ?></option>
-		<option value="clone" data-icon="copy"><?php esc_html_e( 'Duplicate', 'wordpress-popup' ); ?></option>
+		<?php if ( $can_create ) : ?>
+			<option value="clone" data-icon="copy"><?php esc_html_e( 'Duplicate', 'wordpress-popup' ); ?></option>
+		<?php endif; ?>
 		<option value="reset-tracking" data-icon="undo"><?php esc_html_e( 'Reset Tracking Data', 'wordpress-popup' ); ?></option>
 		<option value="enable-tracking" data-icon="graph-line"><?php esc_html_e( 'Enable Tracking', 'wordpress-popup' ); ?></option>
 		<option value="disable-tracking" data-icon="tracking-disabled"><?php esc_html_e( 'Disable Tracking', 'wordpress-popup' ); ?></option>
-		<option value="delete" data-icon="trash"><?php esc_html_e( 'Delete', 'wordpress-popup' ); ?></option>
+		<?php if ( $can_create ) : ?>
+			<option value="delete" data-icon="trash"><?php esc_html_e( 'Delete', 'wordpress-popup' ); ?></option>
+		<?php endif; ?>
 	</select>
 
 	<button

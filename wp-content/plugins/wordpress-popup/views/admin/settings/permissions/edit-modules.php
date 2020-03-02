@@ -1,3 +1,15 @@
+<?php
+
+$modules_data       = Hustle_Module_Collection::instance()->get_all_paginated();
+$filter             = $modules_data['filter'];
+$modules            = $modules_data['modules'];
+$modules_count      = $modules_data['count'];
+$modules_page       = $modules_data['page'];
+$modules_limit      = $modules_data['limit'];
+$modules_show_pager = $modules_data['show_pager'];
+$modules_ids        = [];
+
+?>
 <div class="sui-box-settings-row">
 
 	<div class="sui-box-settings-col-1">
@@ -39,6 +51,7 @@
 						'show' => $modules_show_pager,
 						'filterclass' => 'sui-pagination-open-filter',
 						'filter' => $filter,
+						'section' => 'permissions',
 					)
 				);
 
@@ -129,7 +142,7 @@
 								<select name="filter[role]">
 									<option value="any"><?php esc_html_e( 'Any', 'wordpress-popup' ); ?></option>
 									<?php foreach ( $roles as $value => $label ) {
-										if ( 'administrator' === $value ) {
+										if ( Opt_In_Utils::is_admin_role( $value ) ) {
 											continue;
 										}
 										printf(
@@ -219,14 +232,23 @@
 
 					<tbody>
 
-					<?php foreach ( $modules as $module ) : ?>
+					<?php
+					foreach ( $modules as $module ) :
+						$modules_ids[] = $module->module_id;
+						?>
+
 						<tr data-module-id="<?php echo esc_attr( $module->module_id ); ?>">
 							<td class="sui-table-item-title"><i class="sui-icon-<?php echo esc_attr( $module->module_type ); ?>"></i> <?php echo esc_html( $module->module_name ); ?></td>
-							<td><select class="sui-select-sm sui-select" data-index="module-<?php echo esc_attr( $module->module_id ); ?>" multiple>
+							<td><select
+									form="<?php echo esc_attr( $form_id ); ?>"
+									class="sui-select-sm sui-select"
+									name="modules[<?php echo esc_attr( $module->module_id ); ?>][]"
+									multiple
+								>
 								<?php
-								$current = (array) $modules_edit_roles[ $module->id ];
+								$current = $module->get_edit_roles();
 								foreach ( $roles as $value => $label ) {
-									$admin = 'administrator' === $value;
+									$admin = Opt_In_Utils::is_admin_role( $value );
 									printf(
 										'<option value="%s" %s %s>%s</option>',
 										esc_attr( $value ),
@@ -236,8 +258,20 @@
 									);
 								}
 								?>
+							</td></select>
 						</tr>
+
 					<?php endforeach; ?>
+
+					<?php if ( ! empty( $modules_ids ) ) : ?>
+						<input
+							name="modules_ids"
+							type="hidden"
+							value="<?php echo esc_attr( join( ',', $modules_ids ) ); ?>"
+							form="<?php echo esc_attr( $form_id ); ?>"
+						>
+					<?php endif; ?>
+
 					</tbody>
 
 				</table>

@@ -31,6 +31,7 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 			add_action( 'current_screen', array( $this, 'set_proper_current_screen' ) );
 
 			add_action( 'wp_ajax_hustle_dismiss_notification', array( $this, 'dismiss_notification' ) );
+			add_action( 'wp_ajax_hustle_dismiss_m2_notification', array( $this, 'dismiss_m2_notification' ) );
 
 			if ( Opt_In_Utils::_is_free() && ! file_exists( WP_PLUGIN_DIR . '/hustle/opt-in.php' ) ) {
 				add_action( 'wp_ajax_hustle_dismiss_admin_notice', array( $this, 'dismiss_admin_notice' ) );
@@ -125,10 +126,50 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 				add_action( 'admin_notices', array( $this, 'show_review_css_after_migration_notice' ) );
 			}
 
+			if ( Hustle_Migration::is_migrated( 'hustle_40_migrated' ) ) {
+				add_action( 'admin_notices', array( $this, 'show_visibility_behavior_update' ) );
+			}
+
 			add_action( 'admin_notices', array( $this, 'show_sendgrid_update_notice' ) );
 
 			// add_action( 'admin_notices', array( $this, 'show_provider_migration_notice' ) );
 
+			add_action( 'admin_notices', array( $this, 'show_depricating_m2_conditions' ) );
+
+		}
+
+		/**
+		 * Display a notice for Deprecating Membership 2 visibility condition
+		 *
+		 * @since 4.1
+		 */
+		public function show_depricating_m2_conditions() {
+			$count_m2_modules = count( get_option( 'hustle_notice_stop_support_m2', [] ) );
+			if ( ! $count_m2_modules ) {
+				return;
+			}
+
+			$current_user = wp_get_current_user();
+			$username = ! empty( $current_user->user_firstname ) ? $current_user->user_firstname : $current_user->user_login;
+			?>
+			<div id="hustle-m2-notice" class="notice notice-error">
+				<p><b><?php esc_html_e( 'Hustle - Deprecating Membership 2 visibility condition', 'wordpress-popup' ); ?></b></p>
+				<p>
+				<?php
+					printf( esc_html__( 'Hey %1$s, we have deprecated the membership visibility condition for the %2$sMembership 2%4$s plugin. Since you were using the condition on %5$s modules, you can install a mu-plugin to continue using it. Read our mu-plugin %3$sinstallation guide%4$s.', 'wordpress-popup' )
+						, esc_html( $username )
+						, '<a href="https://github.com/wpmudev/membership-2" target="_blank">'
+						, '<a href="https://premium.wpmudev.org/manuals/wpmu-manual-2/using-mu-plugins/" target="_blank">'
+						, '</a>'
+						, (int)$count_m2_modules
+					); ?></p>
+				<p>
+					<a href="https://gist.github.com/wpmudev-sls/84544541eddd5cd7c7c60c5ef0406597" class="button-primary" target="_blank"><?php esc_html_e( 'Membership 2 condition mu-plugin', 'wordpress-popup' ); ?></a>
+					&nbsp;&nbsp;
+					<span id="hustle-dismiss-m2-notice" data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle_dismiss_notification' ) ); ?>" style="cursor: pointer;"><?php esc_html_e( 'Dismiss', 'wordpress-popup' ); ?></span>
+				</p>
+			</div>
+			<?php
 		}
 
 		/**
@@ -159,7 +200,7 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 				<?php
 					printf( esc_html__( 'Hey %1$s, we have updated our %4$sSendGrid%5$s integration to support the %2$snew Marketing Campaigns%3$s. You need to review your existing SendGrid integration(s) and select the Marketing Campaigns version (new or legacy) you are using to avoid failed API calls.', 'wordpress-popup' )
 						, esc_html( $username )
-						, '<a href="https://sendgrid.com/blog/new-era-marketing-campaigns/" target="_blanc">'
+						, '<a href="https://sendgrid.com/blog/new-era-marketing-campaigns/" target="_blank">'
 						, '</a>'
 						, '<b>'
 						, '</b>'
@@ -181,6 +222,42 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 			$connected = wp_list_pluck( $providers['connected'], 'slug' );
 
 			return in_array( $provider, $connected, true );
+		}
+
+		/**
+		 * Display a notice for reviewing visibility conditions after updating.
+		 * @since 4.1
+		 */
+		public function show_visibility_behavior_update() {
+			if ( Hustle_Settings_Admin::was_notification_dismissed( '41_visibility_behavior_update' ) ) {
+				return;
+			}
+			$url_params = [
+				'page' => self::ADMIN_PAGE,
+				'review-conditions' => 'true',
+			];
+			$url = add_query_arg( $url_params, 'admin.php' );
+			$link = lib3()->html->element( [
+				'type' => 'html_link',
+				'value' => esc_html__( 'Check conditions', 'wordpress-popup' ),
+				'url' => $url,
+				'class' => 'button-primary',
+			], true );
+			$version = Opt_In_Utils::_is_free() ? '7.1' : '4.1';
+			?>
+			<div class="hustle-notice notice notice-warning" data-name="41_visibility_behavior_update" data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle_dismiss_notification' ) ); ?>">
+				<p><b><?php esc_html_e( 'Hustle - Module visibility behaviour update', 'wordpress-popup' ); ?></b></p>
+				<p>
+					<?php printf( esc_html__( 'Hustle %s fixes a visibility bug which may affect the visibility behavior of your popups and other modules. Please review the visibility conditions of each of your modules to ensure they will appear as you expect.', 'wordpress-popup' ), esc_attr( $version ) ); ?>
+				</p>
+				<p>
+					<?php echo $link; // WPCS: XSS ok. ?>&nbsp;&nbsp;&nbsp;
+					<label class="sui-label"><span class="sui-label-link dismiss-notice" role="button"><?php esc_html_e( 'Dismiss', 'wordpress-popup' ); ?></span></label>
+				</p>
+
+			</div>
+			<?php
+
 		}
 
 		/**
@@ -248,6 +325,13 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 			return true;
 		}
 
+		public function dismiss_m2_notification() {
+			Opt_In_Utils::validate_ajax_call( 'hustle_dismiss_notification' );
+			delete_option( 'hustle_notice_stop_support_m2' );
+
+			wp_send_json_success();
+		}
+
 		/**
 		 * Dismiss the given notification.
 		 * @since 4.0
@@ -284,7 +368,7 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 					$ignored_fields = Hustle_Entry_Model::ignored_fields();
 
 					foreach( $saved_fields as $field_name => $data ) {
-						if ( ! in_array( $data['type'], $ignored_fields ) ) {
+						if ( ! in_array( $data['type'], $ignored_fields, true ) ) {
 							$fields[ $field_name ] = $data['label'];
 						}
 					}
@@ -453,6 +537,29 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 					'submissions' => __( '%d Conversions', 'wordpress-popup' ),
 					'views' => __( '%d Views', 'wordpress-popup' ),
 				),
+				'wp_conditions' => [
+					'is_front_page' => __( 'Front page', 'wordpress-popup' ),
+					'is_404' => __( '404 page', 'wordpress-popup' ),
+					'is_search' => __( 'Search results', 'wordpress-popup' ),
+				],
+				'wc_static_pages' => [
+					'is_cart' => __( 'Cart', 'wordpress-popup' ),
+					'is_checkout' => __( 'Checkout', 'wordpress-popup' ),
+					'is_order_received' => __( 'Order Received', 'wordpress-popup' ),
+					'is_account_page' => __( 'My account', 'wordpress-popup' ),
+				],
+				'archive_pages' => [
+					'is_category' => __( 'Category archive', 'wordpress-popup' ),
+					'is_tag' => __( 'Tag archive', 'wordpress-popup' ),
+					'is_author' => __( 'Author archive', 'wordpress-popup' ),
+					'is_date' => __( 'Date archive', 'wordpress-popup' ),
+					'is_post_type_archive' => __( 'Custom post archive', 'wordpress-popup' ),
+				],
+				'wc_archive_pages' => [
+					'is_shop' => __( 'Shop', 'wordpress-popup' ),
+					'is_product_category' => __( 'Product Category', 'wordpress-popup' ),
+					'is_product_tag' => __( 'Product Tag', 'wordpress-popup' ),
+				],
 				'messages' => array(
 					'required_error_message' => __( 'Your {field} is required.', 'wordpress-popup' ),
 					'is_required' => __( '{field} is required.', 'wordpress-popup' ),
@@ -496,6 +603,11 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 				),
 			);
 
+			$optin_vars['browsers'] = $this->_hustle->get_browsers();
+			$optin_vars['countries'] = $this->_hustle->get_countries();
+			$optin_vars['roles'] = Opt_In_Utils::get_user_roles();
+			$optin_vars['templates'] = Opt_In_Utils::hustle_get_page_templates();
+
 			/**
 			 * The variables specific to each page are added via this hook.
 			 */
@@ -511,9 +623,10 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 			if ( 'hustle_entries' === $page ) {
 				$this->enqueue_entries_scripts();
 			}
+			$url_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'debug' : 'min';
 			wp_register_script(
 				'optin_admin_scripts',
-				Opt_In::$plugin_url . 'assets/js/admin.min.js',
+				Opt_In::$plugin_url . 'assets/js/admin.' . $url_suffix . '.js',
 				array( 'jquery', 'backbone', 'jquery-effects-core' ),
 				Opt_In::VERSION,
 				true
@@ -885,7 +998,25 @@ if ( ! class_exists( 'Hustle_Module_Admin' ) ) :
 					}
 				}
 
-				$actions = array_merge( $links, $actions );
+				// Display only on site's plugins page, not network's.
+				if ( current_user_can( 'activate_plugins' ) && ( ! is_network_admin() || ! is_multisite() ) ) {
+
+					$migration      = Hustle_Migration::get_instance();
+					$has_404_backup = $migration->migration_410->is_backup_created();
+
+					// Add a "Rollback to 404" link if we have its backup.
+					if ( $has_404_backup ) {
+						$args    = [
+							'page'                => self::SETTINGS_PAGE,
+							'404-downgrade-modal' => 'true',
+						];
+						$url     = add_query_arg( $args, 'admin.php' );
+						$version = Opt_In_Utils::_is_free() ? 'v7.0.4' : 'v4.0.4';
+
+						$links['rollback_404'] = '<a href="' . esc_url_raw( $url ) . '">' . sprintf( esc_html( 'Rollback to %s', 'wordpress-popup' ), $version ) . '</a>';
+					}
+					$actions = array_merge( $links, $actions );
+				}
 			}
 
 			return $actions;

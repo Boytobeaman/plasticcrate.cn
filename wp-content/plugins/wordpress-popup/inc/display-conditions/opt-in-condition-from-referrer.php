@@ -1,10 +1,10 @@
 <?php
 
 class Opt_In_Condition_From_Referrer extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ) {
+	public function is_allowed() {
 
 		if ( ! isset( $this->args->refs ) ) {
-			return true;
+			return false;
 		}
 
 		if ( 'true' === $this->args->filter_type ) {
@@ -12,9 +12,5 @@ class Opt_In_Condition_From_Referrer extends Opt_In_Condition_Abstract {
 		} else {
 			return ! ( $this->utils()->test_referrer( $this->args->refs ) );
 		}
-	}
-
-	public function label() {
-		return __( 'Not from specific referrers', 'wordpress-popup');
 	}
 }

@@ -133,14 +133,14 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 		 * when duplicate entries is turned off
 		 * for a module.
 		 */
-		if( ! $allow_subscribed ){ //phpcs:ignore
+		// if ( ! $allow_subscribed ){
 			/**
 			 * Use your provider validation to check
 			 * for duplicate entries and put a stop here.
 			 * You can add a message on the`$is_success`
 			 * variable to display your own custom message
 			 */
-		}
+		//}
 
 		/**
 		 * Filter the result of form submit.
@@ -508,6 +508,34 @@ abstract class Hustle_Provider_Form_Hooks_Abstract {
 			$this->_subscriber = array();
 		}
 		return $this->_subscriber;
+	}	
+
+	/**
+	 * Get api field type
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * The fields supported by the 
+	 * provider except the `text` field
+	 * since it is supported by all the
+	 * providers it's used as a default 
+	 * field and doesn't have to be 
+	 * included here.
+	 *
+	 * Hustle will match the
+	 * the plugin fields with the 
+	 * API field type and if it is supported
+	 * on both sides it will create the field 
+	 * on the provider side if it doesn't exist.
+	 *
+	 * @since 4.1
+	 *
+	 * @param string Hustle Field Type
+	 * @return string API Field type
+	 */
+	protected function get_field_type( $type ) {
+		return 'text';
 	}
 
 }

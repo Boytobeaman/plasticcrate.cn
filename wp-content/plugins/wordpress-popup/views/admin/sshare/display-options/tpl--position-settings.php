@@ -88,10 +88,7 @@
 
 						<div class="sui-tabs-menu">
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-offset--top"
-								class="sui-tab-item {{ ( 'top' === eval( '<?php echo esc_html( $prefix ); ?>' + '_position_y' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_html( $prefix ); ?>-offset--top" class="sui-tab-item">
 								<input
 									type="radio"
 									name="<?php echo esc_html( $prefix ); ?>_position_y"
@@ -103,10 +100,7 @@
 								<?php esc_html_e( 'Top', 'wordpress-popup' ); ?>
 							</label>
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-offset--bottom"
-								class="sui-tab-item {{ ( 'bottom' === eval( '<?php echo esc_html( $prefix ); ?>' + '_position_y' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_html( $prefix ); ?>-offset--bottom" class="sui-tab-item">
 								<input
 									type="radio"
 									name="<?php echo esc_html( $prefix ); ?>_position_y"
@@ -150,33 +144,26 @@
 
 						<div class="sui-tabs-menu">
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-offset--screen"
-								class="sui-tab-item {{ ( 'screen' === eval( '<?php echo esc_html( $prefix ); ?>' + '_offset' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_attr( $prefix ); ?>-offset--screen" class="sui-tab-item">
 								<input
 									type="radio"
-									name="<?php echo esc_html( $prefix ); ?>_offset"
-									data-attribute="<?php echo esc_html( $prefix ); ?>_offset"
+									name="<?php echo esc_attr( $prefix ); ?>_offset"
+									data-attribute="<?php echo esc_attr( $prefix ); ?>_offset"
 									value="screen"
-									id="hustle-<?php echo esc_html( $prefix ); ?>-offset--screen"
-									data-tab-menu="offset-screen"
+									id="hustle-<?php echo esc_attr( $prefix ); ?>-offset--screen"
 									{{ _.checked( 'screen' === eval( '<?php echo esc_html( $prefix ); ?>' + '_offset' ) , true)}}
 								/>
 								<?php esc_html_e( 'Screen', 'wordpress-popup' ); ?>
 							</label>
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-offset--css"
-								class="sui-tab-item {{ ( 'css_selector' === eval( '<?php echo esc_html( $prefix ); ?>' + '_offset' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_attr( $prefix ); ?>-offset--css" class="sui-tab-item">
 								<input
 									type="radio"
-									name="<?php echo esc_html( $prefix ); ?>_offset"
-									data-attribute="<?php echo esc_html( $prefix ); ?>_offset"
+									name="<?php echo esc_attr( $prefix ); ?>_offset"
+									data-attribute="<?php echo esc_attr( $prefix ); ?>_offset"
 									value="css_selector"
-									id="hustle-<?php echo esc_html( $prefix ); ?>-offset--css"
-									data-tab-menu="offset-css"
+									id="hustle-<?php echo esc_attr( $prefix ); ?>-offset--css"
+									data-tab-menu="<?php echo esc_attr( $prefix ); ?>-offset-css"
 									{{ _.checked( 'css_selector' === eval( '<?php echo esc_html( $prefix ); ?>' + '_offset' ) , true)}}
 								/>
 								<?php esc_html_e( 'CSS selector', 'wordpress-popup' ); ?>
@@ -186,14 +173,11 @@
 
 						<div class="sui-tabs-content sui-tabs-content-lg">
 
-							<div
-								class="sui-tab-content {{ ( 'css_selector' === eval( '<?php echo esc_html( $prefix ); ?>' + '_offset' ) ) ? 'active' : '' }}"
-								data-tab-content="offset-css"
-							>
+							<div class="sui-tab-content" data-tab-content="<?php echo esc_attr( $prefix ); ?>-offset-css">
 
 								<div class="sui-form-field hustle-css-selector">
 
-									<label for="hustle-offset--<?php echo esc_html( $prefix ); ?>-selector" class="sui-label"><?php esc_html_e( 'CSS selector of the element', 'wordpress-popup' ); ?></label>
+									<label for="hustle-offset--<?php echo esc_attr( $prefix ); ?>-selector" class="sui-label"><?php esc_html_e( 'CSS selector of the element', 'wordpress-popup' ); ?></label>
 
 									<input
 										type="text"
@@ -309,10 +293,7 @@
 
 						<div class="sui-tabs-menu">
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-align--left"
-								class="sui-tab-item {{ ( 'left' === eval( '<?php echo esc_html( $prefix ); ?>' + '_align' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_html( $prefix ); ?>-align--left" class="sui-tab-item">
 								<input
 									type="radio"
 									name="<?php echo esc_html( $prefix ); ?>_align"
@@ -325,10 +306,7 @@
 								<span class="sui-screen-reader-text"><?php esc_html_e( 'Left', 'wordpress-popup' ); ?></span>
 							</label>
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-align--center"
-								class="sui-tab-item {{ ( 'center' === eval( '<?php echo esc_html( $prefix ); ?>' + '_align' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_html( $prefix ); ?>-align--center" class="sui-tab-item">
 								<input
 									type="radio"
 									name="<?php echo esc_html( $prefix ); ?>_align"
@@ -341,10 +319,7 @@
 								<span class="sui-screen-reader-text"><?php esc_html_e( 'Center', 'wordpress-popup' ); ?></span>
 							</label>
 
-							<label
-								for="hustle-<?php echo esc_html( $prefix ); ?>-align--right"
-								class="sui-tab-item {{ ( 'right' === eval( '<?php echo esc_html( $prefix ); ?>' + '_align' ) ) ? 'active' : '' }}"
-							>
+							<label for="hustle-<?php echo esc_html( $prefix ); ?>-align--right" class="sui-tab-item">
 								<input
 									type="radio"
 									name="<?php echo esc_html( $prefix ); ?>_align"

@@ -12,57 +12,62 @@
 			<div class="sui-tabs-menu">
 
 				<label for="hustle-trigger--time"
-					class="sui-tab-item{{ ( 'time' === triggers.trigger ) ? ' active' : '' }}">
+					class="sui-tab-item">
 					<input type="radio"
 						name="trigger"
 						data-attribute="triggers.trigger"
 						value="time"
 						id="hustle-trigger--time"
-						data-tab-menu="trigger-time" />
+						data-tab-menu="trigger-time"
+						{{ _.checked( ( 'time' === triggers.trigger ), true ) }} />
 					<?php esc_html_e( 'Time', 'wordpress-popup' ); ?>
 				</label>
 
 				<label for="hustle-trigger--scroll"
-					class="sui-tab-item{{ ( 'scroll' === triggers.trigger ) ? ' active' : '' }}">
+					class="sui-tab-item">
 					<input type="radio"
 						name="trigger"
 						data-attribute="triggers.trigger"
 						value="scroll"
 						id="hustle-trigger--scroll"
-						data-tab-menu="trigger-scroll" />
+						data-tab-menu="trigger-scroll"
+						{{ _.checked( ( 'scroll' === triggers.trigger ), true ) }} />
 					<?php esc_html_e( 'Scroll', 'wordpress-popup' ); ?>
 				</label>
 
 				<label for="hustle-trigger--click"
-					class="sui-tab-item{{ ( 'click' === triggers.trigger ) ? ' active' : '' }}">
+					class="sui-tab-item">
 					<input type="radio"
 						name="trigger"
 						data-attribute="triggers.trigger"
 						value="click"
 						id="hustle-trigger--click"
-						data-tab-menu="trigger-click" />
+						data-tab-menu="trigger-click"
+						{{ _.checked( ( 'click' === triggers.trigger ), true ) }} />
 					<?php esc_html_e( 'Click', 'wordpress-popup' ); ?>
 				</label>
 
 				<label for="hustle-trigger--exit"
-					class="sui-tab-item{{ ( 'exit_intent' === triggers.trigger ) ? ' active' : '' }}">
+					class="sui-tab-item">
 					<input type="radio"
 						name="trigger"
 						data-attribute="triggers.trigger"
 						value="exit_intent"
 						id="hustle-trigger--exit"
-						data-tab-menu="trigger-exit" />
+						data-tab-menu="trigger-exit"
+						{{ _.checked( ( 'exit_intent' === triggers.trigger ), true ) }} />
 					<?php esc_html_e( 'Exit intent', 'wordpress-popup' ); ?>
 				</label>
 
 				<label for="hustle-trigger--adblock"
-					class="sui-tab-item{{ ( 'adblock' === triggers.trigger ) ? ' active' : '' }}">
+					class="sui-tab-item">
 					<input type="radio"
 						name="trigger"
 						data-attribute="triggers.trigger"
 						value="adblock"
 						id="hustle-trigger--adblock"
-						data-tab-menu="trigger-adblock" />
+						data-tab-menu="trigger-adblock"
+						{{ _.checked( ( 'adblock' === triggers.trigger ), true ) }} />
 					<?php esc_html_e( 'AdBlock', 'wordpress-popup' ); ?>
 				</label>
 
@@ -72,8 +77,7 @@
 
 				<?php
 				// TRIGGER: Time ?>
-				<div class="sui-tab-content{{ ( 'time' === triggers.trigger ) ? ' active' : '' }}"
-					data-tab-content="trigger-time">
+				<div class="sui-tab-content" data-tab-content="trigger-time">
 
 					<label class="sui-settings-label"><?php printf( esc_html__( 'Show %s on page load', 'wordpress-popup' ), esc_html( $smallcaps_singular ) ); ?></label>
 					<span class="sui-description"><?php printf( esc_html__( '%s will be shown as soon as page is loaded. If you want to add some delay, use the option below:', 'wordpress-popup' ), esc_html( $capitalize_singular ) ); ?></span>
@@ -126,8 +130,7 @@
 
 				<?php
 				// TRIGGER: Scroll ?>
-				<div class="sui-tab-content{{ ( 'scroll' === triggers.trigger ) ? ' active' : '' }}"
-					data-tab-content="trigger-scroll">
+				<div class="sui-tab-content" data-tab-content="trigger-scroll">
 
 					<?php
 					// SETTINGS: After the amount of page scroll ?>
@@ -207,8 +210,7 @@
 
 				<?php
 				// TRIGGER: Click ?>
-				<div class="sui-tab-content{{ ( 'click' === triggers.trigger ) ? ' active' : '' }}"
-					data-tab-content="trigger-click">
+				<div class="sui-tab-content" data-tab-content="trigger-click">
 
 					<?php
 					// SETTINGS: Click on existing element ?>
@@ -280,14 +282,11 @@
 
 				</div>
 
-				<?php
-				// TRIGGER: Exit intent ?>
-				<div class="sui-tab-content{{ ( 'exit_intent' === triggers.trigger ) ? ' active' : '' }}"
-					data-tab-content="trigger-exit">
-					<label><?php self::get_exitintent_description(); ?></label>
+				<?php // TRIGGER: Exit intent. ?>
+				<div class="sui-tab-content" data-tab-content="trigger-exit">
+				<div class="sui-notice"><p><?php printf( esc_html__( "%1\$sNote:%2\$s This doesn't work on mobile and tablet because we use mouse movements to detect the exit intent.", 'wordpress-popup' ), '<b>', '</b>' ); ?></p></div>
 
-					<?php
-					// SETTINGS: Trigger once per session ?>
+					<?php // SETTINGS: Trigger once per session. ?>
 					<div class="sui-form-field">
 
 						<label for="hustle-trigger-exit--session" class="sui-toggle">
@@ -372,8 +371,7 @@
 
 				<?php
 				// TRIGGER: AdBlock ?>
-				<div class="sui-tab-content{{ ( 'adblock' === triggers.trigger ) ? ' active' : '' }}"
-					data-tab-content="trigger-adblock">
+				<div class="sui-tab-content" data-tab-content="trigger-adblock">
 
 					<div class="sui-form-field">
 

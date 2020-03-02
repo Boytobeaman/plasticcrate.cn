@@ -85,12 +85,16 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 
 				if ( ! empty( $extra_data ) ) {
 					$custom_fields = array();
+					$module 	 	= Hustle_Module_Model::instance()->get( $module_id );
+					$form_fields 	= $module->get_form_fields();
 					foreach ( $extra_data as $key => $value ) {
+						$type = isset( $form_fields[ $key ] ) ? $this->get_field_type( $form_fields[ $key ]['type'] ) : 'text';
 						$custom_fields[] = array(
 							'name' => $key,
-							'type' => 'text',
+							'type' => $type,
 						);
 					}
+
 					$addon->add_custom_fields( $custom_fields, $api );
 					$merge_vals = array_merge( $merge_vals, $extra_data );
 				}
@@ -316,5 +320,37 @@ class Hustle_Icontact_Form_Hooks extends Hustle_Provider_Form_Hooks_Abstract {
 		}
 
 		return $this->_subscriber[ md5( $data['email'] ) ];
+	}
+
+	/**
+	 * Get supported fields
+	 *
+	 * This method is to be inherited
+	 * and extended by child classes.
+	 * 
+	 * List the fields supported by the 
+	 * provider
+	 *
+	 * @since 4.1
+	 *	
+	 * @param string hustle field type
+	 * @return string Api field type
+	 */
+	protected function get_field_type( $type ) {
+
+		switch ( $type ) {
+			case 'datepicker':
+				$type = 'date';
+				break;
+			case 'number':
+			case 'phone':
+				$type = 'number';
+				break;
+			default:
+				$type = 'text';
+				break;
+		}
+
+		return $type;
 	}
 }

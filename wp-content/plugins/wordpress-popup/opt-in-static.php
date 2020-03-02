@@ -442,5 +442,26 @@ if ( ! class_exists( 'Opt_In_Static', false ) ) {
 				)
 			);
 		}
+
+		/**
+		 * Returns array of browsers
+		 *
+		 * @since 4.1
+		 * @return array|mixed|null|void
+		 */
+		public function get_browsers() {
+			return apply_filters(
+				'hustle_get_browsers_list',
+				array(
+					'chrome'	=> __( 'Chrome', 'wordpress-popup' ),
+					'firefox'	=> __( 'Firefox', 'wordpress-popup' ),
+					'safari'	=> __( 'Safari', 'wordpress-popup' ),
+					'edge' 		=> __( 'Edge', 'wordpress-popup' ),
+					'MSIE'		=> __( 'Internet Explorer', 'wordpress-popup' ),
+					'opera' 	=> __( 'Opera', 'wordpress-popup' ),
+				)
+			);
+		}
+
 	}
 }

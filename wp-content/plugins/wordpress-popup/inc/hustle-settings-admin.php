@@ -33,7 +33,7 @@ class Hustle_Settings_Admin {
 			'invalid_data' => __( "The unsubscription data doesn't seem to be correct.", 'wordpress-popup' ),
 			'email_submitted' => __( 'Please check your email to confirm your unsubscription.', 'wordpress-popup' ),
 			'successful_unsubscription' => __( "You've been successfully unsubscribed.", 'wordpress-popup' ),
-			'email_not_processed' => __( 'Something went wrong submitting the email. Please make sure a list is selected.', 'wordpress-popup' ),
+			'email_not_processed' => __( 'Something went wrong submitting the email. Please make sure a list is selected, and your install is able to send emails.', 'wordpress-popup' ),
 		);
 
 		$messages = $default;
@@ -63,20 +63,18 @@ class Hustle_Settings_Admin {
 	public static function get_unsubscribe_email_settings() {
 
 		$default_email_body = sprintf(
+			/* translators: 1: opening 'p' tag, 2: closing 'p' tag, 3: 'br' tag, 4: link to the unsubscribe url */
 			esc_html__(
 				'%1$sHi%2$s
-				%3$sWe\'re sorry to see you go!%4$s
-				%5$sClick on the link below to unsubscribe:%6$s
-				{hustle_unsubscribe_link}%7$s',
+				%1$sWe\'re sorry to see you go!%2$s
+				%1$sClick on the link below to unsubscribe:%3$s
+				%4$s%2$s',
 				'wordpress-popup'
 			),
-			'<p><strong>',
-			'</strong></p>',
-			'<p><strong>',
-			'</strong></p>',
-			'<p><strong>',
+			'<p>',
+			'</p>',
 			'<br />',
-			'</strong></p>'
+			'<a href="{hustle_unsubscribe_link}" target="_blank">{hustle_unsubscribe_link}</a>'
 		);
 
 		$default_email_settings = array(
@@ -133,11 +131,6 @@ class Hustle_Settings_Admin {
 			'submission_pagination' => 10,
 			'sender_email_name' => get_bloginfo( 'name' ),
 			'sender_email_address' => get_option( 'admin_email', '' ),
-			'popup_on_dashboard' => 5,
-			'slidein_on_dashboard' => 5,
-			'embedded_on_dashboard' => 5,
-			//'social_sharing_on_dashboard' => 5,
-			'shares_per_page_on_dashboard' => 5,
 			'published_popup_on_dashboard' => '1',
 			'draft_popup_on_dashboard' => '1',
 			'published_slidein_on_dashboard' => '1',
@@ -145,6 +138,19 @@ class Hustle_Settings_Admin {
 			'published_embedded_on_dashboard' => '1',
 			'draft_embedded_on_dashboard' => '1',
 			'debug_enabled' => '0',
+			// Dashboard settings
+			'popup_on_dashboard' => 5,
+			'published_popup_on_dashboard' => '1',
+			'draft_popup_on_dashboard' => '1',
+			'slidein_on_dashboard' => 5,
+			'published_slidein_on_dashboard' => '1',
+			'draft_slidein_on_dashboard' => '1',
+			'embedded_on_dashboard' => 5,
+			'published_embedded_on_dashboard' => '1',
+			'draft_embedded_on_dashboard' => '1',
+			// TODO: use a different name for handling the "per page shares"
+			// because we might introduce a widget for displaying sshare as we do for others.
+			'shares_per_page_on_dashboard' => 5,
 		);
 
 		$general_settings = $default_settings;
@@ -195,6 +201,32 @@ class Hustle_Settings_Admin {
 		}
 
 		return apply_filters( 'hustle_get_general_settings', $general_settings );
+	}
+
+	/**
+	 * Get the 'permissions' settings.
+	 *
+	 * @since 4.0.4
+	 * @return array
+	 */
+	public static function get_permissions_settings() {
+
+		$defaults = array(
+			'create'            => [],
+			'edit_integrations' => [],
+			'access_emails'     => [],
+			'edit_settings'     => [],
+		);
+
+		$settings = self::get_hustle_settings( 'permissions' );
+
+		foreach ( $defaults as $permission => $roles ) {
+			if ( empty( $settings[ $permission ] ) ) {
+				$settings[ $permission ] = Opt_In_Utils::get_admin_roles();
+			}
+		}
+
+		return apply_filters( 'hustle_get_permissions_settings', $settings );
 	}
 
 	/**
@@ -283,6 +315,35 @@ class Hustle_Settings_Admin {
 	}
 
 	/**
+	 * Get the stored dashboard analytics settings.
+	 * 
+	 * @since 4.1.0
+	 * @return array
+	 */
+	public static function get_dashboard_analytics_settings() {
+
+		$defaults = array(
+			'title'   => '',
+			'role'    => [],
+			'enabled' => '0',
+			'modules' => [],
+		);
+
+		$stored_settings = self::get_hustle_settings( 'analytics' );
+
+		// If the stored settings' role is empty, use the default one.
+		if ( empty( $stored_settings['role'] ) ) {
+			$defaults['role'] = Opt_In_Utils::get_admin_roles();
+
+			unset( $stored_settings['role'] );
+		}
+
+		$dashboard_analytics_settings = array_merge( $defaults, $stored_settings );
+
+		return apply_filters( 'hustle_get_dashboard_analytics_settings', $dashboard_analytics_settings );
+	}
+
+	/**
 	 * Get privacy settings.
 	 *
 	 * @since 4.0.2
@@ -363,17 +424,21 @@ class Hustle_Settings_Admin {
 
 	/**
 	 * Update Hustle Settings
-	 * @since 4.0.0
 	 *
-	 * @param mixed $value Value to store
+	 * @since 4.0.0
+	 * @param mixed  $value Value to store.
 	 * @param string $key Key from settings, can be null, then whole settings will be saved.
 	 */
 	public static function update_hustle_settings( $value, $key = null ) {
 		if ( empty( $key ) ) {
+			return;
+		}
+
+		if ( 'all' === $key ) {
 			update_option( self::SETTINGS_OPTION_KEY, $value );
 			return;
 		}
-		$settings = self::get_hustle_settings();
+		$settings         = self::get_hustle_settings();
 		$settings[ $key ] = $value;
 		update_option( self::SETTINGS_OPTION_KEY, $settings );
 	}
@@ -425,13 +490,17 @@ class Hustle_Settings_Admin {
 	 */
 	public static function delete_custom_palette( $palette_id ) {
 
+		$name            = false;
 		$stored_palettes = self::get_custom_color_palettes();
 
 		if ( isset( $stored_palettes[ $palette_id ] ) ) {
 
+			$name = $stored_palettes[ $palette_id ]['name'];
 			unset( $stored_palettes[ $palette_id ] );
 			update_option( 'hustle_custom_palettes', $stored_palettes );
 		}
+
+		return $name;
 	}
 
 	/**
@@ -445,6 +514,7 @@ class Hustle_Settings_Admin {
 	 *
 	 * @since 4.0.3
 	 * @param array $palette_data
+	 * @return string
 	 */
 	public static function save_custom_palette( $palette_data ) {
 
@@ -471,6 +541,8 @@ class Hustle_Settings_Admin {
 		$stored_palettes[ $id ] = $palette_data;
 
 		update_option( 'hustle_custom_palettes', $stored_palettes );
+
+		return $id;
 	}
 
 	/**

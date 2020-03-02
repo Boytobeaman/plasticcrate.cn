@@ -38,7 +38,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 						<div class="sui-tabs-menu">
 
-							<label class="sui-tab-item {{ 'instant' === email_time ? 'active' : '' }}">
+							<label class="sui-tab-item">
 								<input type="radio"
 									name="email_time"
 									data-attribute="email_time"
@@ -46,22 +46,22 @@ $editor_css = '<style>' . $editor_css. '</style>';
 									{{ _.checked( ( 'instant' === email_time ), true) }}/>
 								<?php esc_html_e( 'Instant', 'wordpress-popup' ); ?>
 							</label>
-							<label class="sui-tab-item {{ 'delay' === email_time ? 'active' : '' }}">
+							<label class="sui-tab-item">
 								<input type="radio"
 									name="email_time"
 									data-attribute="email_time"
 									data-tab-menu="delay"
 									value="delay"
-									{{ _.checked( ( 'redirect' === email_time ), true) }}/>
+									{{ _.checked( ( 'delay' === email_time ), true) }}/>
 								<?php esc_html_e( 'Delay', 'wordpress-popup' ); ?>
 							</label>
-							<label class="sui-tab-item {{ 'schedule' === email_time ? 'active' : '' }}">
+							<label class="sui-tab-item">
 								<input type="radio"
 									name="email_time"
 									data-attribute="email_time"
 									data-tab-menu="schedule"
 									value="schedule"
-									{{ _.checked( ( 'redirect' === email_time ), true) }}/>
+									{{ _.checked( ( 'schedule' === email_time ), true) }}/>
 								<?php esc_html_e( 'Schedule', 'wordpress-popup' ); ?>
 							</label>
 
@@ -69,7 +69,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 						<div class="sui-tabs-content">
 
-							<div class="sui-tab-content sui-tab-boxed {{ 'delay' === email_time ? 'active' : '' }}" data-tab-content="delay">
+							<div class="sui-tab-content sui-tab-boxed" data-tab-content="delay">
 
 								<div class="sui-row" >
 
@@ -96,7 +96,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 							</div>
 
-							<div class="sui-tab-content sui-tab-boxed {{ 'schedule' === email_time ? 'active' : '' }}" data-tab-content="schedule">
+							<div class="sui-tab-content sui-tab-boxed" data-tab-content="schedule">
 
 								<label class="sui-description"><?php printf( esc_html__( 'Choose a fixed date and time for your email or select %1$sDatepicker and Timepicker%2$s fields of your form to schedule this email dynamically based on user input.', 'wordpress-popup' ), '<b>', '</b>' ); ?></label>
 

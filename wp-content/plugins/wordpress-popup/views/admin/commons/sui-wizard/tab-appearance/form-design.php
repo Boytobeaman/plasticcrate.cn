@@ -17,7 +17,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-field-style--flat" class="sui-tab-item{{ ( 'flat' === form_fields_style ) ? ' active' : '' }}">
+					<label for="hustle-field-style--flat" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_style"
 							data-attribute="form_fields_style"
@@ -27,7 +27,7 @@
 						<?php esc_html_e( 'Flat', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-field-style--outlined" class="sui-tab-item{{ ( 'outlined' === form_fields_style ) ? ' active' : '' }}">
+					<label for="hustle-field-style--outlined" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_style"
 							data-attribute="form_fields_style"
@@ -42,7 +42,7 @@
 
 				<div class="sui-tabs-content">
 
-					<div class="sui-tab-content sui-tab-boxed {{ ( 'flat' !== form_fields_style ) ? 'active' : '' }}" data-tab-content="hustle-field-style">
+					<div class="sui-tab-content sui-tab-boxed" data-tab-content="hustle-field-style">
 
 						<div class="sui-row">
 
@@ -118,7 +118,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-field-icon--none" class="sui-tab-item{{ ( 'none' === form_fields_icon ) ? ' active' : '' }}">
+					<label for="hustle-field-icon--none" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_icon"
 							data-attribute="form_fields_icon"
@@ -128,7 +128,7 @@
 						<?php esc_html_e( 'No icon', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-field-icon--static" class="sui-tab-item{{ ( 'static' === form_fields_icon ) ? ' active' : '' }}">
+					<label for="hustle-field-icon--static" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_icon"
 							data-attribute="form_fields_icon"
@@ -138,7 +138,7 @@
 						<?php esc_html_e( 'Static icon', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-field-icon--animated" class="sui-tab-item{{ ( 'animated' === form_fields_icon ) ? ' active' : '' }}">
+					<label for="hustle-field-icon--animated" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_icon"
 							data-attribute="form_fields_icon"
@@ -164,7 +164,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-field-proximity--separated" class="sui-tab-item{{ ( 'separated' === form_fields_proximity ) ? ' active' : '' }}">
+					<label for="hustle-field-proximity--separated" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_proximity"
 							data-attribute="form_fields_proximity"
@@ -174,7 +174,7 @@
 						<?php esc_html_e( 'Separated', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-field-proximity--joined" class="sui-tab-item{{ ( 'joined' === form_fields_proximity ) ? ' active' : '' }}">
+					<label for="hustle-field-proximity--joined" class="sui-tab-item">
 						<input type="radio"
 							name="form_fields_proximity"
 							data-attribute="form_fields_proximity"
@@ -200,7 +200,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-button-style--flat" class="sui-tab-item{{ ( 'flat' === button_style ) ? ' active' : '' }}">
+					<label for="hustle-button-style--flat" class="sui-tab-item">
 						<input type="radio"
 							name="button_style"
 							data-attribute="button_style"
@@ -210,7 +210,7 @@
 						<?php esc_html_e( 'Flat', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-button-style--outlined" class="sui-tab-item{{ ( 'outlined' === button_style ) ? ' active' : '' }}">
+					<label for="hustle-button-style--outlined" class="sui-tab-item">
 						<input type="radio"
 							name="button_style"
 							data-attribute="button_style"
@@ -225,7 +225,7 @@
 
 				<div class="sui-tabs-content">
 
-					<div class="sui-tab-content sui-tab-boxed {{ ( 'flat' !== button_style ) ? 'active' : '' }}" data-tab-content="hustle-button-style">
+					<div class="sui-tab-content sui-tab-boxed" data-tab-content="hustle-button-style">
 
 						<div class="sui-row">
 
@@ -323,7 +323,7 @@
 
 				<div class="sui-tabs-menu">
 
-					<label for="hustle-gdpr-style--flat" class="sui-tab-item {{ _.class( 'flat' === gdpr_checkbox_style, 'active' ) }}">
+					<label for="hustle-gdpr-style--flat" class="sui-tab-item">
 						<input type="radio"
 							name="gdpr_checkbox_style"
 							data-attribute="gdpr_checkbox_style"
@@ -333,7 +333,7 @@
 						<?php esc_html_e( 'Flat', 'wordpress-popup' ); ?>
 					</label>
 
-					<label for="hustle-gdpr-style--outlined" class="sui-tab-item {{ _.class( 'outlined' === gdpr_checkbox_style, 'active' ) }}">
+					<label for="hustle-gdpr-style--outlined" class="sui-tab-item">
 						<input type="radio"
 							name="gdpr_checkbox_style"
 							data-attribute="gdpr_checkbox_style"
@@ -348,7 +348,7 @@
 
 				<div class="sui-tabs-content">
 
-					<div class="sui-tab-content sui-tab-boxed {{ _.class( 'flat' !== gdpr_checkbox_style, 'active' ) }}" data-tab-content="hustle-gdpr-style">
+					<div class="sui-tab-content sui-tab-boxed" data-tab-content="hustle-gdpr-style">
 
 						<div class="sui-row">
 

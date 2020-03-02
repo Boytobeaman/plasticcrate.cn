@@ -11,15 +11,21 @@
 
 		<div class="sui-box" role="document">
 
-			<div class="sui-box-header">
+			<button class="sui-screen-reader-text hustle-cancel-palette">
+				<?php esc_html_e( 'Close this dialog window', 'wordpress-popup' ); ?>
+			</button>
 
-				<button class="sui-button-icon sui-button-float--right hustle-cancel-palette">
-					<i class="sui-icon-close sui-md" aria-hidden="true"></i>
-					<span class="sui-screen-reader-text"><?php esc_html_e( 'Close this dialog window', 'wordpress-popup' ); ?></span>
-				</button>
+			<div class="sui-box-header">
 
 				<h3 id="customPaletteTitle" class="sui-box-title"><?php esc_html_e( 'Create Custom Palette', 'wordpress-popup' ); ?></h3>
 
+				<div class="sui-actions-right">
+
+					<button class="sui-button-icon hustle-cancel-palette" aria-hidden="true">
+						<i class="sui-icon-close sui-md"></i>
+					</button>
+
+				</div>
 			</div>
 
 			<form id="hustle-edit-palette-form" class="sui-box-body">

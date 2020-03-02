@@ -1,70 +1,95 @@
+<?php
+$form_id  = 'hustle-permissions-settings-form';
+$settings = Hustle_Settings_Admin::get_permissions_settings();
+$roles    = Opt_In_Utils::get_user_roles();
+?>
 <div id="permissions-box" class="sui-box" data-tab="permissions" <?php if ( 'permissions' !== $section ) echo 'style="display: none;"'; ?>>
+
+	<div class="sui-box-header">
+		<h2 class="sui-box-title"><?php esc_html_e( 'Permissions', 'wordpress-popup' ); ?></h2>
+	</div>
 
 	<div class="sui-box-body">
 
 		<?php
-		// SETTINGS: Create Modules
+		// SETTINGS: Create Modules.
 		$this->render(
-			'admin/settings/permissions/create-modules',
+			'admin/settings/permissions/permissions-row',
 			array(
-				'hustle_settings' => $hustle_settings,
-				'roles' => $roles,
+				'roles'         => $roles,
+				'form_id'       => $form_id,
+				'label'         => __( 'Create Modules', 'wordpress-popup' ),
+				'description'   => __( 'Choose the user roles which can create new modules.', 'wordpress-popup' ),
+				'input_name'    => 'create[]',
+				'current_value' => $settings['create'],
 			)
-		); ?>
+		);
 
-		<?php
-		// SETTINGS: Edit Existing Modules
+		// SETTINGS: Edit Existing Modules.
 		$this->render(
 			'admin/settings/permissions/edit-modules',
 			array(
-				'filter' => $filter,
-				'modules' => $modules,
-				'modules_count' => $modules_count,
-				'modules_limit' => $modules_limit,
-				'modules_page' => $modules_page,
-				'modules_show_pager' => $modules_show_pager,
-				'modules_edit_roles' => $modules_edit_roles,
-				'roles' => $roles,
+				'roles'              => $roles,
+				'form_id'            => $form_id,
 			)
-		); ?>
+		);
 
-		<?php
-		// SETTINGS: Access Email List
+		// SETTINGS: Access Email List.
 		$this->render(
-			'admin/settings/permissions/access-emails',
+			'admin/settings/permissions/permissions-row',
 			array(
-				'settings' => $hustle_settings,
-				'roles' => $roles,
+				'roles'         => $roles,
+				'form_id'       => $form_id,
+				'label'         => __( 'Access Email List', 'wordpress-popup' ),
+				'description'   => __( 'Choose the user roles which can access the Email List for the opt-in modules.', 'wordpress-popup' ),
+				'input_name'    => 'access_emails[]',
+				'current_value' => $settings['access_emails'],
 			)
-		); ?>
+		);
 
-		<?php
-		// SETTINGS: Edit Integrations
+		// SETTINGS: Edit Integrations.
 		$this->render(
-			'admin/settings/permissions/edit-integrations',
+			'admin/settings/permissions/permissions-row',
 			array(
-				'hustle_settings' => $hustle_settings,
-				'roles' => $roles,
+				'roles'         => $roles,
+				'form_id'       => $form_id,
+				'label'         => __( 'Edit Integrations', 'wordpress-popup' ),
+				'description'   => __( 'Choose the user roles which can access the Integrations page and connect or disconnect Hustle to 3rd party apps.', 'wordpress-popup' ),
+				'input_name'    => 'edit_integrations[]',
+				'current_value' => $settings['edit_integrations'],
 			)
-		); ?>
+		);
 
-		<?php
-		// SETTINGS: Edit Settings
+		// SETTINGS: Edit Settings.
 		$this->render(
-			'admin/settings/permissions/edit-settings',
+			'admin/settings/permissions/permissions-row',
 			array(
-				'hustle_settings' => $hustle_settings,
-				'roles' => $roles,
+				'roles'         => $roles,
+				'form_id'       => $form_id,
+				'label'         => __( 'Edit Settings', 'wordpress-popup' ),
+				'description'   => __( 'Choose the user roles which can access the Settings page and update any settings.', 'wordpress-popup' ),
+				'input_name'    => 'edit_settings[]',
+				'current_value' => $settings['edit_settings'],
 			)
-		); ?>
+		);
+		?>
+
+		<?php // All inputs point to this form. We can't have them nested due to the filter's form. ?>
+		<form id="<?php echo esc_attr( $form_id ); ?>"></form>
 
 	</div>
+
+
 
 	<div class="sui-box-footer">
 
 		<div class="sui-actions-right">
 
-        	<button class="sui-button sui-button-blue hustle-settings-save" data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle-settings' ) ); ?>">
+			<button 
+				class="sui-button sui-button-blue hustle-settings-save"
+				data-form-id="<?php echo esc_attr( $form_id ); ?>"
+				data-target="permissions"
+			>
 				<span class="sui-loading-text"><?php esc_html_e( 'Save Settings', 'wordpress-popup' ); ?></span>
 				<i class="sui-icon-loader sui-loading" aria-hidden="true"></i>
 			</button>

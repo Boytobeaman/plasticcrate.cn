@@ -160,9 +160,6 @@ $inline_both = self::$plugin_url . 'assets/images/embed-position-both';
 
 				</div>
 
-				<div class="sui-notice sui-notice-info">
-					<p><?php esc_html_e( 'You have full control over the shortcode. Visibility rules in the following section won\'t affect shortcode.', 'wordpress-popup' ); ?></p>
-				</div>
 			</div>
 
 		</div>

@@ -8,6 +8,7 @@ $module_name = $module->module_name;
 $appearance_settings = $module->get_design()->to_array();
 $content_settings = $module->get_content()->to_array();
 $email_settings = $module->get_emails()->to_array();
+$visibility_settings = $module->get_visibility()->to_array();
 $form_elements = !empty( $email_settings['form_elements'] ) ? $email_settings['form_elements'] : array();
 
 $capitalize_singular = esc_html__( 'Embed', 'wordpress-popup' );
@@ -85,8 +86,8 @@ $this->render(
 				'template' => 'admin/commons/sui-wizard/templates/tab-visibility',
 				'support'  => array(
 					'section'             => $section,
-					'capitalize_singular' => $capitalize_singular,
 					'module_type'         => $module_type,
+					'settings'            => $visibility_settings,
 					'smallcaps_singular'  => $smallcaps_singular
 				),
 			),

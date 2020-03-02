@@ -6,15 +6,22 @@
  * @class Hustle_Migration
  */
 class Hustle_Migration {
-	/**
-	 * @var $_query WP_Query
-	 */
-	private $_query;
 
 	/**
-	 * @var Opt_In
-	 **/
-	private $_hustle;
+	 * Instance of Hustle_410_Migration.
+	 *
+	 * @since 4.1.0
+	 * @var Hustle_410_Migration
+	 */
+	public $migration_410;
+
+	/**
+	 * Hustle_Migration instance.
+	 *
+	 * @since 4.1.0
+	 * @var null
+	 */
+	private static $instance = null;
 
 	/**
 	 * Whether any of the modules had custom css.
@@ -39,8 +46,19 @@ class Hustle_Migration {
 		'subscription',
 	);
 
-	public function __construct( Opt_In $hustle ) {
-		$this->_hustle = $hustle;
+	/**
+	 * Get an istance of this class.
+	 *
+	 * @since 4.1.0
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	public function __construct() {
 
 		$this->is_multisite = is_multisite();
 
@@ -49,6 +67,8 @@ class Hustle_Migration {
 		if ( $this->is_migration() ) {
 			add_action( 'init', array( $this, 'do_hustle_30_migration' ) );
 		}
+
+		$this->migration_410 = new Hustle_410_Migration();
 	}
 
 	/**
@@ -65,12 +85,79 @@ class Hustle_Migration {
 		}
 
 		// If migration was already done, skip.
-		if ( get_option( 'hustle_30_migrated', false ) ) {
+		if ( self::is_migrated( 'hustle_30_migrated' ) ) {
 			return false;
 		}
 
 		// If it's a fresh install, no need to migrate.
 		return self::did_hustle_exist();
+	}
+
+	/**
+	 * Check if a spesific migration is passed
+	 *
+	 * @param string $key Migration key
+	 * @return bool
+	 */
+	public static function is_migrated( $key ) {
+		$keys = get_option( 'hustle_migrations', null );
+		if ( is_null( $keys ) ) {
+			self::change_migration_options();
+			$keys = get_option( 'hustle_migrations', [] );
+		}
+
+		return in_array( $key, $keys, true );
+	}
+
+	/**
+	 * Save migration key
+	 *
+	 * @param string $key Migration key
+	 */
+	public static function migration_passed( $key ) {
+		$keys = get_option( 'hustle_migrations', [] );
+		if ( ! in_array( $key, $keys, true ) ) {
+			$keys[] = $key;
+			update_option( 'hustle_migrations', $keys );
+		}
+	}
+
+	/**
+	 * Remove the passed migration flag.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param string $key Flag name.
+	 */
+	public static function remove_migration_passed_flag( $flag ) {
+		$keys = get_option( 'hustle_migrations', array() );
+		if ( in_array( $flag, $keys, true ) ) {
+			$key = array_search( $flag, $keys, true );
+
+			if ( false !== $key ) {
+				unset( $keys[ $key ] );
+				update_option( 'hustle_migrations', $keys );
+			}
+		}
+	}
+
+	/**
+	 * Resave migration keys to a new format
+	 */
+	private static function change_migration_options() {
+		$keys = [
+			'hustle_20_migrated',
+			'hustle_30_migrated',
+			'hustle_30_tracking_migrated',
+		];
+
+		foreach ( $keys as $key ) {
+			$option = get_option( $key );
+			if ( $option ) {
+				self::migration_passed( $key );
+				delete_option( $key );
+			}
+		}
 	}
 
 	/**
@@ -82,7 +169,7 @@ class Hustle_Migration {
 	public static function check_tracking_needs_migration() {
 
 		// If migration was already done, skip.
-		if ( get_option( 'hustle_30_tracking_migrated', false ) ) {
+		if ( self::is_migrated( 'hustle_30_tracking_migrated' ) ) {
 			return false;
 		}
 
@@ -102,11 +189,7 @@ class Hustle_Migration {
 	 * @return bool
 	 */
 	public static function did_hustle_exist() {
-		$hustle_20_migrated = get_option( 'hustle_20_migrated', false );
-
-		if ( false === $hustle_20_migrated ) {
-			update_option( 'hustle_30_migrated', true );
-		}
+		$hustle_20_migrated = self::is_migrated( 'hustle_20_migrated' );
 
 		return $hustle_20_migrated;
 	}
@@ -129,7 +212,7 @@ class Hustle_Migration {
 			Hustle_Settings_Admin::add_dismissed_notification( 'show_review_css_after_migration_notice' );
 		}
 
-		update_option( 'hustle_30_migrated', true );
+		self::migration_passed( 'hustle_30_migrated' );
 	}
 
 	public function migrate_hustle_30( $old_module ) {
@@ -1151,7 +1234,7 @@ class Hustle_Migration {
 
 	public static function mark_tracking_migration_as_completed() {
 		delete_option( 'hustle_30_migration_data' );
-		update_option( 'hustle_30_tracking_migrated', true );
+		self::migration_passed( 'hustle_30_tracking_migrated' );
 	}
 
 	/**

@@ -1,6 +1,7 @@
 <?php
 global $wp_roles;
 $roles = Opt_In_Utils::get_user_roles();
+$admin_roles = [];
 ?>
 
 <div class="sui-box-settings-row">
@@ -11,10 +12,10 @@ $roles = Opt_In_Utils::get_user_roles();
 	</div>
 
 	<div class="sui-box-settings-col-2">
-		<select class="sui-select" name="role" multiple>
+		<select class="sui-select" name="role[]" multiple>
 			<?php foreach ( $roles as $slug => $label ) { ?>
-				<?php $admin = 'administrator' === $slug; ?>
-			<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( in_array($slug, $value, true) || $admin ); ?> <?php disabled( $admin ); ?> ><?php echo esc_html( $label ); ?></option>
+				<?php $admin = Opt_In_Utils::is_admin_role( $slug ); ?>
+			<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( in_array( $slug, $value, true ) || $admin ); ?> <?php disabled( $admin ); ?> ><?php echo esc_html( $label ); ?></option>
 			<?php } ?>
 		</select>
 	</div>

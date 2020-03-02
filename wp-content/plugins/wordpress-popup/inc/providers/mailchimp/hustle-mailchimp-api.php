@@ -326,6 +326,16 @@ class Hustle_Mailchimp_Api {
 	 */
 	public function update_subscription_patch( $list_id, $email, $data ) {
 		$md5_email = md5( strtolower( $email ) );
+		if ( ! empty( $data['tags'] ) && is_array( $data['tags'] ) ) {
+			foreach ( $data['tags'] as $tag_id ) {
+				$res = $this->_post( 'lists/' . $list_id . '/segments/' . $tag_id . '/members/', [
+					'body' => [
+						'email_address' =>  strtolower( $email ),
+					],
+				] );
+			}
+			unset( $data['tags'] );
+		}
 		$res = $this->_patch( 'lists/' . $list_id . '/members/' . $md5_email, array(
 			"body" =>  $data
 		) );

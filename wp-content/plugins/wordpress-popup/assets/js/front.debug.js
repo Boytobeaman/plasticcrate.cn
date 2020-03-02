@@ -185,9 +185,9 @@ if ( 'undefined' !== typeof Backbone ) {
 			/**
 			 * Logs to console
 			 */
-			//log: function() {
-			//	console.log( arguments );
-			//},
+			log: function() {
+				console.log( arguments );
+			},
 
 			/**
 			 * Converts val to boolian
@@ -287,7 +287,7 @@ if ( 'undefined' !== typeof Backbone ) {
 					return cls;
 				}
 				return 'undefined' !== typeof negatingCls ? negatingCls : '';
-			}
+			},
 
 			/**
 			 * Returns class attribute with relevant class name
@@ -297,30 +297,30 @@ if ( 'undefined' !== typeof Backbone ) {
 			 * @param negating_cls
 			 * @returns {string}
 			 */
-			//add_class: function( conditon, cls, negatingCls ) { // eslint-disable-line camelcase
-			//	return 'class={class}'.replace( '{class}',  _.class( conditon, cls, negatingCls ) );
-			//},
+			add_class: function( conditon, cls, negatingCls ) { // eslint-disable-line camelcase
+				return 'class={class}'.replace( '{class}',  _.class( conditon, cls, negatingCls ) );
+			},
 
-			//toUpperCase: function( str ) {
-			//	return  _.isString( str ) ? str.toUpperCase() : '';
-			//}
+			toUpperCase: function( str ) {
+				return  _.isString( str ) ? str.toUpperCase() : '';
+			}
 		});
 
-		//if ( ! _.findKey ) {
-		//	_.mixin({
-		//		findKey: function( obj, predicate, context ) {
-		//			predicate = cb( predicate, context );
-		//			let keys = _.keys( obj ),
-        //                key;
-		//			for ( let i = 0, length = keys.length; i < length; i++ ) {
-		//				key = keys[i];
-		//				if ( predicate( obj[ key ], key, obj ) ) {
-		//					return key;
-		//				}
-		//			}
-		//		}
-		//	});
-		//}
+		if ( ! _.findKey ) {
+			_.mixin({
+				findKey: function( obj, predicate, context ) {
+					predicate = cb( predicate, context );
+					let keys = _.keys( obj ),
+                        key;
+					for ( let i = 0, length = keys.length; i < length; i++ ) {
+						key = keys[i];
+						if ( predicate( obj[ key ], key, obj ) ) {
+							return key;
+						}
+					}
+				}
+			});
+		}
 	};
 
 	Optin.globalMixin();
@@ -1637,7 +1637,7 @@ if ( 'undefined' !== typeof Backbone ) {
 
 				this.storeUpdatedClickCounter( network );
 
-				setTimeout( function() {
+				_.delay( function() {
 
 					$( containerClass + ' a[data-network="' + network + '"]' ).not( 'a[data-counter="native"]' ).each( function() {
 
@@ -1655,7 +1655,7 @@ if ( 'undefined' !== typeof Backbone ) {
 
 			} else {
 
-				setTimeout( function() {
+				_.delay( function() {
 
 					$( containerClass + ' a[data-network="' + network + '"]' ).not( 'a[data-counter="click"]' ).each( function() {
 

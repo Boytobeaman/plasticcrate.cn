@@ -1,5 +1,9 @@
 <?php
 $is_embedded_or_social = Hustle_Module_Model::EMBEDDED_MODULE === $module->module_type || Hustle_Module_Model::SOCIAL_SHARING_MODULE === $module->module_type;
+$free_limit_reached    = ! Hustle_Module_Admin::can_create_new_module( $module->module_type );
+
+$can_edit   = Opt_In_Utils::is_user_allowed( 'hustle_edit_module', $module->id );
+$can_create = Opt_In_Utils::is_user_allowed( 'hustle_create' );
 
 // BUTTON: Open dropdown list ?>
 <button class="sui-button-icon sui-dropdown-anchor" aria-expanded="false">
@@ -16,14 +20,14 @@ $is_embedded_or_social = Hustle_Module_Model::EMBEDDED_MODULE === $module->modul
 
 	<?php
 	// Edit module
-	if ( ! empty( $dashboard ) ) : ?>
+	if ( ! empty( $dashboard ) && $can_edit ) : ?>
 
 		<li><a href="<?php echo esc_url( $module->decorated->get_edit_url() ); ?>" class="hustle-onload-icon-action">
 			<i class="sui-icon-pencil" aria-hidden="true"></i>
 			<?php esc_html_e( 'Edit', 'wordpress-popup' ); ?>
 		</a></li>
 
-	<?php 
+	<?php
 	endif; ?>
 
 	<?php
@@ -56,21 +60,22 @@ $is_embedded_or_social = Hustle_Module_Model::EMBEDDED_MODULE === $module->modul
 
 	<?php
 	// Toggle Status button ?>
-
-	<li><button
-		class="hustle-single-module-button-action hustle-onload-icon-action"
-		data-module-id="<?php echo esc_attr( $module->id ); ?>"
-		data-hustle-action="toggle-status"
-	>
-		<span class="<?php echo $module->active ? '' : 'sui-hidden'; ?>">
-			<i class="sui-icon-unpublish" aria-hidden="true"></i>
-			<?php esc_html_e( 'Unpublish', 'wordpress-popup' ); ?>
-		</span>
-		<span class="<?php echo $module->active ? ' sui-hidden' : ''; ?>">
-			<i class="sui-icon-web-globe-world" aria-hidden="true"></i>
-			<?php esc_html_e( 'Publish', 'wordpress-popup' ); ?>
-		</span>
-	</button></li>
+	<?php if ( $can_edit ) : ?>
+		<li><button
+			class="hustle-single-module-button-action hustle-onload-icon-action"
+			data-module-id="<?php echo esc_attr( $module->id ); ?>"
+			data-hustle-action="toggle-status"
+		>
+			<span class="<?php echo $module->active ? '' : 'sui-hidden'; ?>">
+				<i class="sui-icon-unpublish" aria-hidden="true"></i>
+				<?php esc_html_e( 'Unpublish', 'wordpress-popup' ); ?>
+			</span>
+			<span class="<?php echo $module->active ? ' sui-hidden' : ''; ?>">
+				<i class="sui-icon-web-globe-world" aria-hidden="true"></i>
+				<?php esc_html_e( 'Publish', 'wordpress-popup' ); ?>
+			</span>
+		</button></li>
+	<?php endif; ?>
 
 <?php
 // TODO: FIX INDENTATION.
@@ -97,11 +102,11 @@ if (
 ?>
 
 <?php
-// Duplicate 
+// Duplicate
 ?>
-<?php if ( empty( $dashboard ) ) : ?>
-	<li><button 
-		class="<?php echo $can_create ? 'hustle-single-module-button-action hustle-onload-icon-action' : 'hustle-upgrade-modal-button'; ?>"
+<?php if ( empty( $dashboard ) && $can_create ) : ?>
+	<li><button
+		class="<?php echo ! $free_limit_reached ? 'hustle-single-module-button-action hustle-onload-icon-action' : 'hustle-upgrade-modal-button'; ?>"
 		data-module-id="<?php echo esc_attr( $module->id ); ?>"
 		data-hustle-action="clone"
 	>
@@ -110,14 +115,14 @@ if (
 	</button></li>
 <?php endif; ?>
 
-<?php 
-// Tracking 
+<?php
+// Tracking
 ?>
-<?php if ( empty( $dashboard ) ) : ?>
+<?php if ( empty( $dashboard ) && $can_edit ) : ?>
 
 	<li>
-		<?php 
-		if ( ! $is_embedded_or_social ) : 
+		<?php
+		if ( ! $is_embedded_or_social ) :
 
 			$is_tracking_enabled = $module->is_tracking_enabled( $module->module_type );
 			?>
@@ -178,9 +183,10 @@ if (
 		</form>
 	</li>
 
-	<?php 
-	// Import
-	if ( empty( $dashboard ) ) : ?>
+	<?php
+	// Import.
+	if ( empty( $dashboard ) && $can_edit ) :
+		?>
 
 		<li><button
 			class="hustle-import-module-button"
@@ -198,14 +204,16 @@ if (
 
 	<?php
 	// Delete module ?>
-	<li><button class="sui-option-red hustle-delete-module-button"
-		data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle_listing_request' ) ); ?>"
-		data-type="<?php echo esc_attr( $module->module_type ); ?>"
-		data-id="<?php echo esc_attr( $module->id ); ?>"
-		data-title="<?php printf( esc_attr__( 'Delete %s' ), esc_attr( $capitalize_singular ) ); ?>"
-		data-description="<?php printf( esc_attr__( 'Are you sure you wish to permanently delete this %s? Its additional data, like subscriptions and tracking data, will be deleted as well.' ), esc_attr( $smallcaps_singular ) ); ?>"
-	>
-		<i class="sui-icon-trash" aria-hidden="true"></i> <?php esc_html_e( 'Delete', 'wordpress-popup' ); ?>
-	</button></li>
+	<?php if ( $can_create ) : ?>
+		<li><button class="sui-option-red hustle-delete-module-button"
+			data-nonce="<?php echo esc_attr( wp_create_nonce( 'hustle_listing_request' ) ); ?>"
+			data-type="<?php echo esc_attr( $module->module_type ); ?>"
+			data-id="<?php echo esc_attr( $module->id ); ?>"
+			data-title="<?php printf( esc_attr__( 'Delete %s' ), esc_attr( $capitalize_singular ) ); ?>"
+			data-description="<?php printf( esc_attr__( 'Are you sure you wish to permanently delete this %s? Its additional data, like subscriptions and tracking data, will be deleted as well.' ), esc_attr( $smallcaps_singular ) ); ?>"
+		>
+			<i class="sui-icon-trash" aria-hidden="true"></i> <?php esc_html_e( 'Delete', 'wordpress-popup' ); ?>
+		</button></li>
+	<?php endif; ?>
 
 </ul>

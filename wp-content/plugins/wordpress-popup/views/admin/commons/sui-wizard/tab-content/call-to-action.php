@@ -59,7 +59,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 
 								<div class="sui-tabs-menu">
 
-									<label for="hustle-cta-target-blank" class="sui-tab-item {{ ( 'blank' === cta_target ) ? 'active' : '' }}">
+									<label for="hustle-cta-target-blank" class="sui-tab-item">
 										<input type="radio"
 											name="cta_target"
 											value="blank"
@@ -69,7 +69,7 @@ $editor_css = '<style>' . $editor_css. '</style>';
 										<?php esc_html_e( 'New Tab', 'wordpress-popup' ); ?>
 									</label>
 
-									<label for="hustle-cta-target-self" class="sui-tab-item {{ ( 'self' === cta_target ) ? 'active' : '' }}">
+									<label for="hustle-cta-target-self" class="sui-tab-item">
 										<input type="radio"
 											name="cta_target"
 											value="self"

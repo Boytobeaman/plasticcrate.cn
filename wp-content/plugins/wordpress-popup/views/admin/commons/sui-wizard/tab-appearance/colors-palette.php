@@ -59,10 +59,11 @@ $palettes_settings_url = add_query_arg(
 
 					<label
 						for="hustle-custom-palette--on"
-						class="sui-tab-item {{ _.class( _.isTrue( customize_colors ), 'active' ) }}"
+						class="sui-tab-item"
 					>
 						<input
 							type="radio"
+							name="customize_colors"
 							data-attribute="customize_colors"
 							value="1"
 							id="hustle-custom-palette--on"
@@ -74,10 +75,11 @@ $palettes_settings_url = add_query_arg(
 
 					<label
 						for="hustle-custom-palette--off"
-						class="sui-tab-item {{ _.class( _.isFalse( customize_colors ), 'active' ) }}"
+						class="sui-tab-item"
 					>
 						<input
 							type="radio"
+							name="customize_colors"
 							data-attribute="customize_colors"
 							value="0"
 							id="hustle-custom-palette--off"
@@ -92,7 +94,7 @@ $palettes_settings_url = add_query_arg(
 				<div class="sui-tabs-content">
 
 					<div
-						class="sui-tab-content {{ _.class( _.isTrue( customize_colors ), 'active' ) }}"
+						class="sui-tab-content"
 						data-tab-content="hustle-custom-palette"
 					>
 

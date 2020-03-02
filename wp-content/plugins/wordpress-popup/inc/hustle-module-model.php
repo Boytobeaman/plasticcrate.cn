@@ -222,7 +222,7 @@ class Hustle_Module_Model extends Hustle_Model {
 
 		if ( is_array( $custom_fields ) ) {
 			foreach ( $custom_fields as $field ) {
-				if ( isset( $field[ $key ] ) && $value == $field[ $key ] ) {
+				if ( isset( $field[ $key ] ) && $value === $field[ $key ] ) {
 					return $field;
 				}
 			}
@@ -293,185 +293,139 @@ class Hustle_Module_Model extends Hustle_Model {
 	}
 
 	/**
+	 * Get visibility behavior by default, to display or not
+	 *
+	 * @return bool
+	 */
+	private function get_default_group_behavior( $conditions ) {
+		return !empty( $conditions['show_or_hide_conditions'] ) && 'hide' === $conditions['show_or_hide_conditions'];
+
+	}
+
+	/**
+	 * Get relevant conditions based on subtype or return FALSE if it shouldn't be shown
+	 *
+	 * @param string $subtype
+	 * @return array|false
+	 */
+	private function get_conditions( $subtype = null ) {
+		$all_conditions = $this->get_visibility()->to_array();
+
+		// Return all. No need to filter per subtype.
+		if ( is_null( $subtype ) || empty( $all_conditions['conditions'] ) ) {
+			return $all_conditions;
+		}
+
+		// Remove the conditions that are not for this subtype.
+		$conditions_removed = false;
+		foreach ( $all_conditions['conditions'] as $group_id => $data ) {
+			if ( isset( $data['apply_on_' . $subtype ] ) && 'false' === $data['apply_on_' . $subtype ] ||
+					'shortcode' === $subtype && !isset( $data['apply_on_' . $subtype ] ) ) {
+				$conditions_removed = true;
+				unset( $all_conditions['conditions'][ $group_id ] );
+			}
+		}
+
+		// No conditions are left after filtering per subtype.
+		if ( $conditions_removed && empty( $all_conditions['conditions'] ) ) {
+			return false;
+		}
+
+		return $all_conditions;
+	}
+
+	/**
 	 * Checks if this module is allowed to be displayed
 	 *
 	 * @return bool
 	 */
-	public function is_allowed_to_display( $type, $sub_type = null ) {
+	public function is_allowed_to_display( $module_type, $sub_type = null ) {
+		$global_behavior = false;
 
-		if ( self::SHORTCODE_MODULE === $sub_type ) {
-			$display_options = $this->get_display()->to_array();
+		// If the module isn't published, it shouldn't display.
+		if ( ! $this->active ) {
+			return false;
+		}
 
-			if ( '1' === $display_options['shortcode_enabled'] ) {
+		$all_conditions = $this->get_conditions( $sub_type );
+
+		if ( false === $all_conditions ) {
+			if ( 'shortcode' === $sub_type ) {
 				return true;
 			}
+			return false;
 		}
-
-		$all_conditions = $this->get_settings_meta( self::KEY_VISIBILITY, '{}', true );
-		if ( empty( $all_conditions ) || ! isset( $all_conditions['conditions'] ) ) {
+		if ( empty( $all_conditions['conditions'] ) ) {
 			return true;
 		}
-		global $post;
-		$skip_all_cpt = false;
-		$display = true;
+
+		$display = null;
 		foreach ( $all_conditions['conditions'] as $group_id => $conditions ) {
-			// if Disabled for current user type, do not display
-			if (
-				// If disabled.
-				! $this->should_display()
-			) {
-				return false;
+			$any_true = false;
+			$any_false = false;
+			$default_behavior = $this->get_default_group_behavior( $conditions );
+			if ( $default_behavior ) {
+				$global_behavior = true;
 			}
-			$s = is_archive();
-			if ( is_404() ) {
-				if ( empty( $conditions['page_404'] ) ) {
-					return false;
-				}
-				$display = true;
-				continue;
-			} else {
-				// If not 404 page, remove 404 condition.
-				// Functionality has been changed so this condition only affects 404 pages.
-				// Unset "not found" condition so it displays on other pages.
-				unset( $conditions['page_404'] );
-			}
-			// If no conditions are set, display.
-			if ( empty( $conditions ) ) {
-				$display = true;
-				continue;
-			}
-			// If this is a single page or home page is posts.
-			if ( is_singular() || (is_home() && is_front_page()) ) {
-				// unset not needed post_type
-				if ( isset( $post->post_type ) && 'post' === $post->post_type ) {
-					unset( $conditions['pages'] );
-					$skip_all_cpt = true;
-				} elseif ( isset( $post->post_type ) && 'page' === $post->post_type ) {
-					unset( $conditions['posts'] );
-					unset( $conditions['categories'] );
-					unset( $conditions['tags'] );
-					$skip_all_cpt = true;
-				} else {
-					// unset posts and pages since this is CPT
-					unset( $conditions['posts'] );
-					unset( $conditions['pages'] );
-					if ( empty( $conditions ) ) {
-						$display = false;
-					}
-				}
-			} else {
-				if ( class_exists( 'woocommerce' ) ) {
-					if ( is_shop() ) {
-						//unset the same from pages since shop should be treated as page
-						unset( $conditions['posts'] );
-						unset( $conditions['categories'] );
-						unset( $conditions['tags'] );
-						$skip_all_cpt = true;
-					}
-				} else {
-					// unset posts and pages
-					unset( $conditions['posts'] );
-					unset( $conditions['pages'] );
-					$skip_all_cpt = true;
-				}
-				// unset not needed taxonomy
-				if ( is_category() ) {
-					unset( $conditions['tags'] );
-				}
-				if ( is_tag() ) {
-					unset( $conditions['categories'] );
-				}
-			}
+
 			/**
 			 * condition type
 			 */
-			$filter_type = isset( $conditions['filter_type'] )? $conditions['filter_type']:'any';
-			/**
-			 * Any false
-			 */
-			$any_false = false;
-			// $display is TRUE if all conditions were met
+			$filter_type = isset( $conditions['filter_type'] ) &&
+					'any' === $conditions['filter_type']
+				? $conditions['filter_type'] : 'all';
+
 			foreach ( $conditions as $condition_key => $args ) {
 
-				// only cpt have 'post_type' and 'post_type_label' properties
-				if (
-					is_array( $args ) &&
-					( isset( $args['post_type'] ) && isset( $args['post_type_label'] ) ) ||
-					( isset( $args['postType'] ) && isset( $args['postTypeLabel'] ) )
-				) {
-					$post_type = isset( $args['postType'] ) ? $args['postType'] : $args['post_type'];
-					// skip ms_invoice
-					if ( 'ms_invoice' === $post_type ) {
-						continue;
-					}
-					// handle ms_membership
-					if ( ! in_array( $post_type, array( 'ms_membership', 'ms_membership-n' ), true )
-						&& ( $skip_all_cpt || (isset( $post->post_type ) && $post->post_type !== $post_type )) ) {
-						continue;
-					}
-					$condition = Hustle_Condition_Factory::build( 'cpt', $args );
-				} else {
-					$condition = Hustle_Condition_Factory::build( $condition_key, $args );
+				// These are not conditions but group's properties we don't need to check here.
+				if ( in_array( $condition_key, [ 'group_id', 'filter_type', 'apply_on_inline', 'apply_on_widget', 'apply_on_shortcode', 'show_or_hide_conditions' ], true ) ) {
+					continue;
 				}
 
+				// only cpt have 'postType' and 'postTypeLabel' properties.
+				if ( is_array( $args ) && isset( $args['postType'] ) && isset( $args['postTypeLabel'] ) ) {
+					$condition_key = 'cpt';
+				}
+				$condition = Hustle_Condition_Factory::build( $condition_key, $args );
 				if ( $condition ) {
-					$condition->set_type( $type );
-					$current = $condition->is_allowed( $this );
+					$some_conditions = true;
+					$condition->set_type( $module_type );
+					$condition->module = $this;
+					$current = (bool) $condition->is_allowed();
 					if ( false === $current ) {
 						$any_false = true;
+					} else {
+						$any_true = true;
 					}
-						$display = $display && $current;
 				}
 			}
-			if ( 'none' === $filter_type ) {
-				$display = ! $display;
+
+			if ( 'any' === $filter_type ) {
+				if ( $any_true ) {
+					$display = $display || $any_true && ! $default_behavior ;
+				} else if ( $any_false ) {
+					$display = $display || $default_behavior;
+				}
 			}
-			if ( 'all' === $filter_type && $any_false ) {
-				$display = false;
+			if ( 'all' === $filter_type ) {
+				if ( $any_false ) {
+					$display = $display || $default_behavior;
+				} else if ( $any_true ) {
+					$display = $display || $any_true && ! $default_behavior;
+				}
 			}
 		}
+
+		// show module if there are no conditions
+		if ( empty( $some_conditions ) ) {
+			return true;
+		}
+
+		if ( is_null( $display ) ) {
+			return $global_behavior;
+		}
+
 		return $display;
-	}
-
-	/**
-	 * Returns array of active conditions objects
-	 *
-	 * @param $type
-	 * @return array
-	 */
-	public function get_obj_conditions( $settings ) {
-		$conditions = array();
-		// defaults
-		$_conditions = array(
-			'posts' => array(),
-			'pages' => array(),
-			'categories' => array(),
-			'tags' => array(),
-		);
-
-		if ( ! isset( $settings['conditions'] ) ) {
-			return $conditions;
-		}
-
-		$_conditions = wp_parse_args( $settings['conditions'], $_conditions );
-
-		if ( isset( $_conditions['scalar'] ) ) {
-			unset( $_conditions['scalar'] );
-		}
-
-		if ( ! empty( $_conditions ) ) {
-			foreach ( $_conditions as $condition_key => $args ) {
-				// only cpt have 'post_type' and 'post_type_label' properties
-				if ( is_array( $args ) && isset( $args['post_type'] ) && isset( $args['post_type_label'] ) ) {
-					$conditions[ $condition_key ] = Hustle_Condition_Factory::build( 'cpt', $args );
-				} else {
-					$conditions[ $condition_key ] = Hustle_Condition_Factory::build( $condition_key, $args );
-				}
-				if ( $conditions[ $condition_key ] ) { $conditions[ $condition_key ]->set_type( $this->module_type ); }
-			}
-		}
-
-		return $conditions;
 	}
 
 	/**

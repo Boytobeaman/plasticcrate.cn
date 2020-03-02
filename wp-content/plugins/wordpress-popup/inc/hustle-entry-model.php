@@ -313,9 +313,11 @@ class Hustle_Entry_Model {
 	 */
 	public function save( $date_created = null ) {
 		global $wpdb;
+
 		if ( empty( $date_created ) ) {
 			$date_created = Opt_In_Utils::get_current_date();
 		}
+
 		$result = $wpdb->insert(
 			$this->table_name,
 			array(
@@ -600,6 +602,7 @@ class Hustle_Entry_Model {
 		do_action_ref_array( 'hustle_before_delete_entries', array( $module_id, $entries ) );
 
 		$sql = $db->prepare( "DELETE FROM {$table_meta_name} WHERE `entry_id` IN ($prepared_placeholders)", $entries );
+
 		$db->query( $sql );
 
 		$sql = $db->prepare( "DELETE FROM {$table_name} WHERE `entry_id` IN ($prepared_placeholders)", $entries );
@@ -951,13 +954,21 @@ class Hustle_Entry_Model {
 	 */
 	public function get_modules_id_by_email_in_local_list( $email ) {
 		global $wpdb;
-		$query = sprintf(
-			'SELECT DISTINCT `module_id` FROM %s e INNER JOIN %s m ON e.entry_id = m.entry_id AND m.meta_key = \'email\' AND m.meta_value = %%s',
-			Hustle_Db::entries_table(),
-			Hustle_Db::entries_meta_table()
-		);
-		$query = $wpdb->prepare( $query, $email ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		return $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		$cache_key = get_class( $this );
+		$id = wp_cache_get( 'local_' . $email, $cache_key );
+
+		if ( empty( $id ) ) {
+			$query = $wpdb->prepare(
+				"SELECT DISTINCT `module_id` FROM " . Hustle_Db::entries_table() . " e INNER JOIN " . Hustle_Db::entries_meta_table() . " m ON e.entry_id = m.entry_id AND m.meta_key = 'email' AND m.meta_value = %s",
+				$email
+			);
+
+			$id = $wpdb->get_col( $query );//phpcs:ignore
+			wp_cache_set( 'local_' . $email, $id, $cache_key );
+		}
+
+		return $id;
 	}
 
 	/**
@@ -990,6 +1001,11 @@ class Hustle_Entry_Model {
 		foreach ( $email_data['lists_id'] as $id ) {
 			$unsubscribed = $this->remove_local_subscription_by_email_and_module_id( $email, $id );
 		}
+
+		// Clear cache after unsubscription.
+		$cache_key = get_class( $this );
+		$id = wp_cache_delete( 'local_' . $email, $cache_key );
+
 		// The email was unsubscribed and the nonce was used. Remove it from the saved list.
 		unset( $data[ $email ] );
 		update_option( Hustle_Data::KEY_UNSUBSCRIBE_NONCES, $data );
@@ -1033,6 +1049,7 @@ class Hustle_Entry_Model {
 	 */
 	public static function get_older_entry_ids( $date_created ) {
 		global $wpdb;
+
 		$entries_table = Hustle_Db::entries_table();
 		$query = "SELECT e.entry_id AS entry_id
 					FROM {$entries_table} e

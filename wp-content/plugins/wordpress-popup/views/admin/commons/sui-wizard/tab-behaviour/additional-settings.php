@@ -20,12 +20,10 @@
 
 					<div class="sui-tabs-menu">
 
-						<label
-							for="hustle-settings--scroll-on"
-							class="sui-tab-item {{ _.isTrue( allow_scroll_page ) ? 'active' : '' }}"
-						>
+						<label for="hustle-settings--scroll-on" class="sui-tab-item">
 							<input
 								type="radio"
+								name="allow_scroll_page"
 								data-attribute="allow_scroll_page"
 								value="1"
 								id="hustle-settings--scroll-on"
@@ -34,12 +32,10 @@
 							<?php esc_html_e( 'Enable', 'wordpress-popup' ); ?>
 						</label>
 
-						<label
-							for="hustle-settings--scroll-off"
-							class="sui-tab-item {{ _.isFalse( allow_scroll_page ) ? 'active' : '' }}"
-						>
+						<label for="hustle-settings--scroll-off" class="sui-tab-item">
 							<input
 								type="radio"
+								name="allow_scroll_page"
 								data-attribute="allow_scroll_page"
 								value="0"
 								id="hustle-settings--scroll-off"

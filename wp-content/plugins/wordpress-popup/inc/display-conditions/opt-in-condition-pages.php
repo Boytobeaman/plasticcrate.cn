@@ -1,63 +1,39 @@
 <?php
 
 class Opt_In_Condition_Pages extends Opt_In_Condition_Abstract {
-	public function is_allowed( Hustle_Model $optin ){
+	public function is_allowed(){
 		global $post;
 
-		if ( !isset( $this->args->pages ) || empty( $this->args->pages ) ) {
-			if ( !isset($this->args->filter_type) || "except" === $this->args->filter_type ) {
-				return true;
+		$all = false;
+		$none = false;
+		$pages = !empty( $this->args->pages ) ? (array)$this->args->pages : [];
+		$filter_type = isset( $this->args->filter_type ) && in_array( $this->args->filter_type, array( 'only', 'except' ), true )
+				? $this->args->filter_type : 'except';
+
+
+		if( !isset( $post ) || !( $post instanceof WP_Post ) || "page" !== $post->post_type || ! is_page() ) {
+			return false;
+		}
+		if ( empty( $pages ) ) {
+			if ( "except" === $filter_type ) {
+				$all = true;
 			} else {
-				return false;
-			}
-		} elseif ( in_array("all", $this->args->pages, true) ) {
-			if ( !isset($this->args->filter_type) || "except" === $this->args->filter_type ) {
-				return false;
-			} else {
-				return true;
+				$none = true;
 			}
 		}
+		if ( $none ) {
+			return false;
+		}
 
-		switch( $this->args->filter_type ){
+		$page_id = class_exists('woocommerce') && is_shop() ? wc_get_page_id('shop') : $post->ID;
+		switch( $filter_type ){
 			case "only":
-				if ( class_exists('woocommerce') ) {
-					if( is_shop() ) return in_array( wc_get_page_id('shop'), (array) $this->args->pages );
-				}
-				if( !isset( $post ) || !( $post instanceof WP_Post ) || "page" !== $post->post_type ) return false;
+				return $all || in_array( $page_id, $pages );
 
-				return in_array( $post->ID, (array) $this->args->pages );
 			case "except":
-				if ( class_exists('woocommerce') ) {
-					if( is_shop() ) return !in_array( wc_get_page_id('shop'), (array) $this->args->pages );
-				}
-				if( !isset( $post ) || !( $post instanceof WP_Post ) || "page" !== $post->post_type ) return true;
-
-				return !in_array( $post->ID, (array) $this->args->pages );
 			default:
-				return true;
+				return $all || !in_array( $page_id, $pages );
 		}
 	}
 
-
-	public function label(){
-		if ( isset( $this->args->pages ) && !empty( $this->args->pages ) && is_array( $this->args->pages ) ) {
-			$total = count( $this->args->pages );
-			switch( $this->args->filter_type ){
-				case "only":
-					return ( in_array("all", $this->args->pages, true) )
-						? __("All pages", 'wordpress-popup')
-						: sprintf( __("%d pages", 'wordpress-popup'), $total );
-				case "except":
-					return ( in_array("all", $this->args->pages, true) )
-						? __("No pages", 'wordpress-popup')
-						: sprintf( __("All pages except %d", 'wordpress-popup'), $total );
-				default:
-					return null;
-			}
-		} else {
-			return ( !isset($this->args->filter_type) || "except" === $this->args->filter_type )
-				? __("All pages", 'wordpress-popup')
-				: __("No pages", 'wordpress-popup');
-		}
-	}
 }

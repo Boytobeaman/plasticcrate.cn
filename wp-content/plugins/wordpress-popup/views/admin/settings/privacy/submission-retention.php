@@ -13,7 +13,7 @@ $submissions_retention_unit = $settings['submissions_retention_number_unit'];
 
 		<div class="sui-tabs-menu">
 
-			<label class="sui-tab-item<?php echo $retain_submission_forever ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="retain_submission_forever"
 				id="hustle-retain-submission-forever--on"
@@ -22,7 +22,7 @@ $submissions_retention_unit = $settings['submissions_retention_number_unit'];
 				<?php esc_html_e( 'Forever', 'wordpress-popup' ); ?>
 			</label>
 
-			<label class="sui-tab-item<?php echo ! $retain_submission_forever ? ' active':''; ?>">
+			<label class="sui-tab-item">
 				<input type="radio"
 				name="retain_submission_forever"
 				id="hustle-retain-submission-forever--off"
@@ -34,7 +34,7 @@ $submissions_retention_unit = $settings['submissions_retention_number_unit'];
 		</div>
 
 		<div class="sui-tabs-content">
-			<div class="sui-tab-boxed<?php echo ! $retain_submission_forever ? ' active':''; ?>" data-tab-content="retention-number">
+			<div class="sui-tab-boxed" data-tab-content="retention-number">
 				<div class="sui-row">
 					<div class="sui-col-md-6">
 						<input type="number"

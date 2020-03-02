@@ -1,7 +1,7 @@
 <?php
 	$messages_enabled = '0' !== (string) $messages['enabled'];
 ?>
-<div id="customize-row" class="sui-box-settings-row">
+<div class="sui-box-settings-row">
 
 	<div class="sui-box-settings-col-1">
 		<span class="sui-settings-label"><?php esc_html_e( 'Customize Unsubscribe Form', 'wordpress-popup' ); ?></span>
@@ -21,7 +21,7 @@
 		</label>
 		<label class="sui-toggle-label" for="hustle-unsub-edit-message"><?php esc_html_e( 'Enable form customization', 'wordpress-popup' ); ?></label>
 
-		<div class="sui-border-frame sui-toggle-content" data-toggle-content="unsub-messages">
+		<div class="sui-border-frame sui-toggle-content" data-toggle-content="unsub-messages" style="display:none;">
 
 			<!-- Submit button text -->
 			<div class="sui-form-field">

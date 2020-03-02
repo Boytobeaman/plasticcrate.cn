@@ -277,8 +277,8 @@ if ( ! class_exists( 'Hustle_HubSpot' ) ) :
 					$property = array(
 						'name' => $field['name'],
 						'label' => $field['label'],
-						'type' => 'string',
-						'fieldType' => 'text',
+						'type' => 'text' === $field['type'] ? 'string' : $field['type'],
+						'fieldType' => $field['type'],
 						'groupName' => 'contactinformation',
 					);
 
